@@ -1,0 +1,6 @@
+\beamer@sectionintoc {1}{Motivation}{2}{0}{1}
+\beamer@sectionintoc {2}{Moderators}{7}{0}{2}
+\beamer@sectionintoc {3}{The case}{10}{0}{3}
+\beamer@sectionintoc {4}{Data and research design}{14}{0}{4}
+\beamer@sectionintoc {5}{Appendix}{22}{0}{5}
+\beamer@sectionintoc {6}{Resources}{27}{0}{6}
