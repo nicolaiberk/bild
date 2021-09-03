@@ -1,4 +1,6 @@
 
+# estimate DiD for each issue-paper-wave-combination
+
 library(here)
 library(dplyr)
 library(tidyverse)
@@ -6,8 +8,13 @@ library(data.table)
 library(haven)
 library(lubridate)
 library(glue)
+library(fixest)
 
 gles_p <- read_dta(here('data/gles/Panel/GLESMerge/ZA6838_allwaves_sA_v4-0-0.dta'))
+
+## id var
+gles_p$lfdn <- as.factor(gles_p$lfdn)
+
 
 ## date
 date_vars <- colnames(gles_p)[grep(pattern = 'datetime', colnames(gles_p))]
@@ -44,8 +51,15 @@ coeflist_medium <- c()
 coeflist_paper <- c()
 coeflist_issue <- c()
 coeflist_wave  <- c()
-coeflist_coef <- c()
-coeflist_p <- c()
+coeflist_date <- c()
+coeflist_coef_lm <- c()
+coeflist_p_lm <- c()
+coeflist_coef_fe <- c()
+coeflist_p_fe <- c()
+
+
+
+
 
 mediumlist <- c('1681', '1661')
 
@@ -84,17 +98,17 @@ for (medium in mediumlist){
         
       }
       
-      # emulate data for waves with no questions regarding readership
-      for (i in (1:13)[(!(1:13) %in% papervar_waves)]){
-        new_var <- paste0('papervar_w', i)
-        
-        prev_wave <- max(papervar_waves[as.integer(papervar_waves) < i])
-        
-        tempdta[[new_var]] <- tempdta[[paste0("papervar_w", prev_wave)]]
-      }
-      
-      papervar_vars <- colnames(tempdta)[grep(pattern = 'papervar', colnames(tempdta))]
-      papervar_waves <- str_match(papervar_vars, 'papervar_w(.*)')[,2]
+      # impute data for waves with no questions regarding readership
+      # for (i in (1:13)[(!(1:13) %in% papervar_waves)]){
+      #   new_var <- paste0('papervar_w', i)
+      #   
+      #   prev_wave <- max(papervar_waves[as.integer(papervar_waves) < i])
+      #   
+      #   tempdta[[new_var]] <- tempdta[[paste0("papervar_w", prev_wave)]]
+      # }
+      # 
+      # papervar_vars <- colnames(tempdta)[grep(pattern = 'papervar', colnames(tempdta))]
+      # papervar_waves <- str_match(papervar_vars, 'papervar_w(.*)')[,2]
       
       
       
@@ -202,36 +216,36 @@ for (medium in mediumlist){
       wavelist <- sort(unique(as.integer(gles_p_long$wave)))
       if (length(wavelist) > 2){
       
-        ## aggregate
-        gles_p_agg <- gles_p_long %>%
-          group_by(wave, reader_fin) %>%
-          summarise(
-            issue_m = mean(issue, na.rm = T),
-            issue_sd = sd(issue, na.rm = T),
-            n_respondents = n(),
-            dateagg = max(as.Date(date_new))
-          )
-  
-        ### CI's
-        gles_p_agg$issue_se <-  gles_p_agg$issue_sd/sqrt(gles_p_agg$n_respondents)
-        gles_p_agg$issue_low_ci <- gles_p_agg$issue_m - qt(1 - (0.05 / 2), gles_p_agg$n_respondents-1) * gles_p_agg$issue_se
-        gles_p_agg$issue_upp_ci <- gles_p_agg$issue_m + qt(1 - (0.05 / 2), gles_p_agg$n_respondents-1) * gles_p_agg$issue_se
-  
-  
-        ## plot
-        ggplot(gles_p_agg, aes(x = dateagg,
-                               y = issue_m,
-                               ymin = issue_low_ci,
-                               ymax = issue_upp_ci,
-                               group = reader_fin,
-                               fill = reader_fin,
-                               col = reader_fin
-        )) +
-          geom_line() +
-          geom_ribbon(alpha = 0.5) +
-          ggtitle(paste(issue_label),
-                  paste("Condition:", paper_label))
-        ggsave(filename = here(paste0('paper/ReportThomas/paneleffectplots/panel_', medium, '_',  paper, '_', issue, '.png')))
+        # ## aggregate
+        # gles_p_agg <- gles_p_long %>%
+        #   group_by(wave, reader_fin) %>%
+        #   summarise(
+        #     issue_m = mean(issue, na.rm = T),
+        #     issue_sd = sd(issue, na.rm = T),
+        #     n_respondents = n(),
+        #     dateagg = max(as.Date(date_new))
+        #   )
+        # 
+        # ### CI's
+        # gles_p_agg$issue_se <-  gles_p_agg$issue_sd/sqrt(gles_p_agg$n_respondents)
+        # gles_p_agg$issue_low_ci <- gles_p_agg$issue_m - qt(1 - (0.05 / 2), gles_p_agg$n_respondents-1) * gles_p_agg$issue_se
+        # gles_p_agg$issue_upp_ci <- gles_p_agg$issue_m + qt(1 - (0.05 / 2), gles_p_agg$n_respondents-1) * gles_p_agg$issue_se
+        # 
+        # 
+        # ## plot
+        # ggplot(gles_p_agg, aes(x = dateagg,
+        #                        y = issue_m,
+        #                        ymin = issue_low_ci,
+        #                        ymax = issue_upp_ci,
+        #                        group = reader_fin,
+        #                        fill = reader_fin,
+        #                        col = reader_fin
+        # )) +
+        #   geom_line() +
+        #   geom_ribbon(alpha = 0.5) +
+        #   ggtitle(paste(issue_label),
+        #           paste("Condition:", paper_label))
+        # ggsave(filename = here(paste0('paper/ReportThomas/paneleffectplots/panel_', medium, '_',  paper, '_', issue, '.png')))
         
         ## did-model (fe model with long data too extensive to run in loop)
         
@@ -241,14 +255,18 @@ for (medium in mediumlist){
             mutate(treat = ifelse(wave == as.character(wavelist[(wave_id-1)]), 0, treat))
           
           ## fes dropped bc takes too long
-          sum <- summary(lm(issue ~ treat*paper_reader, data = gles_p_long))
+          sum_lm <- summary(lm(issue ~ treat*paper_reader, data = gles_p_long))
+          sum_fe <- summary(feglm(issue ~ treat*paper_reader | lfdn, data = gles_p_long))
           
           coeflist_medium <- c(coeflist_medium, medium)
           coeflist_paper <- c(coeflist_paper, paper)
           coeflist_issue <- c(coeflist_issue, issue)
           coeflist_wave  <- c(coeflist_wave,  wavelist[wave_id])
-          coeflist_coef  <- c(coeflist_coef,  sum$coefficients[4])
-          coeflist_p     <- c(coeflist_p, sum$coefficients[4,][4])
+          coeflist_date  <- c(coeflist_date,  max(gles_p_long$date_new[gles_p_long$wave == wavelist[wave_id]]))
+          coeflist_coef_fe  <- c(coeflist_coef_fe,  sum_fe$coeftable['treat:paper_readerTRUE', 1])
+          coeflist_p_fe     <- c(coeflist_p_fe, sum_fe$coeftable['treat:paper_readerTRUE', 4])
+          coeflist_coef_lm  <- c(coeflist_coef_lm,  sum_lm$coefficients['treat:paper_readerTRUE',][1])
+          coeflist_p_lm     <- c(coeflist_p_lm, sum_lm$coefficients['treat:paper_readerTRUE', ][4])
           
         }
       }
@@ -283,16 +301,16 @@ for (paper in papers_list){
         tempdta[[new_var]][subset] <- tempdta[[papervar_vars[i]]][subset]
         
       }
-      
-      # emulate data for waves with no questions regarding readership
-      for (i in (1:13)[(!(1:13) %in% papervar_waves)]){
-        new_var <- paste0('papervar_w', i)
-        
-        prev_wave <- max(papervar_waves[as.integer(papervar_waves) < i])
-        
-        tempdta[[new_var]] <- tempdta[[paste0("papervar_w", prev_wave)]]
-      }
-      
+      # 
+      # # emulate data for waves with no questions regarding readership
+      # for (i in (1:13)[(!(1:13) %in% papervar_waves)]){
+      #   new_var <- paste0('papervar_w', i)
+      #   
+      #   prev_wave <- max(papervar_waves[as.integer(papervar_waves) < i])
+      #   
+      #   tempdta[[new_var]] <- tempdta[[paste0("papervar_w", prev_wave)]]
+      # }
+      # 
       papervar_vars <- colnames(tempdta)[grep(pattern = 'papervar', colnames(tempdta))]
       papervar_waves <- str_match(papervar_vars, 'papervar_w(.*)')[,2]
       
@@ -379,53 +397,57 @@ for (paper in papers_list){
       if (length(wavelist) > 2){
       
       
-        ## aggregate
-        gles_p_agg <- gles_p_long %>%
-          group_by(wave, paper_reader) %>%
-          summarise(
-            issue_m = mean(issue, na.rm = T),
-            issue_sd = sd(issue, na.rm = T),
-            n_respondents = n(),
-            dateagg = max(as.Date(date_new))
-          )
-    
-        ### CI's
-        gles_p_agg$issue_se <-  gles_p_agg$issue_sd/sqrt(gles_p_agg$n_respondents)
-        gles_p_agg$issue_low_ci <- gles_p_agg$issue_m - qt(1 - (0.05 / 2), gles_p_agg$n_respondents-1) * gles_p_agg$issue_se
-        gles_p_agg$issue_upp_ci <- gles_p_agg$issue_m + qt(1 - (0.05 / 2), gles_p_agg$n_respondents-1) * gles_p_agg$issue_se
-    
-    
-        ## plot
-        ggplot(gles_p_agg, aes(x = dateagg,
-                               y = issue_m,
-                               ymin = issue_low_ci,
-                               ymax = issue_upp_ci,
-                               group = paper_reader,
-                               fill = paper_reader,
-                               col = paper_reader
-        )) +
-          geom_line() +
-          geom_ribbon(alpha = 0.5) +
-          ggtitle(paste(issue_label),
-                  paste("Condition:", paper_label))
-        ggsave(filename = here(paste0('paper/ReportThomas/paneleffectplots/panel_1701',  paper, '_', issue, '.png')))
+        # ## aggregate
+        # gles_p_agg <- gles_p_long %>%
+        #   group_by(wave, paper_reader) %>%
+        #   summarise(
+        #     issue_m = mean(issue, na.rm = T),
+        #     issue_sd = sd(issue, na.rm = T),
+        #     n_respondents = n(),
+        #     dateagg = max(as.Date(date_new))
+        #   )
+        # 
+        # ### CI's
+        # gles_p_agg$issue_se <-  gles_p_agg$issue_sd/sqrt(gles_p_agg$n_respondents)
+        # gles_p_agg$issue_low_ci <- gles_p_agg$issue_m - qt(1 - (0.05 / 2), gles_p_agg$n_respondents-1) * gles_p_agg$issue_se
+        # gles_p_agg$issue_upp_ci <- gles_p_agg$issue_m + qt(1 - (0.05 / 2), gles_p_agg$n_respondents-1) * gles_p_agg$issue_se
+        # 
+        # 
+        # ## plot
+        # ggplot(gles_p_agg, aes(x = dateagg,
+        #                        y = issue_m,
+        #                        ymin = issue_low_ci,
+        #                        ymax = issue_upp_ci,
+        #                        group = paper_reader,
+        #                        fill = paper_reader,
+        #                        col = paper_reader
+        # )) +
+        #   geom_line() +
+        #   geom_ribbon(alpha = 0.5) +
+        #   ggtitle(paste(issue_label),
+        #           paste("Condition:", paper_label))
+        # ggsave(filename = here(paste0('paper/ReportThomas/paneleffectplots/panel_1701',  paper, '_', issue, '.png')))
         
-        ## did-model (fe model with long data too extensive to run in loop)
+        ## fe-did-model
         
         for (wave_id in 2:length(wavelist)){
           gles_p_long <- gles_p_long %>%
             mutate(treat = ifelse(wave == as.character(wavelist[wave_id]), 1, NA)) %>%
             mutate(treat = ifelse(wave == as.character(wavelist[(wave_id-1)]), 0, treat))
           
-          ## fes dropped bc takes too long
-          sum <- summary(lm(issue ~ treat*paper_reader, data = gles_p_long))
           
-          coeflist_medium <- c(coeflist_medium, '1701')
+          sum_lm <- summary(lm(issue ~ treat*paper_reader, data = gles_p_long))
+          sum_fe <- summary(feglm(issue ~ treat*paper_reader | lfdn, data = gles_p_long))
+          
+          coeflist_medium <- c(coeflist_medium, medium)
           coeflist_paper <- c(coeflist_paper, paper)
           coeflist_issue <- c(coeflist_issue, issue)
           coeflist_wave  <- c(coeflist_wave,  wavelist[wave_id])
-          coeflist_coef  <- c(coeflist_coef,  sum$coefficients[4])
-          coeflist_p     <- c(coeflist_p, sum$coefficients[4,][4])
+          coeflist_date  <- c(coeflist_date,  max(gles_p_long$date_new[gles_p_long$wave == wavelist[wave_id]]))
+          coeflist_coef_fe  <- c(coeflist_coef_fe,  sum_fe$coeftable['treat:paper_readerTRUE', 1])
+          coeflist_p_fe     <- c(coeflist_p_fe, sum_fe$coeftable['treat:paper_readerTRUE', 4])
+          coeflist_coef_lm  <- c(coeflist_coef_lm,  sum_lm$coefficients['treat:paper_readerTRUE',][1])
+          coeflist_p_lm     <- c(coeflist_p_lm, sum_lm$coefficients['treat:paper_readerTRUE', ][4])
           
         }
       }
@@ -439,7 +461,10 @@ coeftable <- data.frame(medium = coeflist_medium,
                         paper = coeflist_paper,
                         issue = coeflist_issue,
                         wave  = coeflist_wave,
-                        coef  = coeflist_coef,
-                        p_value = coeflist_p)
+                        date = coeflist_date,
+                        coef_lm  = coeflist_coef_lm,
+                        p_value_lm = coeflist_p_lm,
+                        coef_fe  = coeflist_coef_fe,
+                        p_value_fe = coeflist_p_fe)
 
-write.csv(coeftable, here('paper/ReportThomas/coeftable.csv'))
+write.csv(coeftable, here('paper/ReportThomas/coeftable_noimp.csv'))
