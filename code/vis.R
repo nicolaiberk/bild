@@ -98,7 +98,8 @@ for (issue in c('Immigration', 'Integration')){
   }
   
   
-  gles_p_long_paper %>% 
+  temp <- 
+    gles_p_long_paper %>% 
     filter(reader == T) %>% 
     group_by(wave, paper) %>% 
     filter(!is.na(dv)) %>% 
@@ -110,11 +111,15 @@ for (issue in c('Immigration', 'Integration')){
     mutate(
       dv_up = (dv + qt(1 - (0.05/2), respondents - 1)*dv_sd/respondents),
       dv_low = (dv - qt(1 - (0.05/2), respondents - 1)*dv_sd/respondents),
-    ) %>% 
-    ggplot(aes(x = date_clean)) +
+    )
+  
+  unique_waves <- paste(sort(unique(temp$wave)))
+  
+  ggplot(temp, aes(x = date_clean)) +
     geom_line(aes(y = dv, col = paper)) +
     geom_ribbon(aes(ymax = dv_up, ymin = dv_low, fill = paper), alpha = 0.5) +
-    ggtitle(glue("{issue} attitude among newspaper-readers"), "Data: GLES Panel, waves 1-13, a1 & a2")
+    ggtitle(glue("{issue} attitude among newspaper-readers"), 
+            glue("Data: GLES Panel, waves {unique_waves}"))
   
   ggsave(filename = here(glue('paper/vis/{issue}_papers.png')),
          width = 8, height = 6)
