@@ -34,53 +34,64 @@ citestyle=authoryear
 \maketitle
 
 \begin{abstract}
-    A large body of literature debates the existence and extent of effects of media framing on consumers' issue attitudes. At the same time, mechanisms of opinion formation have mainly been studied experimentally. Combining panel data from the German Longitudinal Election Study with fine-grained analyses of media framing, I address both debates with observational data. I provide strong evidence from 1,338 fixed-effect, difference-in-differences models suggesting the existence of sizeable media effects. Second, I show that such changes in consumers' issue attitudes correspond to changes in the issue framing of their preferred media outlet. Lastly, the study explores whether such changes in media framing affect consumers' issue definitions using state-of-the-art text analysis methods. The findings contribute to our understanding of opinion formation processes and the relevance of the news media in the 21st century.
+    A large body of literature debates the existence and extent of effects of media framing on consumers' issue attitudes. At the same time, mechanisms of opinion formation have mainly been studied experimentally. Combining panel data from the German Longitudinal Election Study with fine-grained analyses of media framing, I address both debates with observational data. I provide strong evidence from 1,338 fixed-effect, difference-in-differences models suggesting the existence of media effects. Second, I show that such changes in consumers' issue attitudes do \textit{not} correspond to changes in the issue framing of their preferred media outlet. Instead, these changes could be explained by an ideological readership reacting differently to changes in the news agenda. Lastly, the study explores whether such changes in media framing affect consumers' issue definitions using state-of-the-art text analysis methods. The findings contribute to our understanding of opinion formation processes and the relevance of the news media in the 21st century.
 \end{abstract}
 
 
 \section{Introduction}
 
-% starting point: historical discussion on minimal vs maximal media effects and the discussion on external validity
-% agenda setting yes (cite), but what about framing? Debate goes on
-% second: unclear mechanisms - look for lab evidence to cite on this
+\begin{itemize}
+  \item starting point: historical discussion on minimal vs maximal media effects and the discussion on external validity
+  \item agenda setting yes (cite), but what about framing? Debate goes on
+  \item second: unclear mechanisms - look for lab evidence to cite on this
+\end{itemize}
+
 
 \section{Framing in the wild}
 
 \subsection{General evidence of framing effects}
 
-% argument 1: key issue is not the external validity of framing experiments, but the more likely to observe framing effects when consuming the SAME newspaper, which one trusts already - basically cue taking (Foos, Spirig, Ladd vs Gentzkow, Guess, resolved by Slothuus and Leeper)
+argument 1: key issue is not the external validity of framing experiments, but the more likely to observe framing effects when consuming the SAME newspaper, which one trusts already - basically cue taking (Foos, Spirig, Ladd vs Gentzkow, Guess, resolved by Slothuus and Leeper)
 
 
 \subsection{Mechanisms of framing}
 
-% argument 2: opinion shifts come about through changing associations (framing/) -> value expectancy framework, but with a neurological basis
+argument 2: opinion shifts come about through changing associations (framing/issue definition) $\rightarrow$ value expectancy framework, but with a neurological basis
 
 
 \subsection{Implications for the study of framing effects}
-
-% Lesson: more observational data necessary, but we need to study cases where the slant of a newspaper that people already read changes, without obvious changes eg in ownership that made readers discount the slant
-% people could a) not care, b) stop reading their newspaper, c) change their opinion
-
-% changes in issue association should affect first people's issue definitions, which changes their opinion on the issue.
+\begin{itemize}
+\item Lesson: more observational data necessary, but we need to study cases where the slant of a newspaper that people already read changes, without obvious changes eg in ownership that made readers discount the slant
+\item people could a) not care, b) stop reading their newspaper, c) change their opinion
+\item changes in issue association should affect first people's issue definitions, which changes their opinion on the issue.
+\end{itemize}
 
 \section{Study design}
 
 \subsection{Data and case description}
 
+% plot with opinion development per paper for four / six issues
+
+% plot with descriptives and survey dates
+
 \subsection{Study design}
 
 \subsubsection{Can framing effects among newspaper readers be observed?}
 
-% 1.5k DiDs for all issue-paper-wave combinations
+1,336 DiDs for all issue-paper-wave combinations
 
 \subsubsection{Can these opinion shifts be explained by changing media frames?}
 
-% look at migration, maybe a second issue: how strongly do DiD's correlate with changing topic prevalence?
-% add right/wing slant as second dependent using AfD-classifier
+\begin{itemize}
+    \item look at migration, maybe a second issue: how strongly do DiD's correlate with changing topic prevalence?
+    \item look at how FE model DiD's change when controlling for newspaper attention/DiD
+    \item add right/wing slant as second dependent using AfD-classifier
+\end{itemize}
+
 
 \subsubsection{Have readers' issue definitions changed as a result of the changing media frames?}
 
-% embedding regression: do shifts in migration definitions among the readers correspond to changes in the media definition?
+embedding regression: do shifts in migration definitions among the readers correspond to changes in the media definition?
 
 \section{Results}
 
@@ -103,5 +114,11 @@ citestyle=authoryear
 % show for one specific case that shift in media frame corresponded to 
 
 \section{Discussion}
+
+\newpage
+
+\section{Comments for Thomas}
+
+Das hier war grob die geplante Vorgehensweise. Ich denke gegeben der Findings nicht so sinnvoll mehr, aber man könnte meines Erachtens in zwei Richtungen gehen: a) Evidenz zeigen, dass opinion shifts als Reaktionen ideologischer Leserschaft gelesen werden können (Modell mit Interaktion Migration attention und newspaper), b) Leserschaft als dependent, um zu zeigen, ob Framing shifts Leserschaft abstossen. Hier könnte man auch überlegen, ob das mit dem Slant der Zeitung zusammenhängt. Ausserdem könnte es auch re validity noch sinnvoll sein, wenigstens agenda-setting effects zu zeigen. Fraglich ist, ob es noch sinnvoll ist, die (methodisch eigentlich am spannendsten \& theoretisch an innovativsten) issue definitions zu analysieren.
 
 \end{document}
