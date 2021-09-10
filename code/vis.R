@@ -113,13 +113,13 @@ for (issue in c('Immigration', 'Integration')){
       dv_low = (dv - qt(1 - (0.05/2), respondents - 1)*dv_sd/respondents),
     )
   
-  unique_waves <- paste(sort(unique(temp$wave)))
+  unique_waves <- paste(sort(unique(temp$wave)), collapse = ', ')
   
   ggplot(temp, aes(x = date_clean)) +
     geom_line(aes(y = dv, col = paper)) +
     geom_ribbon(aes(ymax = dv_up, ymin = dv_low, fill = paper), alpha = 0.5) +
     ggtitle(glue("{issue} attitude among newspaper-readers"), 
-            glue("Data: GLES Panel, waves {unique_waves}"))
+            glue("Data: GLES Panel; waves {unique_waves}"))
   
   ggsave(filename = here(glue('paper/vis/{issue}_papers.png')),
          width = 8, height = 6)
