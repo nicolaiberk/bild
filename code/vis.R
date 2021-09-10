@@ -116,7 +116,8 @@ for (issue in c('Immigration', 'Integration')){
     geom_ribbon(aes(ymax = dv_up, ymin = dv_low, fill = paper), alpha = 0.5) +
     ggtitle(glue("{issue} attitude among newspaper-readers"), "Data: GLES Panel, waves 1-13, a1 & a2")
   
-  ggsave(filename = here(glue('paper/vis/{issue}_papers.png')))
+  ggsave(filename = here(glue('paper/vis/{issue}_papers.png')),
+         width = 8, height = 6)
 
 }
 
@@ -195,20 +196,21 @@ framing_sum %>%
 ggsave(here('paper/vis/frames_papers_unwtd.png'))
 
 framing_sum %>% 
-  filter(date_m < as.Date('2020-01-01')) %>%
-  filter(date_m > as.Date('2016-06-01')) %>% 
+  filter(date < as.Date('2020-01-01')) %>%
+  filter(date > as.Date('2016-06-01')) %>% 
   group_by(paper, frame) %>% 
   ggplot(aes(x = date, y = attention, col = frame)) +
   geom_line() +
   geom_vline(xintercept = survey_dates$date, col = 'darkgray') +
   facet_grid(frame~paper, scales = 'free') +
   ggtitle('Migration salience in different newspapers', 'Grey lines indicate survey waves')
-ggsave(here('paper/vis/frames_papers_unwtd.png'))
+ggsave(here('paper/vis/frames_papers_unwtd_focus.png'))
 
 
 ### weighted by abs n of articles (makes it comparable across newspapers)
 overall_sum <- 
-  merge(salience_sum, framing_sum, by.x = c('paper', 'date_m'), by.y = c('paper', 'date'))
+  merge(salience_sum, framing_sum, by.x = c('paper', 'date_m'), by.y = c('paper', 'date')) %>% 
+  filter(paper != 'spon')
 
 overall_sum %>% 
   mutate(
@@ -216,10 +218,20 @@ overall_sum %>%
   ) %>%  
   ggplot(aes(x = date_m, y = attention_share, col = frame)) +
   geom_line(size = 0.8) +
+  geom_vline(xintercept = survey_dates$date, col = 'darkgray') +
   facet_grid(frame~paper, scales = 'free')
-
 ggsave(here('paper/vis/frames_papers_wtd.png'))
 
+overall_sum %>% 
+  mutate(
+    attention_share = attention/n_all
+  ) %>%  
+  filter(date_m > as.Date('2016-06-01')) %>% 
+  ggplot(aes(x = date_m, y = attention_share, col = frame)) +
+  geom_line(size = 0.8) +
+  geom_vline(xintercept = survey_dates$date, col = 'darkgray') +
+  facet_grid(frame~paper, scales = 'free')
+ggsave(here('paper/vis/frames_papers_wtd_focus.png'))
 
 
 
