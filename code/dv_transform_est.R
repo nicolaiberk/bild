@@ -247,7 +247,7 @@ for (medium in mediumlist){
         #           paste("Condition:", paper_label))
         # ggsave(filename = here(paste0('paper/ReportThomas/paneleffectplots/panel_', medium, '_',  paper, '_', issue, '.png')))
         
-        ## did-model (fe model with long data too extensive to run in loop)
+        ## did-models
         
         for (wave_id in 2:length(wavelist)){
           gles_p_long <- gles_p_long %>%

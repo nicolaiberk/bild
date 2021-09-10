@@ -25,7 +25,7 @@ framing_dids <-
   framing_dids %>% 
   filter(!is.na(p))
 
-attitude_dids <- read.csv(here('data/coeftable.csv'))
+attitude_dids <- read.csv(here('data/coeftable_noimp.csv'))
 
 attitude_dids$paper_name <- ''
 attitude_dids$paper_name[attitude_dids$paper == 'a'] <- 'bild'
@@ -116,14 +116,14 @@ for (issue in c("immigration", "integration")){
   }
 }
 
-save(efftable, file = here('data/efftable.Rdata'))
+save(efftable, file = here('data/efftable_noimp.Rdata'))
 
 for (issue in c('immigration', 'integration')){
   for (lag in c("g", "1w", "1m", "6m")){
     for (ind in c('coef', 'attention')){
       grid.arrange(grobs = plots[[issue]][[lag]][[ind]],
                    top = paste(issue, lag, ind)) %>% 
-        ggsave(filename = here(paste0("paper/vis/effectplots/did_", issue, '_', lag, '_', ind, ".png")))
+        ggsave(filename = here(paste0("paper/vis/effectplots/did_", issue, '_', lag, '_', ind, "_noimp.png")))
     }
   }
 }

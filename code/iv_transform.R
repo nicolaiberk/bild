@@ -52,6 +52,7 @@ framing_raw$date_new[framing_raw$paper == "welt"] <- framing_raw$date[framing_ra
 framing_raw <- framing_raw[framing_raw$date_new >= as.Date('2013-01-01'),]
 framing_raw <- framing_raw %>% filter(!is.na(date_new))
 
+save(framing_raw, file = here('data/frames_cleaned.csv'))
 
 
 ## 1.3 salience ####
@@ -98,6 +99,8 @@ salience <- salience %>%
   select(estimate, mig, paper, date_new)
   
 salience_raw <- salience;rm(salience)
+
+save(salience_raw, file = here('data/salience_cleaned.csv'))
 
 # 2. transform ####
 
