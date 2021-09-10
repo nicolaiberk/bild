@@ -236,7 +236,8 @@ overall_sum %>%
   geom_line(size = 0.8) +
   geom_vline(xintercept = survey_dates$date, col = 'darkgray') +
   facet_grid(frame~paper, scales = 'free')
-ggsave(here('paper/vis/frames_papers_wtd_focus.png'))
+ggsave(here('paper/vis/frames_papers_wtd_focus.png'),
+       width = 8, height = 8)
 
 
 
