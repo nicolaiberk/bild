@@ -18,6 +18,7 @@ library(here)
 library(lubridate)
 library(glue)
 library(gridExtra)
+library(stargazer)
   
 # 1. load data ####
 load(here("data/coefs_media.Rdata"))
@@ -393,10 +394,13 @@ imm_mod_unw_all_nosal <-
        labmar_tot_7d_unw + 
        deport_tot_7d_unw )
 
-summary(imm_mod_unw_all_nosal) # all but crime significant, refnums and deport negative
+mod_tbl <- summary(imm_mod_unw_all_nosal) # all but crime significant, refnums and deport negative
+
 
 longnames <- c('(Intercept)', 'Lagged DV', 'Petty Crime', 'Capital Crime', 'Refugee Numbers', 'Camps', 'Mediterranean Rescue', 'Labour Market', 'Deportations')
-arm::coefplot(imm_mod_unw_all_nosal, longnames)
+arm::coefplot(imm_mod_unw_all_nosal, longnames) %>% 
+  ggsave(filename = here('paper/vis/individual_effects_immigration.png'),
+                         width = 8, height = 6)
 
 
 
@@ -415,6 +419,11 @@ int_mod_unw_all_nosal <-
        deport_tot_7d_unw )
 
 summary(int_mod_unw_all_nosal) # capcrime negative (expected), deport positive (also expected), but surprisingly labmar no effect
+
+stargazer(imm_mod_unw_all_nosal, 
+          int_mod_unw_all_nosal,
+          title = 'Individual-level Model', 
+          out = here('paper/imm_unw.tex'))
 
 arm::coefplot(int_mod_unw_all_nosal)
 
