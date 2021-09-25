@@ -1,10 +1,13 @@
-library(dplyr)
 library(tidyverse)
 library(data.table)
 library(here)
 library(stm)
 library(lubridate)
 library(tidytext)
+library(ggthemes)
+library(scales)
+library(knitr)
+library(dplyr)
 
 # load the preselected migration articles
 # mig_texts_raw <- fread(here('data/_migration_articles_new.csv'), encoding = 'UTF-8') %>% as_tibble()
@@ -25,11 +28,9 @@ mig_texts_raw$date_new[mig_texts_raw$paper == "taz"] <- mig_texts_raw$date[mig_t
 mig_texts_raw$date_new[mig_texts_raw$paper == "welt"] <- mig_texts_raw$date[mig_texts_raw$paper=="welt"] %>% as.integer() %>% as.Date(origin = "1970-01-01")
 mig_texts_raw <- mig_texts_raw[mig_texts_raw$date_new > as.Date('2010-01-01'),]
 
-## check uniqueness of articles
-# length(unique(mig_texts_raw$url)) # some duplicates
-
 ## load german stopwords
 german_stopwords <- data.frame(word = c(stopwords::stopwords("de"), 'dass', 'sagte', 'sagt', 'sei'), stringsAsFactors = F)
+
 
 ## preprocess
 processed <- textProcessor(
@@ -44,28 +45,11 @@ out <- prepDocuments(
   documents = processed$documents,
   vocab = processed$vocab,
   meta = processed$meta
-)
+);rm(processed)
+save(out, file = here('data/out_docs.Rdata'))
 
-set.seed(42)
+# set.seed(42)
+topic_model <- stm(out$documents, out$vocab, K = 60, init.type = "Spectral", prevalence =~ s(date_new) + paper, data = out$meta)
+save(topic_model, file = here('topic_model_K60.Rdata'))
 
-print(paste('Started at:', Sys.time()))
 
-## Search K
-print("Searching right number of topics...")
-kResult <- searchK(out$documents, out$vocab, K = c(100, 60, 30, 10), init.type = "Spectral", prevalence =~ date_new + paper, data = out$meta)
-
-# plot disgnostics
-jpeg(here("paper/vis/plot1_kSearch_broad.jpeg"))
-plot(kResult)
-dev.off()
-
-# plot coherence-exclusivity
-jpeg(here("paper/vis/plot2_kSearch_broad.jpeg"))
-plot(kResult$results$semcoh, kResult$results$exclus, xlab = 'Semantic Coherence', ylab = 'Exclusivity')
-text(kResult$results$semcoh, kResult$results$exclus, labels = paste("K", kResult$results$K), pos = 1)
-dev.off()
-
-# coherence-exclusivity table
-save(kResult, file = here('paper/vis/table_ksearch_broad.RData'))
-
-print(paste('Finished at:', Sys.time()))

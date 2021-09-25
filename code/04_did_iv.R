@@ -18,10 +18,10 @@ library(here)
 library(lubridate)
 library(glue)
 
-# 1. load and clean ####
+# 1. load ####
 
-## 1.1 survey data ####
-attitude_dids <- read.csv(here('paper/ReportThomas/coeftable.csv'))
+## survey data for wave dates
+attitude_dids <- read.csv(here('data/coeftable_gles_noimp.csv'))
 
 attitude_dids$paper_name <- ''
 attitude_dids$paper_name[attitude_dids$paper == 'a'] <- 'bild'
@@ -31,76 +31,8 @@ attitude_dids$paper_name[attitude_dids$paper == 'd'] <- 'sz'
 attitude_dids$paper_name[attitude_dids$paper == 'e'] <- 'taz'
 attitude_dids$paper_name[attitude_dids$paper == 'f'] <- 'welt'
 
-## 1.2 framing ####
-load(here('data/mig_articles_topics.Rdata'))
-framing_raw <- output; rm(output)
-
-frames <- 
-  framing_raw %>% 
-  ungroup() %>% 
-  select(7:13) %>% 
-  colnames()
-
-# fix dates
-framing_raw$date_new <- NA_Date_
-framing_raw$date_new[framing_raw$paper == "bild"] <- framing_raw$date[framing_raw$paper == "bild"] %>% as.Date()
-framing_raw$date_new[framing_raw$paper == "faz"] <- framing_raw$date[framing_raw$paper=="faz"] %>% as.numeric() %>% as.Date(origin = "1970-01-01")
-framing_raw$date_new[framing_raw$paper == "spon"] <- framing_raw$date[framing_raw$paper=="spon"] %>% as.Date(format = "%d.%m.%Y")
-framing_raw$date_new[framing_raw$paper == "sz"] <- framing_raw$date[framing_raw$paper=="sz"] %>% as.integer() %>% as.Date(origin = "1970-01-01")
-framing_raw$date_new[framing_raw$paper == "taz"] <- framing_raw$date[framing_raw$paper=="taz"] %>% as.integer() %>% as.Date(origin = "1970-01-01")
-framing_raw$date_new[framing_raw$paper == "welt"] <- framing_raw$date[framing_raw$paper=="welt"] %>% as.integer() %>% as.Date(origin = "1970-01-01")
-framing_raw <- framing_raw[framing_raw$date_new >= as.Date('2013-01-01'),]
-framing_raw <- framing_raw %>% filter(!is.na(date_new))
-
-save(framing_raw, file = here('data/frames_cleaned.csv'))
-
-
-## 1.3 salience ####
-salience <- fread(here('data/BERT_estimates_cleaned.csv'), header = T)
-salience <- salience[2:nrow(salience),] # remove duplicate header row
-
-## use urls to identify paper
-salience$urlhead <- substr(salience$link, 1, 20) # get different start urls
-tb <- table(salience$urlhead, useNA = 'ifany')
-urlheaders <- names(tb[tb > 500])
-
-salience$paper <- NA_character_
-salience$paper[salience$urlhead == "https://taz.de/Archi"] <- 'taz'
-salience$paper[salience$urlhead == "https://www.bild.de/"] <- 'bild'
-salience$paper[salience$urlhead == "https://www.faz.net/"] <- 'faz'
-salience$paper[salience$urlhead == "https://www.jetzt.de"] <- 'sz'
-salience$paper[salience$urlhead == "https://www.spiegel."] <- 'spon'
-salience$paper[salience$urlhead == "https://www.sueddeut"] <- 'sz'
-salience$paper[salience$urlhead == "https://www.welt.de/"] <- 'welt'
-prop.table(table(salience$paper, useNA = 'ifany')) %>% round(3) # 99.9% assigned
-
-## fix date
-salience <- salience %>% 
-  filter(!is.na(date)) %>% 
-  filter(!is.na(paper))
-
-salience$date_new <- NA_Date_
-salience$date_new[salience$paper == "bild"] <- salience$date[salience$paper == "bild"] %>% as.Date()
-salience$date_new[salience$paper == "faz"] <- salience$date[salience$paper=="faz"] %>% as.numeric() %>% as.Date(origin = "1970-01-01")
-salience$date_new[salience$paper == "spon"] <- salience$date[salience$paper=="spon"] %>% as.Date(format = "%d.%m.%Y")
-salience$date_new[salience$paper == "sz"] <- salience$date[salience$paper=="sz"] %>% as.integer() %>% as.Date(origin = "1970-01-01")
-salience$date_new[salience$paper == "taz"] <- salience$date[salience$paper=="taz"] %>% as.integer() %>% as.Date(origin = "1970-01-01")
-salience$date_new[salience$paper == "welt"] <- salience$date[salience$paper=="welt"] %>% as.integer() %>% as.Date(origin = "1970-01-01")
-salience <- salience %>% 
-  filter(date_new >= as.Date('2013-01-01')) %>% 
-  filter(!is.na(date_new))
-
-## transform & select variables  
-salience <- salience %>% 
-  mutate(
-    estimate = as.numeric(est),
-    mig = label == "True"
-  ) %>% 
-  select(estimate, mig, paper, date_new)
-  
-salience_raw <- salience;rm(salience)
-
-save(salience_raw, file = here('data/salience_cleaned.csv'))
+load(here('data/frames_cleaned.csv'))
+load(here('data/salience_cleaned.csv'))
 
 # 2. transform ####
 
@@ -108,6 +40,7 @@ save(salience_raw, file = here('data/salience_cleaned.csv'))
 
 ## add relevant treatment waves for did
 framing_raw$pre_wave <- NA # upcoming survey wave
+framing_raw$pre_wave_1d <- NA # upcoming survey wave
 framing_raw$pre_wave_1w <- NA # upcoming survey wave
 framing_raw$pre_wave_1m <- NA # upcoming survey wave
 framing_raw$pre_wave_6m <- NA # upcoming survey wave
@@ -123,19 +56,22 @@ for (wave in sort(unique(attitude_dids$wave))){
   
   upper <- max(as.Date(attitude_dids$date[attitude_dids$wave == wave]))
   
+  lower_1d <- upper - days(1)
   lower_1w <- upper - weeks(1)
   lower_1m <- upper - months(1)
   lower_6m <- upper - months(6)
   
   
   framing_raw <- framing_raw %>% 
-    mutate(is.wave = c(date_new > lower & (date_new < upper)),
+    mutate(is.wave = (date_new > lower & (date_new <= upper)),
            pre_wave = ifelse(is.wave, wave, pre_wave)) %>% 
-    mutate(is.wave = c(date_new > lower_1w & (date_new < upper)),
+    mutate(is.wave = (date_new > lower_1d & (date_new <= upper)),
+           pre_wave_1d = ifelse(is.wave, wave, pre_wave_1d)) %>% 
+    mutate(is.wave = (date_new > lower_1w & (date_new <= upper)),
            pre_wave_1w = ifelse(is.wave, wave, pre_wave_1w)) %>% 
-    mutate(is.wave = c(date_new > lower_1m & (date_new < upper)),
+    mutate(is.wave = (date_new > lower_1m & (date_new <= upper)),
            pre_wave_1m = ifelse(is.wave, wave, pre_wave_1m)) %>% 
-    mutate(is.wave = c(date_new > lower_6m & (date_new < upper)),
+    mutate(is.wave = (date_new > lower_6m & (date_new <= upper)),
            pre_wave_6m = ifelse(is.wave, wave, pre_wave_6m))
     
 }
@@ -144,6 +80,7 @@ for (wave in sort(unique(attitude_dids$wave))){
 ## generate did table
 framing_temp <-
   framing_raw %>% 
+  filter(!is.na(pre_wave)) %>% 
   select(paper, pre_wave) %>% 
   group_by(paper, pre_wave) %>% 
   summarise() %>%
@@ -157,7 +94,7 @@ framing_temp <-
 
 framing_dids <- data.frame()
 
-for (lag in c("g", "1w", "1m", "6m")){
+for (lag in c("g", "1d", "1w", "1m", "6m")){
   framing_temp$dv_lag <- lag
   for (topic in c(colnames(framing_raw)[7:13], "salience")){
   
@@ -172,7 +109,7 @@ for (lag in c("g", "1w", "1m", "6m")){
 }
 rm(framing_temp)
 
-for (lag in c("g", "1w", "1m", "6m")){
+for (lag in c("g", "1d", "1w", "1m", "6m")){
   for (paper_treat in unique(framing_dids$paper)){
     for (topic in unique(framing_dids$frame)[-8]){
       framing_raw["topic"] <- framing_raw[topic]
@@ -181,6 +118,8 @@ for (lag in c("g", "1w", "1m", "6m")){
         ## add relevant treatment waves for did
         if (lag == "g"){
           framing_raw$wave <- framing_raw$pre_wave
+        } else if (lag == "1d"){
+          framing_raw$wave <- framing_raw$pre_wave_1d
         } else if (lag == "1w"){
           framing_raw$wave <- framing_raw$pre_wave_1w
         } else if (lag == "1m"){
@@ -189,13 +128,17 @@ for (lag in c("g", "1w", "1m", "6m")){
           framing_raw$wave <- framing_raw$pre_wave_6m
         }
         
+        
         framing_raw <- framing_raw %>%
           mutate(treat = ifelse(wave == wave_id, 1, NA)) %>%
           mutate(treat = ifelse(wave == (wave_id-1), 0, treat),
                  paper_reader = paper == paper_treat)
         
+        framing_raw$topic <- scale(framing_raw[, topic], center = T, scale = T)
+        
         # ensure all conditions are observable
-        if (table(framing_raw$paper_reader, framing_raw$treat) %>% min() > 0){
+        if (table(framing_raw$paper_reader, framing_raw$treat) %>% min() > 0 &
+            (table(framing_raw$paper_reader, framing_raw$treat) %>% dim() %>% min() == 2)){
           
           ## estimate model
           sum_lm <- summary(lm(topic ~ treat*paper_reader, data = framing_raw))
@@ -222,36 +165,7 @@ for (lag in c("g", "1w", "1m", "6m")){
   }
 }
 
-# add general attention variable
-
-framing_temp <- data.frame()
-
-for (lag in c("g", "1w", "1m", "6m")){
-  if (lag == "g"){
-    framing_raw$wave <- framing_raw$pre_wave
-  } else if (lag == "1w"){
-    framing_raw$wave <- framing_raw$pre_wave_1w
-  } else if (lag == "1m"){
-    framing_raw$wave <- framing_raw$pre_wave_1m
-  } else if (lag == "6m"){
-    framing_raw$wave <- framing_raw$pre_wave_6m
-  }
-  
-  framing_temp <- 
-    framing_raw %>% 
-    group_by(paper, wave) %>% 
-    summarise_at(vars(6:12), sum) %>% 
-    pivot_longer(!c(paper, wave), names_to = "frame", values_to = "attention") %>% 
-    mutate(dv_lag = lag) %>% 
-    mutate(pre_wave = wave) %>% 
-    rbind(framing_temp)
-}
-
-framing_dids <- merge(framing_dids, framing_temp, 
-                       by = c("paper", "pre_wave", "frame", "dv_lag"),
-                       all.x = T) 
-rm(framing_raw, framing_temp)
-
+rm(framing_raw)
 
 
 
@@ -259,6 +173,7 @@ rm(framing_raw, framing_temp)
 ## 2.2 salience ####
 ## add relevant treatment waves for did
 salience_raw$pre_wave <- NA # upcoming survey wave
+salience_raw$pre_wave_1d <- NA # upcoming survey wave
 salience_raw$pre_wave_1w <- NA # upcoming survey wave
 salience_raw$pre_wave_1m <- NA # upcoming survey wave
 salience_raw$pre_wave_6m <- NA # upcoming survey wave
@@ -274,30 +189,35 @@ for (wave in sort(unique(attitude_dids$wave))){
   
   upper <- max(as.Date(attitude_dids$date[attitude_dids$wave == wave]))
   
+  lower_1d <- upper - days(1)
   lower_1w <- upper - weeks(1)
   lower_1m <- upper - months(1)
   lower_6m <- upper - months(6)
   
   
   salience_raw <- salience_raw %>% 
-    mutate(is.wave = c(date_new > lower & (date_new < upper)),
+    mutate(is.wave = (date_new > lower & (date_new <= upper)),
            pre_wave = ifelse(is.wave, wave, pre_wave)) %>% 
-    mutate(is.wave = c(date_new > lower_1w & (date_new < upper)),
+    mutate(is.wave = (date_new > lower_1d & (date_new <= upper)),
+           pre_wave_1d = ifelse(is.wave, wave, pre_wave_1d)) %>% 
+    mutate(is.wave = (date_new > lower_1w & (date_new <= upper)),
            pre_wave_1w = ifelse(is.wave, wave, pre_wave_1w)) %>% 
-    mutate(is.wave = c(date_new > lower_1m & (date_new < upper)),
+    mutate(is.wave = (date_new > lower_1m & (date_new <= upper)),
            pre_wave_1m = ifelse(is.wave, wave, pre_wave_1m)) %>% 
-    mutate(is.wave = c(date_new > lower_6m & (date_new < upper)),
+    mutate(is.wave = (date_new > lower_6m & (date_new <= upper)),
            pre_wave_6m = ifelse(is.wave, wave, pre_wave_6m))
   
 }
 
-for (lag in c("g", "1w", "1m", "6m")){
+for (lag in c("g", "1d", "1w", "1m", "6m")){
   for (paper_treat in unique(framing_dids$paper)){
     for (wave_id in sort(unique(salience_raw$pre_wave))[-1]){
         
       ## add relevant treatment waves for did
       if (lag == "g"){
         salience_raw$wave <- salience_raw$pre_wave
+      } else if (lag == "1d"){
+        salience_raw$wave <- salience_raw$pre_wave_1d
       } else if (lag == "1w"){
         salience_raw$wave <- salience_raw$pre_wave_1w
       } else if (lag == "1m"){
@@ -312,7 +232,8 @@ for (lag in c("g", "1w", "1m", "6m")){
                paper_reader = paper == paper_treat)
       
       # ensure all conditions are observable
-      if (table(salience_raw$paper_reader, salience_raw$treat) %>% min() > 0){
+      if (table(salience_raw$paper_reader, salience_raw$treat) %>% min() > 0 &
+          (table(salience_raw$paper_reader, salience_raw$treat) %>% dim() %>% min() == 2)){
         
         ## estimate model
         sum_lm <- summary(lm(mig ~ treat*paper_reader, data = salience_raw))
@@ -338,8 +259,7 @@ for (lag in c("g", "1w", "1m", "6m")){
           mutate(
             coef = ifelse(change, beta, coef),
             p    = ifelse(change, pval, p),
-            date = as.numeric(ifelse(change, max(salience_raw$date_new[salience_raw$wave == wave_id], na.rm = T), date)),
-            attention = ifelse(change, sal_share, attention))
+            date = as.numeric(ifelse(change, max(salience_raw$date_new[salience_raw$wave == wave_id], na.rm = T), date)))
       }
     }
   }
