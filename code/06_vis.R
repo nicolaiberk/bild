@@ -119,6 +119,7 @@ for (issue in c('Immigration', 'Integration')){
     ggplot(temp, aes(x = date_clean)) +
     geom_line(aes(y = dv, col = paper)) +
     geom_ribbon(aes(ymax = dv_up, ymin = dv_low, fill = paper), alpha = 0.5) +
+    xlab('') + ylab('')+
     ggtitle(glue("{issue} attitude among newspaper-readers"), 
             glue("Data: GLES Panel; waves {unique_waves}"))
   
@@ -127,7 +128,7 @@ for (issue in c('Immigration', 'Integration')){
 
 grid.arrange(plots[['Immigration']], plots[['Integration']]) %>% 
   ggsave(filename = here(glue('paper/vis/issues_readers.png')),
-         width = 10, height = 10)
+         width = 8, height = 8)
 
 ## 2.2 vis independents ####
 load(here('data/efftable_noimp.Rdata'))
@@ -167,7 +168,7 @@ salience_sum %>%
   geom_line() +
   geom_vline(xintercept = survey_dates$date, col = 'darkgray') +
   ggtitle('Migration salience in different newspapers', 'Gray lines indicate survey waves')
-ggsave(here('paper/vis/salience_papers.png'), width = 10, height = 6)
+ggsave(here('paper/vis/salience_papers.png'), width = 8, height = 5)
 
 sal_2017 <- 
   salience_sum %>% 
@@ -177,7 +178,8 @@ sal_2017 <-
   geom_line() +
   geom_vline(xintercept = survey_dates$date, col = 'darkgray') +
   ggtitle('Migration salience in different newspapers', 'Gray lines indicate survey waves')
-ggsave(sal_2017, filename = here('paper/vis/salience_papers_focus.png'), width = 10, height = 6)
+ggsave(sal_2017, filename = here('paper/vis/salience_papers_focus.png'), 
+       width = 8, height = 5)
 
 
 ## frames over time
@@ -220,10 +222,10 @@ framing_sum %>%
   ggplot(aes(x = date, y = attention, col = frame)) +
   geom_line() +
   geom_rug(data = survey_dates, aes(x = date),sides = 't', inherit.aes = F) +
-  facet_grid(frame~paper, scales = 'free') +
+  facet_grid(frame~paper, scales = 'free', ) +
   ggtitle('Migration frames in different newspapers 2017', 'Black ticks indicate survey waves') +
   scale_x_date(date_labels = '%b')
-ggsave(here('paper/vis/frames_papers_focus.png'), width = 8, height = 8)
+ggsave(here('paper/vis/frames_papers_focus.png'), width = 5, height = 7)
 
 framing_sum %>% 
   filter(date < as.Date('2018-01-01')) %>% 
@@ -314,7 +316,7 @@ theoryplot <- data.frame(p = runif(1336, 0, 1)) %>%
 gridExtra::grid.arrange(fe_plot, theoryplot, nrow = 2) %>% 
   ggsave(plot = ., 
          filename = here("paper/vis/DiD_model_ps.png"),
-         width = 10, height = 8)
+         width = 8, height = 6)
 
 
 ## vis effects across specifications ####
@@ -345,4 +347,4 @@ for (frame in c('crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'dep
 
 grid.arrange(grobs = plots, nrow = 7) %>% 
   ggsave(filename = here("paper/vis/effectplot_frames.png"),
-       width = 8, height = 12)
+       width = 6, height = 13)
