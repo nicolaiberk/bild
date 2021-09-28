@@ -125,7 +125,11 @@ Figure \ref{fig:issues} shows the two main dependent variables for each group of
 
 \subsubsection{Measuring news attention to migration}
 
+To measure media attention to immigration, I collected 2.5 million newspaper articles from the most important German broadsheets \textit{Frankfurter Allgemeine Zeitung (FAZ), Spiegel Online (SPON), Süddeutsche Zeitung (SZ), Die Tageszeitung (TAZ), Die Welt} and the major German tabloid \textit{Bild} for the period 2016-2019. To identify whether an article is about migration, I train a BERT deep-learning classifier. 
 
+As migration content is rare, and my training data needs to be somewhat balanced, I first construct a dictionary of terms related to migration. I use dictionary extension based on German Glove\footnote{Downloadable from \url{https://deepset.ai/german-word-embeddings}.} to construct a comprehensive dictionary, and apply it to the articles. Based on the relative share of migration words in an article, I draw a stratified sample of 300 articles (100 from the third with fewest migration terms, 100 from the third with most migration terms and 100 from the third in between) for each paper for a total of 1,800 papers. Then, a student assistant\footnote{Thank you Robin.} hand-coded these articles, assessing whether their main topic is related to migration. 
+
+Using this sample, a BERT deep-learning classifier\footnote{\url{https://huggingface.co/bert-base-german-cased}} is fine-tuned on a subset of 1,400 annotated articles. After fine-tuning, the model correctly classifies 95.5\% of the test set (F1: 0.94, recall: 0.93, precision: 0.95). This classifier is then used to annotate all 2.5 million newspaper articles. For the time frame of relevance for this study (the entire year of 2017), out of the total of 388,617 articles, 13,589 (3.5\%) are identified to treat the issue of migration.
 
 \begin{figure}[!ht]
     \centering
@@ -134,8 +138,25 @@ Figure \ref{fig:issues} shows the two main dependent variables for each group of
     \label{fig:salience}
 \end{figure}
 
+Figure \ref{fig:salience} shows the share of migration articles in each newspaper. While the first few months of 2017 show rather high salience of the issue, attention decreases until May, before the share of articles covering this issue increases again in all newspapers except Bild, which shows a stark decrease in July and maintains this level afterward. Most newspapers show similar levels of attention to the issue between 2.5\% and 6\%, with the exception of SZ, which moves between 5\% and 12.5\%.
 
 \subsubsection{Measuring news frames}
+
+To measure news frames, I estimate a structural topic model with 60 topics for the nearly 90,000 migration articles in the full period (2016-2019)\footnote{The }. Topic prevalence is estimated as a function of the release date of the article, as well as the paper it has been published in. The 60 topics' most predictive words and ten most representative articles were assessed to assess the content of each topic, and the most frequent and relevant topics that allow to form clear hypotheses regarding their effect on immigration attitudes are selected. 
+
+With this procedure, the following seven 'large' migration frames were selected:
+
+\begin{enumerate}
+    \item Capital crime (sexual assault/rape/murder) committed by refugees, 
+    \item general petty crime by refugees and issues in refugee living quarters in Germany,
+    \item refugee numbers,
+    \item labour market needs for and integration of refugees,
+    \item deportations,
+    \item internment camps (e.g. Moria),
+    \item drownings in the Mediterranean.
+\end{enumerate}
+
+I expect both crime frames and the refugee numbers to have negative effects on attitudes towards migrants (as connected to negative considerations regarding immigration), while labour market considerations, deportations, internment camps, and drownings in the Mediterranean sea should have positive effects as positive considerations, framing immigration either as a labour market need or a humanitarian necessity. Figure \ref{fig:frames} shows the prevalence of all frames across time for each newspaper. It can be seen that substantial variation exists in the relative emphasis of migration frames both within and across newspapers.
 
 \begin{figure}[!ht]
     \centering
@@ -144,22 +165,7 @@ Figure \ref{fig:issues} shows the two main dependent variables for each group of
     \label{fig:frames}
 \end{figure}
 
-\begin{itemize}
-    \item Collected around 2.5 million newspaper articles from six major newspapers
-    \item Extracted and annotated a stratified sample of articles using a migration dictionary
-    \item Trained a migration classifier (BERT transformer) based on these annotations
-    \item estimated migration frames using STM on migration articles only (N = 90,000): 
-    \item retained most common and relevant frames that allow to form clear hypotheses about attitude formation:
-    \begin{itemize}
-        \item Internment camps, 
-        \item capital crime (sexual assault/rape/murder) committed by refugees, 
-        \item general petty crime by refugees and issues in refugee living quarters in Germany,
-        \item deportations,
-        \item labour market needs for and integration of refugees
-        \item drownings in the mediterranean
-        \item refugee numbers
-    \end{itemize}
-\end{itemize}
+
 
 
 
@@ -167,7 +173,7 @@ Figure \ref{fig:issues} shows the two main dependent variables for each group of
 
 \subsubsection{Can framing effects among newspaper readers be observed?}
 
-To get a glimpse of whether opinion shifts might be influenced by news consumption, I estimate difference-in-differences models (DiDs) for all available combinations of news outlets (incl. TV news), issues, and survey waves. The main term of interest is the interaction of a binary indicator of readership of a certain outlet with a binary indicator which equals 1 for the current wave and 0 for the preceding wave. That means I measure the shift in opinions of the readership of a certain outlet, controlling for the changes taking place among consumers of other news.
+To get a glimpse of whether opinion shifts might be influenced by news consumption, I estimate difference-in-differences models (DiDs) for all available combinations of news outlets, issues, and survey waves. The main term of interest is the interaction of a binary indicator of readership of a certain outlet with a binary indicator which equals 1 for the current wave and 0 for the preceding wave. That means I measure the shift in opinions of the readership of a certain outlet, controlling for the changes taking place among consumers of other news.
 
 \subsubsection{Can these opinion shifts be explained by changing media frames?}
 
@@ -277,5 +283,7 @@ F Statistic & 17,740.240$^{***}$ (df = 8; 88017) & 3,286.942$^{***}$ (df = 8; 36
 \subsection{Descriptives on issue importance across time and newspaper consumption}\label{app:importance}
 
 [add description and plot issue importance]
+
+\subsection{Structural Topic Model}\label{app:stm}
 
 \end{document}
