@@ -225,7 +225,7 @@ framing_sum %>%
   facet_grid(frame~paper, scales = 'free', ) +
   ggtitle('Migration frames in different newspapers 2017', 'Black ticks indicate survey waves') +
   scale_x_date(date_labels = '%b')
-ggsave(here('paper/vis/frames_papers_focus.png'), width = 5, height = 7)
+ggsave(here('paper/vis/frames_papers_focus.png'), width = 8, height = 7)
 
 framing_sum %>% 
   filter(date < as.Date('2018-01-01')) %>% 
