@@ -12,13 +12,13 @@
 # 0. load ####
 
 library(here)
-library(dplyr)
 library(tidyverse)
 library(data.table)
 library(haven)
 library(lubridate)
 library(glue)
 library(naniar)
+library(dplyr)
 
 gles_p <- read_dta(here('data/gles/Panel/GLESMerge/ZA6838_allwaves_sA_v4-0-0.dta'))
 
@@ -203,6 +203,19 @@ for (issue in c(ego_issues, "1500", "1090", "1130",
   
 }
 
+# party preference
+gles_p_long <- 
+  gles_p %>% 
+  select(c(lfdn, contains('190bb'))) %>% 
+  pivot_longer(
+    cols = c(ends_with('190bb'))) %>% 
+  mutate(
+    wave = str_match(name, "kp(.*)_")[,2],
+    `190b` = value
+  ) %>% 
+  select(lfdn, wave, contains('190b')) %>% 
+  merge(gles_p_long, ., by = c("lfdn", "wave"), all.x = T)
+
 
 
 ## save
@@ -251,6 +264,31 @@ for (varname in c(newsm_vars, non_vars)){
 gles_p_long[,'1702_clean'] <- gles_p_long[,'1702'] - 1
 gles_p_long[gles_p_long$`1702`< 0 & !is.na(gles_p_long$`1702`),'1702_clean'] <- NA
 
+## ideology
+gles_p_long[,'1500_clean'] <- NA
+gles_p_long[gles_p_long$`1500` > 0 & !is.na(gles_p_long$`1500`), '1500_clean'] <- 
+  gles_p_long[gles_p_long$`1500` > 0 & !is.na(gles_p_long$`1500`),'1500'] - 1
+
+
+## party preference
+gles_p_long[,'190b_inter'] <- 
+  ifelse(gles_p_long[,'190b'] > 0,
+         gles_p_long[,'190b'],
+         NA)
+
+gles_p_long[,'190b_clean'] <- NA_character_
+gles_p_long[gles_p_long$`190b_inter` == 1  & 
+              !is.na(gles_p_long$`190b_inter`),'190b_clean'] <- 'CDU/CSU'
+gles_p_long[gles_p_long$`190b_inter` == 4  & 
+              !is.na(gles_p_long$`190b_inter`),'190b_clean'] <- 'SPD'
+gles_p_long[gles_p_long$`190b_inter` == 5  & 
+              !is.na(gles_p_long$`190b_inter`),'190b_clean'] <- 'FDP'
+gles_p_long[gles_p_long$`190b_inter` == 6  & 
+              !is.na(gles_p_long$`190b_inter`),'190b_clean'] <- 'Grüne'
+gles_p_long[gles_p_long$`190b_inter` == 7  & 
+              !is.na(gles_p_long$`190b_inter`),'190b_clean'] <- 'Linke'
+gles_p_long[gles_p_long$`190b_inter` == 322  & 
+              !is.na(gles_p_long$`190b_inter`),'190b_clean'] <- 'AfD'
 
 
 
