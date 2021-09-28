@@ -347,4 +347,4 @@ for (frame in c('crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'dep
 
 grid.arrange(grobs = plots, nrow = 7) %>% 
   ggsave(filename = here("paper/vis/effectplot_frames.png"),
-       width = 6, height = 13)
+       width = 7, height = 12)
