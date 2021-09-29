@@ -224,8 +224,10 @@ framing_sum %>%
   geom_rug(data = survey_dates, aes(x = date),sides = 't', inherit.aes = F) +
   facet_grid(frame~paper, scales = 'free', ) +
   ggtitle('Migration frames in different newspapers 2017', 'Black ticks indicate survey waves') +
-  scale_x_date(date_labels = '%b')
-ggsave(here('paper/vis/frames_papers_focus.png'), width = 8, height = 7)
+  scale_x_date(date_labels = '%b') +
+  xlab('Share of all migration articles') +
+  ylab('') + theme(legend.position = "none")
+ggsave(here('paper/vis/frames_papers_focus.png'), width = 8, height = 10)
 
 framing_sum %>% 
   filter(date < as.Date('2018-01-01')) %>% 
@@ -345,6 +347,8 @@ for (frame in c('crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'dep
     coord_cartesian(xlim = c(-2, 2))
 }
 
-grid.arrange(grobs = plots, nrow = 7) %>% 
+library(ggpubr)
+ggarrange(plotlist = plots, ncol = 2, nrow = 4, 
+          common.legend = T, legend = "bottom") %>% 
   ggsave(filename = here("paper/vis/effectplot_frames.png"),
-       width = 7, height = 12)
+         width = 10, height = 7)
