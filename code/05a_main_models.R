@@ -361,7 +361,7 @@ int_mod_unw_all_nosal <-
        scale(camps_tot_7d_unw, center = T, scale = T) + 
        scale(medit_tot_7d_unw, center = T, scale = T) + 
        scale(labmar_tot_7d_unw, center = T, scale = T) + 
-       scale(deport_tot_7d_unw ))
+       scale(deport_tot_7d_unw, center = T, scale = T))
 
 summary(int_mod_unw_all_nosal)
 
