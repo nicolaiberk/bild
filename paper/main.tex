@@ -215,59 +215,13 @@ As a first step, the DiDs for all wave-issue-paper combinations are estimated. T
 
 There seems to be interesting variation in the dependent variable. Can these opinion shifts be explained by shifts in news content? Figure \ref{fig:did_corr} shows the core analysis to estimate the effect of media attention on reader opinion. The displayed estimates are obtained by regressing the resulting DiD-estimates for issue attitudes on the DiD-estimates for media attention. Each dot in this graph represents the coefficient of a model explaining standardised aggregate opinion shifts with standardised shifts in media attention to specific frames for a specific frame and a specific model specification, as outlined in section \ref{sec:models}. If opinion shifts among newspapers' readers - relative to other readers - can be explained by shifts in newspapers' issue framing, these two variables should be highly correlated.
 
-This is however not the case. 
+This is however not the case. As figure \ref{fig:did_corr} shows, even with different specifications, \textit{no} estimate has predictive power for our analysis. For example, in the upper left panel 'crime', we can see 5 different lags 'g', '6m', '1m', '1w', '1d' distinguished vertically, and the effects for two different issues in the two different panes. Additionally, the color of the points indicates whether the model was estimated only for readers of a single newspaper (lower N, but no treatment diffusion) or all readers of a newspaper (who might read another newspaper, say SZ readers who also read FAZ). All estimates are clearly clustering around the null, indicating no effect. While the 'exclusive reader' estimates show more variation, they also indicate far broader confidence intervals. There is no considerable difference across lags, and the variables only differ by the broader confidence intervals of the integration variable, owing to the fewer waves including this question. Generally, this analysis indicates no effect of media framing of migration on migration attitudes.
+
+To corroborate these results, I estimate another model directly predicting individual migration opinions with a lagged dependent and individual estimates of consumed migration frames (see section \ref{sec:models}). The results for migration and integration attitudes can be seen in table \ref{tab:ind_model}. While the 
 
 
-% show for one specific case that shift in media frame corresponded to 
-\begin{table}[!htbp] \centering 
-  \caption{Individual-level Model} 
-  \label{} 
-\begin{tabular}{@{\extracolsep{5pt}}lcc} 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{2}{c}{\textit{Dependent variable:}} \\ 
-\cline{2-3} 
-\\[-1.8ex] & Immigration attitude & Integration attitude \\ 
-\\[-1.8ex] & (1) & (2)\\ 
-\hline \\[-1.8ex] 
- Lagged DV & 0.793$^{***}$ & 0.664$^{***}$ \\ 
-  &  & (0.004) \\ 
-  & & \\ 
- Petty Crime & 0.0001 & 0.002 \\ 
-  & (0.002) & (0.004) \\ 
-  & & \\ 
- Capital Crime & 0.033$^{***}$ & $-$0.027$^{**}$ \\ 
-  & (0.006) & (0.012) \\ 
-  & & \\ 
- Refugee Numbers & $-$0.016$^{***}$ & $-$0.001 \\ 
-  & (0.002) & (0.004) \\ 
-  & & \\ 
- Refugee Camps & 0.025$^{***}$ & $-$0.004 \\ 
-  & (0.004) & (0.012) \\ 
-  & & \\ 
- Mediterranean S\&R & 0.035$^{***}$ & $-$0.005 \\ 
-  & (0.002) & (0.005) \\ 
-  & & \\ 
- Labour Market & 0.015$^{***}$ & 0.009 \\ 
-  & (0.003) & (0.006) \\ 
-  & & \\ 
- Deportation & $-$0.002$^{***}$ & 0.002$^{**}$ \\ 
-  & (0.001) & (0.001) \\ 
-  & & \\ 
- Constant & 0.045$^{***}$ & $-$0.288$^{***}$ \\ 
-  & (0.015) & (0.036) \\ 
-  & & \\ 
-\hline \\[-1.8ex] 
-Observations & 88,026 & 36,180 \\ 
-R$^{2}$ & 0.617 & 0.421 \\ 
-Adjusted R$^{2}$ & 0.617 & 0.421 \\ 
-Residual Std. Error & 1.095 (df = 88017) & 1.095 (df = 36171) \\ 
-F Statistic & 17,740.240$^{***}$ (df = 8; 88017) & 3,286.942$^{***}$ (df = 8; 36171) \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
-\end{tabular} 
-\end{table}
+
+
 
 
 \section{Discussion}
