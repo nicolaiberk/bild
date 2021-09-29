@@ -257,8 +257,8 @@ merged_data <-
         (`1661c_clean` > 0),
         (`1661d_clean` > 0),
         (`1661e_clean` > 0),
-        (`1661f_clean` > 0)
-      )
+        (`1661f_clean` > 0),
+        na.rm = T)
   )
 
 merged_data <- 
