@@ -191,17 +191,13 @@ media_attention <-
   pivot_wider(names_from = paper, values_from = 3:ncol(media_attention)) %>% 
   mutate(date_str = as.character(date_new))
 
-#############################
-# calculate media diet for all respondents, multiplying treatment by days read
-# run fe models once with weighted frame exposure both for all and exclusive r, 
-#   once unweighted and with exclusive readers
 
 ## merge
 merged_data <- 
   gles_p_long %>% 
   left_join(media_attention, by = c("date_str"))
 
-## estimate frame exposure by days read in last week
+## estimate frame exposure
 merged_data <- 
   merged_data %>% 
   mutate(
@@ -269,53 +265,53 @@ merged_data <-
   merged_data %>% 
   mutate(
     n_mig_tot_7d_unw = 
-      n_mig_7d_bild + # take sum of consumed newspapers weighted by days read, divided by n of newspapers consumed
-      n_mig_7d_faz  +
-      n_mig_7d_sz   +
-      n_mig_7d_taz  +
-      n_mig_7d_welt,
+      (n_mig_7d_bild *`1661a_bin` + # take sum of consumed newspapers, divided by total papers read
+      n_mig_7d_faz  *`1661c_bin` +
+      n_mig_7d_sz   *`1661d_bin` +
+      n_mig_7d_taz  *`1661e_bin` +
+      n_mig_7d_welt *`1661f_bin`)/n_read,
     crime_tot_7d_unw = 
-      crime_7d_bild +
-      crime_7d_faz  +
-      crime_7d_sz   +
-      crime_7d_taz  +
-      crime_7d_welt,
+      (crime_7d_bild *`1661a_bin` +
+      crime_7d_faz  *`1661c_bin` +
+      crime_7d_sz   *`1661d_bin` +
+      crime_7d_taz  *`1661e_bin` +
+      crime_7d_welt *`1661f_bin`)/n_read,
     capcrime_tot_7d_unw = 
-      capcrime_7d_bild +
-      capcrime_7d_faz  +
-      capcrime_7d_sz   +
-      capcrime_7d_taz  +
-      capcrime_7d_welt,
+      (capcrime_7d_bild *`1661a_bin` +
+      capcrime_7d_faz  *`1661c_bin` +
+      capcrime_7d_sz   *`1661d_bin` +
+      capcrime_7d_taz  *`1661e_bin` +
+      capcrime_7d_welt *`1661f_bin`)/n_read,
     refnums_tot_7d_unw = 
-      refnums_7d_bild +
-      refnums_7d_faz+
-      refnums_7d_sz+
-      refnums_7d_taz+
-      refnums_7d_welt,
+      (refnums_7d_bild *`1661a_bin` +
+      refnums_7d_faz  *`1661c_bin` +
+      refnums_7d_sz   *`1661d_bin` +
+      refnums_7d_taz  *`1661e_bin` +
+      refnums_7d_welt *`1661f_bin`)/n_read,
     camps_tot_7d_unw = 
-      camps_7d_bild +
-      camps_7d_faz +
-      camps_7d_sz +
-      camps_7d_taz +
-      camps_7d_welt,
+      (camps_7d_bild *`1661a_bin` +
+      camps_7d_faz  *`1661c_bin` +
+      camps_7d_sz   *`1661d_bin` +
+      camps_7d_taz  *`1661e_bin` +
+      camps_7d_welt *`1661f_bin`)/n_read,
     medit_tot_7d_unw = 
-      medit_7d_bild +
-      medit_7d_faz +
-      medit_7d_sz +
-      medit_7d_taz +
-      medit_7d_welt,
+      (medit_7d_bild *`1661a_bin` +
+      medit_7d_faz  *`1661c_bin` +
+      medit_7d_sz   *`1661d_bin` +
+      medit_7d_taz  *`1661e_bin` +
+      medit_7d_welt *`1661f_bin`)/n_read,
     labmar_tot_7d_unw = 
-      labmar_7d_bild +
-      labmar_7d_faz +
-      labmar_7d_sz +
-      labmar_7d_taz +
-      labmar_7d_welt,
+      (labmar_7d_bild *`1661a_bin` +
+      labmar_7d_faz  *`1661c_bin` +
+      labmar_7d_sz   *`1661d_bin` +
+      labmar_7d_taz  *`1661e_bin` +
+      labmar_7d_welt *`1661f_bin`)/n_read,
     deport_tot_7d_unw = 
-      deport_7d_bild +
-      deport_7d_faz +
-      deport_7d_sz +
-      deport_7d_taz +
-      deport_7d_welt
+      (deport_7d_bild *`1661a_bin` +
+      deport_7d_faz  *`1661c_bin` +
+      deport_7d_sz   *`1661d_bin` +
+      deport_7d_taz  *`1661e_bin` +
+      deport_7d_welt *`1661f_bin`)/n_read
   )
 
 
@@ -329,7 +325,6 @@ imm_mod_unw_all_nosal <-
      formula = 
        `1130_clean` ~ 
        `1130_lag` + 
-       n_mig_tot_7d_unw +
        crime_tot_7d_unw + 
        capcrime_tot_7d_unw + 
        refnums_tot_7d_unw + 
@@ -338,19 +333,19 @@ imm_mod_unw_all_nosal <-
        labmar_tot_7d_unw + 
        deport_tot_7d_unw )
 
-mod_tbl <- summary(imm_mod_unw_all_nosal) # all but crime significant, refnums and deport negative
+summary(imm_mod_unw_all_nosal) # only camps very restrictive effect - weird, generally large effects
 
 
 longnames <- c('(Intercept)', 'Lagged DV', 'Petty Crime', 'Capital Crime', 'Refugee Numbers', 'Camps', 'Mediterranean Rescue', 'Labour Market', 'Deportations')
-plot_model(imm_mod_unw_all_nosal, 
-           sort.est = T, rm.terms = '1130_lag',
-           axis.labels =  c('Salience', 'Crime', 'Capcrime', 'Refugee numbers',
-                            'Detention Camps', 'Mediterranean', 
-                            'Labour Market', 'Deportations'),
+
+imm_model_plot <- 
+  plot_model(imm_mod_unw_all_nosal, 
+           sort.est = T,
            title = 'Effect of different frames on Immigration attitude', 
-           axis.lim = c(-.25, .25), show.p = T) %>% 
-  ggsave(filename = here('paper/vis/individual_effects_immigration.png'),
-         width = 8, height = 6)
+           show.p = T)
+ggsave(imm_model_plot,
+       filename = here('paper/vis/individual_effects_immigration.png'),
+        width = 8, height = 6)
 
 
 
@@ -368,15 +363,24 @@ int_mod_unw_all_nosal <-
        labmar_tot_7d_unw + 
        deport_tot_7d_unw )
 
-summary(int_mod_unw_all_nosal) # capcrime negative (expected), deport positive (also expected), but surprisingly labmar no effect
+summary(int_mod_unw_all_nosal)
 
 stargazer(imm_mod_unw_all_nosal, 
           int_mod_unw_all_nosal,
           title = 'Individual-level Model', 
           out = here('paper/imm_unw.tex'))
 
-arm::coefplot(int_mod_unw_all_nosal) %>% 
-  ggsave(filename = here('paper/vis/individual_effects_immigration.png'),
+int_model_plot <- 
+  plot_model(int_mod_unw_all_nosal, 
+           sort.est = T,
+           title = 'Effect of different frames on Integration attitude', 
+           show.p = T)
+
+ggsave(int_model_plot, 
+       filename = here('paper/vis/individual_effects_integration.png'),
          width = 8, height = 6)
 
+grid.arrange(imm_model_plot, int_model_plot) %>% 
+  ggsave(filename = here('paper/vis/individual_effects_combined.png'),
+                         width = 8, height = 8)
 
