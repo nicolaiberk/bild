@@ -249,17 +249,14 @@ merged_data <-
     labmar_7d_taz  = ifelse(is.na(labmar_7d_taz),  0, labmar_7d_taz),
     labmar_7d_welt = ifelse(is.na(labmar_7d_welt), 0, labmar_7d_welt)
     
-  ) %>% 
-  mutate(
-    n_read = 
-      sum(
-        (`1661a_clean` > 0),
-        (`1661c_clean` > 0),
-        (`1661d_clean` > 0),
-        (`1661e_clean` > 0),
-        (`1661f_clean` > 0),
-        na.rm = T)
   )
+
+merged_data$n_read  <-  
+  merged_data %>% 
+  ungroup() %>% 
+  select(contains("1661")) %>% 
+  select(contains("bin"), -`1661g_bin`, -`1661b_bin`) %>% 
+  rowSums()
 
 merged_data <- 
   merged_data %>% 
