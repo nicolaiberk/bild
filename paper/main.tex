@@ -166,43 +166,41 @@ I expect both crime frames and the refugee numbers to have negative effects on a
 \end{figure}
 
 
-
-
-
 \subsection{Study design}
 
-\subsubsection{Can framing effects among newspaper readers be observed?}
+\subsubsection{Differences in opinion formation across readers}
 
-To get a glimpse of whether opinion shifts might be influenced by news consumption, I estimate difference-in-differences models (DiDs) for all available combinations of news outlets, issues, and survey waves. The main term of interest is the interaction of a binary indicator of readership of a certain outlet with a binary indicator which equals 1 for the current wave and 0 for the preceding wave. That means I measure the shift in opinions of the readership of a certain outlet, controlling for the changes taking place among consumers of other news.
+To assess whether opinion shifts might be influenced by news consumption, I estimate difference-in-differences (DiDs) for all available combinations of issues, news outlets, and survey waves. The main term of interest is the interaction of a binary indicator of readership of a certain outlet with a binary indicator which equals 1 for the current wave and 0 for the preceding wave. Hence I measure the shift in opinions of the readership of a certain outlet, controlling for the changes taking place among consumers of other news. The distribution of p-values of these DiDs allows me to assess whether meaningful variation exists in readers' attitude formation that can be explained by shifts in media consumption. The formula is given below:
 
-\subsubsection{Can these opinion shifts be explained by changing media frames?}
+$$ y = \beta_1 * W + \beta_2 * R + \beta_3 * W * R, $$
 
-\begin{itemize}
-    \item look at migration, maybe a second issue: how strongly do DiD's correlate with changing frame prevalence/DiD of frame attention?
-    \item look at how FE model DiD's change when controlling for newspaper attention/DiD
-    \item add right-wing slant as second dependent using AfD-classifier
-\end{itemize}
+where $y$ is the dependent (attention to migration frame or migration opinion), $W$ indicates whether the interview took place ($W = 1$) in a given survey wave or in the preceding one ($W = 0$), and $R$ indicates whether the respondent is a reader of the newspaper of interest.
+
+
+\subsubsection{Estimation of framing effect}\label{sec:models}
+
+I estimate the same DiDs to measure shifts in migration framing in a certain newspaper, controlling for shifts in all other newspapers. To do that, I first sum the attention given to a certain frame in a given newspaper in the past day, week, month, or half year, up to the last survey. This allows me to assess whether choosing different lags affects my estimates. Then, I estimate the DiD, indicating how much a newspaper changed its attention to a given migration frame. These estimates are then matched and correlated with the DiDs estimating the opinion shifts. If increasing attention to a certain frame causes a shift in migration attitudes, these two measures should be highly correlated.
+
+Second, I estimate an individual-level model predicting immigration opinion with a lagged dependent variable and the exposure to each frame. Controlling for the lagged dependent variable means that I restrict the variance to the shift in opinions since the last wave. I measure exposure to each frame by summing up the frame attention of the past week in each newspaper the respondent claimed to have read in the past week and dividing it by the total number of newspapers read. This way, I estimate frame exposure for each individual respondent's interview date and news diet.
+
 
 \section{Results}
 
 \subsection{DiD-assumption: Parallel trends}
 
-% refer to graph on mig issue
-The parallel trends assumption is met, as can be seen in figure \ref{fig:issues}. A plot of all other issues showing similar co-variation will be added to the appendix at a later point in time.
-    
-% also think about excludability: how can you ensure that these shifts are a result of media framing (this might be answered in number two)
-
-\subsection{Distribution of DiD-effect significance}
-
-The upper panel of figure \ref{fig:p_values} shows the distribution of p-values for the DiD-term from 1,056 fixed-effect models with GLES Panel data. The distribution shows a considerable deviation from the expected uniform distribution (visible in the lower panel) were there no explaining variation in the DiD-term beyond the uniform effects of wave and paper readership. This means, more often than random, the opinions of consumers of certain news deviate from the opinions of other citizens.
-
-% show distribution of p-values vs theoretical distribution -> looks like there is systematic deviation
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=\textwidth]{paper/vis/DiD_model_ps.png}
-    \caption{Empirical and theoretical p-values of 1,363 DiD-models.}
+    \caption{Empirical and theoretical p-values of 1,752 DiD-models.}
     \label{fig:p_values}
 \end{figure}
+
+DiD-designs rest on the assumption that treated and untreated units would follow the same trend, were it not for the treatment. This means that, generally, treated and untreated units should show similar trends. Returning to figure \ref{fig:issues}, we can safely state that the parallel trends assumption is met in this case. All reader groups move in a highly similar fashion on both variables, albeit at different levels, which reflect the ideological leaning of their newspaper.
+
+\subsection{Distribution of DiD-effect significance}
+
+As a first step, the DiDs for all wave-issue-paper combinations are estimated. This means I use all political issues included in the surveys (economic, issues, climate, ...) are used as dependent variable, and assess whether news consumption matters for opinion formation more generally. The upper panel of figure \ref{fig:p_values} shows the distribution of p-values for the DiD-term from 1,752 fixed-effect models with GLES Panel data. The distribution shows a considerable deviation from the expected uniform distribution (visible in the lower panel) were there no explaining variation in the DiD-term beyond the uniform effects of wave and paper readership. This means, more often than random, the opinions of consumers of certain news deviate from the opinions of other citizens. This strongly indicates that news consumption matters for opinion formation.
+
 
 
 
@@ -215,9 +213,9 @@ The upper panel of figure \ref{fig:p_values} shows the distribution of p-values 
     \label{fig:did_corr}
 \end{figure}
 
-Figure \ref{fig:did_corr} shows the core analysis to estimate the effect of media attention on reader opinion. Each dot in this graph represents the t-value of a model explaining aggregate opinion shifts (DiDs, blue dots) with aggregate media attention or shifts in attention (DiDs) for a specific frame and a specific model specification. These aggregate parameters come from models explaining immigration opinion/media attention with news outlet-wave interactions, as in the models providing the p-values for figure \ref{fig:p_values}. If opinion shifts among newpapers' readers - relative to other readers - can be explained by shifts in newspapers' issue framing, these two variables should be highly correlated. The displayed estimates are hence obtained by regressing the resulting DiD-estimates for issue attitudes on the DiD-estimates for media attention.
+There seems to be interesting variation in the dependent variable. Can these opinion shifts be explained by shifts in news content? Figure \ref{fig:did_corr} shows the core analysis to estimate the effect of media attention on reader opinion. The displayed estimates are obtained by regressing the resulting DiD-estimates for issue attitudes on the DiD-estimates for media attention. Each dot in this graph represents the coefficient of a model explaining standardised aggregate opinion shifts with standardised shifts in media attention to specific frames for a specific frame and a specific model specification, as outlined in section \ref{sec:models}. If opinion shifts among newspapers' readers - relative to other readers - can be explained by shifts in newspapers' issue framing, these two variables should be highly correlated.
 
-For example, the left graph in the top panel row shows the effect of media attention on immigration attitudes for two different independent variables (DiD \textit{coef}ficients estimating the increase in news coverage in the consumed outlet relative to all others, and the general \textit{attention} in the preceding period) and four different time lags (see horizontal lines in descending order: 1 week, 1 month, 6 months, and the full period until last survey wave [g]). Note that immigration and integration are inversely coded. Higher values indicate more restrictive attitudes on immigration, but more liberal attitudes on integration. +/- signs corresponding to the frames (visible on the right-hand side) indicate the hypothesized effect of the frame on integration.
+This is however not the case. 
 
 
 % show for one specific case that shift in media frame corresponded to 
@@ -274,8 +272,8 @@ F Statistic & 17,740.240$^{***}$ (df = 8; 88017) & 3,286.942$^{***}$ (df = 8; 36
 
 \section{Discussion}
 \begin{itemize}
-    \item 
     \item people could a) not react, b) stop reading their newspaper, c) change their opinion
+    \item add right-wing slant as second dependent using AfD-classifier
 \end{itemize}
 
 \section{Appendix}
