@@ -325,13 +325,13 @@ imm_mod_unw_all_nosal <-
      formula = 
        `1130_clean` ~ 
        `1130_lag` + 
-       crime_tot_7d_unw + 
-       capcrime_tot_7d_unw + 
-       refnums_tot_7d_unw + 
-       camps_tot_7d_unw + 
-       medit_tot_7d_unw + 
-       labmar_tot_7d_unw + 
-       deport_tot_7d_unw )
+       scale(crime_tot_7d_unw,    center = T, scale = T) + 
+       scale(capcrime_tot_7d_unw, center = T, scale = T) + 
+       scale(refnums_tot_7d_unw,  center = T, scale = T) + 
+       scale(camps_tot_7d_unw,    center = T, scale = T) + 
+       scale(medit_tot_7d_unw,    center = T, scale = T) + 
+       scale(labmar_tot_7d_unw,   center = T, scale = T) + 
+       scale(deport_tot_7d_unw,   center = T, scale = T))
 
 summary(imm_mod_unw_all_nosal) # only camps very restrictive effect - weird, generally large effects
 
