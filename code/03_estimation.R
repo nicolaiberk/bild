@@ -64,7 +64,7 @@ framing_dids <-
 ## correlate with frames
 efftable <- data.frame()
 for (issue in c("immigration", "integration")){
-  for (lag in c("g", "1d", "1w", "1m", "6m")){
+  for (lag in c("all", "1d", "1w", "1m", "6m")){
     for (respons in unique(attitude_dids$respondents)){
     
       if (issue == "immigration"){

@@ -85,10 +85,10 @@ for (wave_id in 1:nrow(survey_dates)){
   
   upper <- survey_dates$date[wave_id]
   
-  lower_1d <- upper - days(1)
-  lower_1w <- upper - weeks(1)
-  lower_1m <- upper - months(1)
-  lower_6m <- upper - months(6)
+  lower_1d <- max((upper - days(1)),   lower)
+  lower_1w <- max((upper - weeks(1)),  lower)
+  lower_1m <- max((upper - months(1)), lower)
+  lower_6m <- max((upper - months(6)), lower)
   
   wave <- survey_dates$wave[wave_id]
     
