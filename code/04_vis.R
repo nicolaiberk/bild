@@ -131,6 +131,7 @@ grid.arrange(plots[['Immigration']], plots[['Integration']]) %>%
          width = 8, height = 8)
 
 ## 2.2 vis independents ####
+
 load(here('data/efftable_noimp.Rdata'))
 survey_dates <- 
   gles_p_long %>% 
@@ -183,37 +184,42 @@ ggsave(sal_2017, filename = here('paper/vis/salience_papers_focus.png'),
 
 
 ## frames over time
-load(here('data/daily_media_attention.Rdata'))
+load(here("data/media_daily_2021-10-03.Rdata"))
 
 framing_sum <- 
-  media_attention %>% 
+  merged_media %>% 
   mutate(
     date = floor_date(as.Date(date_new), 'month')
   ) %>% 
   select(-date_new) %>% 
   group_by(paper, date) %>% 
-  summarise_all(sum, na.rm = T) %>%
-  mutate(crime_share = crime/n_mig,
-         capcrime_share = capcrime/n_mig,
-         medit_share = medit/n_mig,
-         camps_share = camps/n_mig,
-         deport_share = deport/n_mig,
-         refnums_share = refnums/n_mig,
-         labmar_share = labmar/n_mig,
-         salience_share = n_mig/n_tot) %>% 
-  pivot_longer(cols = !c(date, paper, n_mig, n_tot, crime, 
+  summarise_all(mean, na.rm = T) %>% 
+  pivot_longer(cols = !c(date, paper, crime, n_tot, 
+                         n_mig_fra, n_mig_sal, share_mig,
                          medit, deport, refnums, camps, 
                          labmar, capcrime), 
-               names_to = 'frame', values_to = 'attention')
+               names_to = 'frame', values_to = 'attention') %>% 
+  mutate(paper = recode(paper, 
+                        'bild' = 'Bild', 'faz' = 'FAZ', 'spon' = 'Spiegel',
+                        'sz' = 'SZ', 'taz' = 'TAZ', 'welt' = 'Welt'
+                        )) %>% 
+  mutate(frame = recode(frame,
+                        'camps_share' = 'Camps', 'crime_share' = 'Petty Crime',
+                        'capcrime_share' = 'Capital Crime', 'deport_share' = 'Deportations',
+                        'labmar_share' = 'Labour Market', 'medit_share' = 'Mediterranean',
+                        'refnums_share' = 'Refugee Numbers'
+                        ))
 
 framing_sum %>% 
   filter(date < as.Date('2020-01-01')) %>%
   group_by(paper, frame) %>% 
   ggplot(aes(x = date, y = attention, col = frame)) +
   geom_line() +
-  facet_grid(frame~paper, scales = 'free') +
-  ggtitle('Migration salience in different newspapers')
-ggsave(here('paper/vis/frames_papers.png'), width = 10, height = 10)
+  facet_grid(paper~frame, scales = 'free') +
+  ggtitle('Migration framing in different newspapers') +
+  ylab('Share of all migration articles') +
+  xlab('') + theme(legend.position = "none")
+ggsave(here('paper/vis/frames_papers.png'), width = 10, height = 6)
 
 framing_sum %>% 
   filter(date < as.Date('2018-01-01')) %>% 
@@ -222,69 +228,12 @@ framing_sum %>%
   ggplot(aes(x = date, y = attention, col = frame)) +
   geom_line() +
   geom_rug(data = survey_dates, aes(x = date),sides = 't', inherit.aes = F) +
-  facet_grid(frame~paper, scales = 'free', ) +
+  facet_grid(paper~frame, scales = 'free') +
   ggtitle('Migration frames in different newspapers 2017', 'Black ticks indicate survey waves') +
   scale_x_date(date_labels = '%b') +
-  xlab('Share of all migration articles') +
-  ylab('') + theme(legend.position = "none")
-ggsave(here('paper/vis/frames_papers_focus.png'), width = 8, height = 10)
-
-framing_sum %>% 
-  filter(date < as.Date('2018-01-01')) %>% 
-  filter(date >= as.Date('2017-01-01')) %>% 
-  filter(frame == "salience_share") %>% 
-  group_by(paper, frame) %>% 
-  ggplot(aes(x = date, y = attention, col = paper)) +
-  geom_line() +
-  geom_rug(data = survey_dates, aes(x = date), inherit.aes = F) +
-  ggtitle('Migration salience in different newspapers', 'Black ticks indicate survey waves')
-ggsave(here('paper/vis/salience_papers_focus.png'), width = 10, height = 6)
-
-
-## bild example
-framing_sum %>% 
-  filter(date >= as.Date('2015-01-01')) %>% 
-  filter(date < as.Date('2017-01-01')) %>% 
-  filter(frame != "salience_share") %>% 
-  group_by(paper, frame) %>% 
-  ggplot(aes(x = date, y = attention, col = paper)) +
-  geom_line() +
-  facet_wrap(~frame) +
-  ggtitle('Migration coverage in different newspapers 2015-2016')
-
-framing_sum %>% 
-  filter(date >= as.Date('2015-01-01')) %>% 
-  filter(date < as.Date('2017-01-01')) %>% 
-  filter(frame == "salience_share") %>% 
-  group_by(paper, frame) %>% 
-  ggplot(aes(x = date, y = attention, col = paper)) +
-  geom_line() +
-  ggtitle('Migration coverage in different newspapers 2015-2016')
-
-framing_sum %>% 
-  filter(date >= as.Date('2015-01-01')) %>% 
-  filter(date < as.Date('2020-01-01')) %>% 
-  filter(paper == "bild") %>% 
-  filter(frame != "salience_share") %>% 
-  group_by(paper, frame) %>% 
-  ggplot(aes(x = date, y = attention, col = frame)) +
-  geom_line() +
-  facet_wrap(~frame, ncol = 2)+
-  ggtitle('Migration coverage in Bild 2015-2019')
-ggsave(filename = here('paper/vis/BILD_frames_1519.png'), width = 10, height = 10)
-
-
-framing_sum %>% 
-  filter(date >= as.Date('2015-01-01')) %>% 
-  filter(date < as.Date('2020-01-01')) %>% 
-  filter(paper == "bild") %>% 
-  filter(frame == "crime_share") %>% 
-  group_by(paper, frame) %>% 
-  ggplot(aes(x = date, y = attention, col = frame)) +
-  geom_line() +
-  facet_wrap(~frame, ncol = 2)+
-  ggtitle('Migration coverage in Bild 2015-2019')
-ggsave(filename = here('paper/vis/BILD_crime_1519.png'), width = 10, height = 6)
+  ylab('Share of all migration articles') +
+  xlab('') + theme(legend.position = "none")
+ggsave(here('paper/vis/frames_papers_focus.png'), width = 10, height = 6)
 
 
 ## 2.3 vis p-values attitude did ####
@@ -303,7 +252,7 @@ fe_plot <- attitude_dids %>%
   geom_histogram(bins = 20, col = 'gray', breaks = seq(from = 0, to = 0.95, 0.05)) +
   geom_hline(aes(yintercept = 0.05), col = 'red', lty = 2) +
   ylim(0, 0.25) +
-  xlab('Density')+ylab('p')+
+  ylab('Density')+xlab('p')+
   ggtitle(glue("P-values from {nrow(attitude_dids)} fixed-effect DiD-models"), 
           "Treatment = wave, condition = media outlet consumption")
 
@@ -312,7 +261,7 @@ theoryplot <- data.frame(p = runif(1336, 0, 1)) %>%
   geom_histogram(bins = 20, col = 'gray', breaks = seq(from = 0, to = 0.95, 0.05)) +
   geom_hline(aes(yintercept = 0.05), col = 'red', lty = 2) +
   ylim(0, 0.25) +
-  xlab('Density')+ylab('p')+
+  ylab('Density')+xlab('p')+
   ggtitle(glue("Theoretical distribution of p-values with no effect of media consumption"))
 
 gridExtra::grid.arrange(fe_plot, theoryplot, nrow = 2) %>% 
@@ -324,6 +273,8 @@ gridExtra::grid.arrange(fe_plot, theoryplot, nrow = 2) %>%
 ## vis effects across specifications ####
 load(here('data/efftable_did_2021-10-04.Rdata'))
 
+efftable$dv_lag_f <- factor(efftable$dv_lag, levels = c('6m', '1m', '1w', '1d'))
+
 plots <- list()
 for (frame in c('crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'deport')){
   
@@ -332,7 +283,7 @@ for (frame in c('crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'dep
     ggplot(mapping = 
              aes_string(
               x = paste0('beta_', frame), 
-              y = 'dv_lag', 
+              y = 'dv_lag_f', 
               xmin = paste0('lower_beta_', frame),
               xmax = paste0('upper_beta_', frame),
               col = 'respondents'
@@ -359,6 +310,8 @@ ggarrange(plotlist = plots, ncol = 2, nrow = 4,
 ## individual fe model
 load(here('data/efftable_fe_2021-10-04.Rdata'))
 
+efftable$dv_lag_f <- factor(efftable$dv_lag, levels = c('30d', '7d'))
+
 
 ## absolute frame attention model
 plots <- list()
@@ -370,7 +323,7 @@ for (frame in c('crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'dep
     ggplot(mapping = 
              aes_string(
                x = paste0('beta_', frame), 
-               y = 'dv_lag', 
+               y = 'dv_lag_f', 
                xmin = paste0('lower_beta_', frame),
                xmax = paste0('upper_beta_', frame),
                col = 'respondents'
@@ -400,7 +353,7 @@ for (frame in c('salience', 'crime', 'capcrime', 'refnums', 'medit', 'camps', 'l
     ggplot(mapping = 
              aes_string(
                x = paste0('beta_', frame), 
-               y = 'dv_lag', 
+               y = 'dv_lag_f', 
                xmin = paste0('lower_beta_', frame),
                xmax = paste0('upper_beta_', frame),
                col = 'respondents'
