@@ -341,10 +341,10 @@ for (frame in c('crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'dep
 }
 
 library(ggpubr)
-ggarrange(plotlist = plots, ncol = 2, nrow = 4, 
+ggarrange(plotlist = plots, ncol = 1, nrow = 7,
           common.legend = T, legend = "bottom") %>% 
   ggsave(filename = here("paper/vis/effectplot_frames_did.png"),
-         width = 10, height = 7)
+         width = 6, height = 12)
 
 
 
@@ -379,10 +379,10 @@ for (frame in c('crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'dep
     theme_minimal()
 }
 
-ggarrange(plotlist = plots, 
+ggarrange(plotlist = plots, ncol = 2, nrow = 4,
           common.legend = T, legend = "bottom") %>% 
   ggsave(filename = here("paper/vis/effectplot_frames_fe_abs.png"),
-         width = 10, height = 7)
+         width = 7, height = 10)
 
 
 ## relative frame attention model
@@ -409,7 +409,7 @@ for (frame in c('salience', 'crime', 'capcrime', 'refnums', 'medit', 'camps', 'l
     theme_minimal()
 }
 
-ggarrange(plotlist = plots, 
+ggarrange(plotlist = plots,  nrow = 4, ncol = 2,
           common.legend = T, legend = "bottom") %>% 
   ggsave(filename = here("paper/vis/effectplot_frames_fe_rel.png"),
-         width = 10, height = 7)
+         width = 7, height = 10)
