@@ -605,31 +605,31 @@ for (spec in c('absolute', 'share')){
                 respondents = respons,
                 specification = spec,
                 
-                beta_crime  = mod$coefficients['crime'] %>% round(3),
+                beta_crime  = mod$coefficients['crime'],
                 lower_beta_crime = confint(rawmod)['crime',1],
                 upper_beta_crime = confint(rawmod)['crime',2],
                 
-                beta_capcrime = mod$coefficients['capcrime'] %>% round(3),
+                beta_capcrime = mod$coefficients['capcrime'],
                 lower_beta_capcrime = confint(rawmod)['capcrime',1],
                 upper_beta_capcrime = confint(rawmod)['capcrime',2],
                 
-                beta_medit = mod$coefficients['medit'] %>% round(3),
+                beta_medit = mod$coefficients['medit'],
                 lower_beta_medit = confint(rawmod)['medit',1],
                 upper_beta_medit = confint(rawmod)['medit',2],
                 
-                beta_deport = mod$coefficients['deport'] %>% round(3),
+                beta_deport = mod$coefficients['deport'],
                 lower_beta_deport = confint(rawmod)['deport',1],
                 upper_beta_deport = confint(rawmod)['deport',2],
                 
-                beta_refnums = mod$coefficients['refnums'] %>% round(3),
+                beta_refnums = mod$coefficients['refnums'],
                 lower_beta_refnums = confint(rawmod)['refnums',1],
                 upper_beta_refnums = confint(rawmod)['refnums',2],
                 
-                beta_camps = mod$coefficients['camps'] %>% round(3),
+                beta_camps = mod$coefficients['camps'],
                 lower_beta_camps = confint(rawmod)['camps',1],
                 upper_beta_camps = confint(rawmod)['camps',2],
                 
-                beta_labmar = mod$coefficients['labmar'] %>% round(3),
+                beta_labmar = mod$coefficients['labmar'],
                 lower_beta_labmar = confint(rawmod)['labmar',1],
                 upper_beta_labmar = confint(rawmod)['labmar',2]
                 
