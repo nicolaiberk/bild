@@ -50,7 +50,7 @@ int_mean <-
   gles_p_long %>%
   group_by(wave) %>% 
   filter(!is.na(`1210_clean`)) %>% 
-  summarise(integration = mean(`1210_clean`),
+  summarise(integration = mean(`1210_clean`)*(-1),
             integration_sd = sd(`1210_clean`),
             date_new  = max(as.Date(date_clean, unit = 'days')),
             respondents = n()) %>% 
@@ -94,7 +94,7 @@ for (issue in c('Immigration', 'Integration')){
   if (issue == 'Immigration'){
     gles_p_long_paper['dv'] <- gles_p_long_paper['1130_clean']
   }else{
-    gles_p_long_paper['dv'] <- gles_p_long_paper['1210_clean']
+    gles_p_long_paper['dv'] <- gles_p_long_paper['1210_clean']*(-1)
   }
   
   
@@ -322,7 +322,7 @@ gridExtra::grid.arrange(fe_plot, theoryplot, nrow = 2) %>%
 
 
 ## vis effects across specifications ####
-load(here('data/efftable_noimp.Rdata'))
+load(here('data/efftable_did_2021-10-04.Rdata'))
 
 plots <- list()
 for (frame in c('crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'deport')){
@@ -350,5 +350,71 @@ for (frame in c('crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'dep
 library(ggpubr)
 ggarrange(plotlist = plots, ncol = 2, nrow = 4, 
           common.legend = T, legend = "bottom") %>% 
-  ggsave(filename = here("paper/vis/effectplot_frames.png"),
+  ggsave(filename = here("paper/vis/effectplot_frames_did.png"),
+         width = 10, height = 7)
+
+
+
+
+## individual fe model
+load(here('data/efftable_fe_2021-10-04.Rdata'))
+
+
+## absolute frame attention model
+plots <- list()
+for (frame in c('crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'deport')){
+  
+  plots[[frame]] <- 
+    efftable %>% 
+    filter(specification == 'absolute') %>%
+    ggplot(mapping = 
+             aes_string(
+               x = paste0('beta_', frame), 
+               y = 'dv_lag', 
+               xmin = paste0('lower_beta_', frame),
+               xmax = paste0('upper_beta_', frame),
+               col = 'respondents'
+             )) +
+    geom_vline(aes(xintercept = 0), col = "red", lty = 2) +
+    geom_pointrange(size = 0.3, position = ggstance::position_dodgev(height = 0.75)) +
+    facet_grid( ~ dv, scales = 'free') +
+    xlab("Beta") +
+    ylab("") +
+    ggtitle(frame) +
+    theme_minimal()
+}
+
+ggarrange(plotlist = plots, 
+          common.legend = T, legend = "bottom") %>% 
+  ggsave(filename = here("paper/vis/effectplot_frames_fe_abs.png"),
+         width = 10, height = 7)
+
+
+## relative frame attention model
+plots <- list()
+for (frame in c('salience', 'crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'deport')){
+  
+  plots[[frame]] <- 
+    efftable %>% 
+    filter(specification == 'share') %>% 
+    ggplot(mapping = 
+             aes_string(
+               x = paste0('beta_', frame), 
+               y = 'dv_lag', 
+               xmin = paste0('lower_beta_', frame),
+               xmax = paste0('upper_beta_', frame),
+               col = 'respondents'
+             )) +
+    geom_vline(aes(xintercept = 0), col = "red", lty = 2) +
+    geom_pointrange(size = 0.3, position = ggstance::position_dodgev(height = 0.75)) +
+    facet_grid( ~ dv, scales = 'free') +
+    xlab("Beta") +
+    ylab("") +
+    ggtitle(frame) +
+    theme_minimal()
+}
+
+ggarrange(plotlist = plots, 
+          common.legend = T, legend = "bottom") %>% 
+  ggsave(filename = here("paper/vis/effectplot_frames_fe_rel.png"),
          width = 10, height = 7)
