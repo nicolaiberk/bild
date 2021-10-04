@@ -43,7 +43,8 @@ imm_mean <-
   ggplot(aes(x = date_clean)) +
   geom_line(aes(y = immigration), col = "red") +
   geom_ribbon(aes(ymax = imm_up, ymin = imm_low), fill = "red") +
-  ggtitle("Immigration attitude in Germany across time", "Scale: -3 \nData: GLES Panel, waves 1-13, a1 & a2")
+  ggtitle("Immigration attitude in Germany across time", 
+          "Should immigration of foreigners be made easier (-3) or restricted (3) \nData: GLES Panel, waves 1-13, a1 & a2")
 
 ## integration attitude across time
 int_mean <- 
@@ -61,7 +62,8 @@ int_mean <-
   ggplot(aes(x = date_new)) +
   geom_line(aes(y = integration), col = "blue") +
   geom_ribbon(aes(ymax = imm_up, ymin = imm_low), fill = "blue") +
-  ggtitle("Integration attitude in Germany across time", "Data: GLES Panel, waves 1-13")
+  ggtitle("Integration attitude in Germany across time", 
+          "Should foreigners be allowed to live according to their own culture (-3) or fully adapt to German culture (3) \nData: GLES Panel, waves 1-13, a1 & a2")
 
 grid.arrange(imm_mean, int_mean, nrow = 2) %>% 
   ggsave(here('paper/vis/dv_plot.png'), plot = .)
@@ -81,11 +83,11 @@ gles_p_long_paper <-
   )
 
 ## adjust paper names
-gles_p_long_paper$paper[gles_p_long_paper$paper == 'a'] <- 'bild'
-gles_p_long_paper$paper[gles_p_long_paper$paper == 'c'] <- 'faz'
-gles_p_long_paper$paper[gles_p_long_paper$paper == 'd'] <- 'sz'
-gles_p_long_paper$paper[gles_p_long_paper$paper == 'e'] <- 'taz'
-gles_p_long_paper$paper[gles_p_long_paper$paper == 'f'] <- 'welt'
+gles_p_long_paper$paper[gles_p_long_paper$paper == 'a'] <- 'Bild'
+gles_p_long_paper$paper[gles_p_long_paper$paper == 'c'] <- 'FAZ'
+gles_p_long_paper$paper[gles_p_long_paper$paper == 'd'] <- 'SZ'
+gles_p_long_paper$paper[gles_p_long_paper$paper == 'e'] <- 'TAZ'
+gles_p_long_paper$paper[gles_p_long_paper$paper == 'f'] <- 'Welt'
 
 gles_p_long_paper$reader <- gles_p_long_paper$days_read > 0
 
@@ -115,13 +117,19 @@ for (issue in c('Immigration', 'Integration')){
   
   unique_waves <- paste(sort(unique(temp$wave)), collapse = ', ')
   
+  if (issue == 'Integration'){
+    scale_desc <- "Should foreigners be allowed to live according to their own culture (-3) or fully adapt to German culture (3) \n"
+  }else{
+    scale_desc <- "Should immigration of foreigners be made easier (-3) or restricted (3) \n"
+  }
+  
   plots[[issue]] <- 
     ggplot(temp, aes(x = date_clean)) +
     geom_line(aes(y = dv, col = paper)) +
     geom_ribbon(aes(ymax = dv_up, ymin = dv_low, fill = paper), alpha = 0.5) +
     xlab('') + ylab('')+
     ggtitle(glue("{issue} attitude among newspaper-readers"), 
-            glue("Data: GLES Panel; waves {unique_waves}"))
+            paste0(scale_desc, glue("Data: GLES Panel; waves {unique_waves}")))
   
 
 }
@@ -129,6 +137,8 @@ for (issue in c('Immigration', 'Integration')){
 grid.arrange(plots[['Immigration']], plots[['Integration']]) %>% 
   ggsave(filename = here(glue('paper/vis/issues_readers.png')),
          width = 8, height = 8)
+
+
 
 ## 2.2 vis independents ####
 
