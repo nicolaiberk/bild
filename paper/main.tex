@@ -209,31 +209,35 @@ These highly parallel trends might raise another problem, however. Possibly, no 
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{paper/vis/effectplot_frames_did.png}
-    \caption{Correlation of opinion shifts (DiDs) with media attention or shifts in attention (DiD's) for different specifications.}
+    \includegraphics[width=1.2\textwidth]{paper/vis/effectplot_frames_did.png}
+    \caption{Regression coefficients from DiD-models with different specifications.}
     \label{fig:did_corr}
 \end{figure}
 
 There seems to be interesting variation in the dependent variable. Can these opinion shifts be explained by shifts in news content? Figure \ref{fig:did_corr} shows the core analysis to estimate the effect of media attention on reader opinion. The displayed estimates are obtained by regressing the resulting DiD-estimates for issue attitudes on the DiD-estimates for media attention. Each dot in this graph represents the coefficient of a model explaining standardised aggregate opinion shifts with standardised shifts in media attention to specific frames for a specific frame and a specific model specification, as outlined in section \ref{sec:models}. If opinion shifts among newspapers' readers - relative to other readers - can be explained by shifts in newspapers' issue framing, these two variables should be highly correlated.
 
-This is however not the case. As figure \ref{fig:did_corr} shows, even with different specifications, \textit{no} estimate has predictive power for our analysis. For example, in the upper left panel 'crime', we can see four different lags indicating the frame prevalence of the past day, week, month, or half year (up to the last survey date) distinguished vertically, and the effects for two different issues in the two different panes. Additionally, the color of the points indicates whether the model was estimated only for readers of a single newspaper (lower N, but no treatment diffusion) or all readers of a newspaper (who might read another newspaper, say SZ readers who also read FAZ). All estimates are clearly clustering around the null, indicating no effect. While the 'exclusive reader' estimates show more variation, they also indicate far broader confidence intervals. There is no considerable difference across lags, and the variables only differ by the broader confidence intervals of the integration variable, owing to the fewer waves including this question. Generally, this analysis indicates no effect of media framing of migration on migration attitudes.
+This is however not the case. Figure \ref{fig:did_corr} shows standardised\footnote{Meaning that independent and dependent variables were mean-corrected and standardised before regression. A coefficient of one means that a one-standard-deviation shift in the independent variable corresponds to a one-standard deviation shift in the dependent variable.} regression coefficients for different specifications of the DiD-model. Each panel shows the effect of one frame on an attitude variable (controlling for all other frames), across different lags and different treatment definitions. For example, in the upper left panel 'crime', we can see two different panes ('immigration' and 'integration') for each dependent variable. The vertical rows distinguish four different lags indicating the frame prevalence of the past day, week, month, half year, or´the entire period up to the last survey date. Additionally, the color of the points indicates whether the model was estimated only for readers of a single newspaper (lower N, but no treatment diffusion) or all readers of a newspaper (who might read another newspaper, say SZ readers who also read FAZ). 
 
-To corroborate these results, I estimate another model directly predicting individual migration opinions with a lagged dependent and individual estimates of consumed migration frames (see section \ref{sec:models}). The results for migration and integration attitudes can be seen in table \ref{tab:ind_model}. Maybe even more interesting, these frames differ for the two dependent variables. The effects for the frame variables can be read as "one standard deviation increase in frame attention increases the dependent variable by X points on a -3 to 3 scale". Note that higher values on the immigration variable indicate more restrictive attitudes, and vice versa for the integration variable.
-
-Surprisingly, several frames show highly significant results in this model. Additionally, these effects can be considered fairly large. For example, a one-standard deviation increase in the attention to refugee numbers in the preceding week (compared to a week preceding the last interview) moves respondents 0.328 points towards the \textit{liberal} end of the 7-point immigration attitude scale. Similarly, respondents move 1.12 points towards the restrictive pole when discussion of the humanitarian crisis in the Mediterranean Sea increases by one standard deviation, and 2.43 points when the labour market frame is increasingly discussed.  Most interestingly, the labour market frame has the \textit{opposite} effect on integration attitudes, making people .34 points towards the liberal pole. Lastly, deportations have a slightly liberalising effect. None of these frames have the expected impact on opinions. Perhaps the clearest expectation can be formulated regarding the capital crime frame, which has pretty much no effect.
+Only very few estimates are significant, but no trends emerge across specifications for any variable. All estimates are clearly clustering around zero, indicating no effect. Estimates of all relationship indicate both positive and negative relationships across specifications. While the 'exclusive reader' estimates show more variation, they also indicate far broader confidence intervals. There is no considerable difference across lags, and the variables only differ by the broader confidence intervals of the integration variable, owing to the fewer waves including this question. Generally, this analysis indicates no effect of media framing of migration on migration attitudes.
 
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{paper/vis/effectplot_frames_fe_abs.png}
-    \caption{Caption}
-    \label{fig:mode_fe}
+    \caption{Regression coefficients from fixed-effects models with different specifications.}
+    \label{fig:model_fe}
 \end{figure}
+
+To corroborate these results, I estimate another model directly regressing individual migration opinions on individual estimates of consumed migration frames with fixed effects for survey wave and respondent. The results for migration and integration attitudes can be seen in figure \ref{fig:mode_fe}.
+
+Again, most estimates are not significant, differ in direction across specifications, and cluster around 0. While some estimates are unidirectional (crime and labour market in the immigration issue), they show tiny effects (a standard deviation increase in attention to the labour market ) and 
+
 
 \section{Discussion}
 
-It is unclear so far what to make of these results. While I am fairly certain that I need to re-assess the code, it seems that null effects dominate the (more identified) DiD-model, while the individual-level model shows odd, significant effects, highly dependent on model specifications. It might be that these effects are conditional, perhaps dependent on pre-existing immigration attitudes, issue importance, or partisanship. While these interactions do seem to have an effect, no clear narrative seems to emerge. For example, Petty Crime news are de-polarising, while news on capital crime by refugees affect opinions in a polarising way. If I settle on the first model and argue for null-effects, it is unclear how to present more evidence. Look for alternative explanation of opinion shifts? Assess effect on issue definitions, as initially planned? Show that strong shifts in frame attention drive people to stop reading the newspaper? Run an alternative model with 'right-wingness' of the migration discourse as main independent variable?
 
-It seems I have crashed.
+
+
+\newpage
 
 \section{Appendix}
 
@@ -256,7 +260,7 @@ The extended migration dictionary for the pre-sampling of articles on migration 
     \centering
     \includegraphics[width=\textwidth]{paper/vis/DiD_model_ps_immint.png}
     \caption{Empirical and theoretical p-values of 192 DiD-models corresponding to the immigration and integration questions of the GLES.}
-    \label{fig:my_label}
+    \label{fig:p-val_imm}
 \end{figure}
 
 \end{document}
