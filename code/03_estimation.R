@@ -107,40 +107,40 @@ for (issue in c("immigration", "integration")){
               dv_lag = lag,
               respondents = respons,
               
-              beta_crime  = mod$coefficients['crime',1] %>% round(3),
+              beta_crime  = mod$coefficients['crime',1],
               lower_beta_crime = confint(rawmod)['crime',1],
               upper_beta_crime = confint(rawmod)['crime',2],
-              pval_crime = mod$coefficients['crime',4] %>% round(3),
+              pval_crime = mod$coefficients['crime',4],
               
-              beta_capcrime = mod$coefficients['capcrime',1] %>% round(3),
+              beta_capcrime = mod$coefficients['capcrime',1],
               lower_beta_capcrime = confint(rawmod)['capcrime',1],
               upper_beta_capcrime = confint(rawmod)['capcrime',2],
-              pval_capcrime = mod$coefficients['capcrime',4] %>% round(3),
+              pval_capcrime = mod$coefficients['capcrime',4],
               
-              beta_medit = mod$coefficients['medit',1] %>% round(3),
+              beta_medit = mod$coefficients['medit',1],
               lower_beta_medit = confint(rawmod)['medit',1],
               upper_beta_medit = confint(rawmod)['medit',2],
-              pval_medit = mod$coefficients['medit',4] %>% round(3),
+              pval_medit = mod$coefficients['medit',4],
               
-              beta_deport = mod$coefficients['deport',1] %>% round(3),
+              beta_deport = mod$coefficients['deport',1],
               lower_beta_deport = confint(rawmod)['deport',1],
               upper_beta_deport = confint(rawmod)['deport',2],
-              pval_deport = mod$coefficients['deport',4] %>% round(3),
+              pval_deport = mod$coefficients['deport',4],
               
-              beta_refnums = mod$coefficients['refnums',1] %>% round(3),
+              beta_refnums = mod$coefficients['refnums',1],
               lower_beta_refnums = confint(rawmod)['refnums',1],
               upper_beta_refnums = confint(rawmod)['refnums',2],
-              pval_refnums = mod$coefficients['refnums',4] %>% round(3),
+              pval_refnums = mod$coefficients['refnums',4],
               
-              beta_camps = mod$coefficients['camps',1] %>% round(3),
+              beta_camps = mod$coefficients['camps',1],
               lower_beta_camps = confint(rawmod)['camps',1],
               upper_beta_camps = confint(rawmod)['camps',2],
-              pval_camps = mod$coefficients['camps',4] %>% round(3),
+              pval_camps = mod$coefficients['camps',4],
               
-              beta_labmar = mod$coefficients['labmar',1] %>% round(3),
+              beta_labmar = mod$coefficients['labmar',1],
               lower_beta_labmar = confint(rawmod)['labmar',1],
               upper_beta_labmar = confint(rawmod)['labmar',2],
-              pval_labmar = mod$coefficients['labmar',4] %>% round(3)
+              pval_labmar = mod$coefficients['labmar',4]
               
           ))
       
