@@ -155,7 +155,7 @@ With this procedure, the following seven 'large' migration frames were selected 
     \item drownings in the Mediterranean (topic 49).
 \end{enumerate}
 
-I expect the capital crime, illegal entry/petty crime, and the refugee numbers frames to have negative effects on attitudes towards migrants (as connected to negative considerations regarding immigration), while deportations, internment camps, and drownings in the Mediterranean sea should have positive effects, framing immigration as a humanitarian issue. The labour market frame should show mixed results, given that labour market integration might be perceived as threatening or addressing needs in the German economy. Figure \ref{fig:frames} shows the prevalence of all frames across time for each newspaper. It can be seen that substantial variation exists in the relative emphasis of migration frames both within and across newspapers.
+I expect the capital crime, illegal entry/petty crime, and the refugee numbers frames to have negative effects on attitudes towards migrants (as connected to negative considerations regarding immigration), while deportations, internment camps, and drownings in the Mediterranean sea should have positive effects, framing immigration as a humanitarian issue. The labour market frame should show mixed results, given that labour market integration might be perceived as threatening or addressing needs in the German economy. Figure \ref{fig:frames} shows the prevalence of all frames across time for each newspaper. It can be seen that substantial variation exists in the relative emphasis of migration frames both within and across newspapers. Interestingly, some issues seem to vary according to newspaper slant. For example, more right-leaning outlets \textit{Bild, FAZ}, and \textit{Welt} seem to largely ignore the humanitarian crisis in the Mediterranean sea, while they emphasise petty crime more. This lends some first credibility to the expected effects for these frames, although the differences are not clearly visible for the other frames.
 
 \begin{figure}[!ht]
     \centering
@@ -167,9 +167,9 @@ I expect the capital crime, illegal entry/petty crime, and the refugee numbers f
 
 \subsection{Study design}
 
-\subsubsection{Differences in opinion formation across readers}
+\subsubsection{Differences in opinion formation across readers}\label{sec:did_readers}
 
-To assess whether opinion shifts might be influenced by news consumption, I estimate difference-in-differences (DiDs) for all available combinations of issues, news outlets, and survey waves. The main term of interest is the interaction of a binary indicator of readership of a certain outlet with a binary indicator which equals 1 for the current wave and 0 for the preceding wave. Hence I measure the shift in opinions of the readership of a certain outlet, controlling for the changes taking place among consumers of other news. The distribution of p-values of these DiDs allows me to assess whether meaningful variation exists in readers' attitude formation that can be explained by shifts in media consumption. The formula is given below:
+To assess whether opinion shifts might be influenced by news consumption, I isolate the opinion shift by readers of one newspaper relative to all other newspaper readers. To do this, I estimate difference-in-differences (DiDs) for all available combinations of issues, news outlets, and survey waves. The binary variable indicating readership controls for differences in levels between different news consumers, while the binary variable indicating the survey wave controls for general attitudinal shifts across time. The main term of interest is then the interaction of the binary indicator of readership of a certain outlet with the binary indicator for the current wave. This captures the change of the specified group (e.g. \textit{Bild}-readers), beyond time-constant differences between the newspapers and general trends from one survey wave to another. Hence I measure the shift in opinions of the readership of a certain outlet, controlling for the changes taking place among consumers of other news. The formula is given below:
 
 $$ y = \beta_1 * W + \beta_2 * R + \beta_3 * W * R, $$
 
@@ -178,9 +178,11 @@ where $y$ is the dependent (attention to migration frame or migration opinion), 
 
 \subsubsection{Estimation of framing effect}\label{sec:models}
 
-I estimate the same DiDs to measure shifts in migration framing in a certain newspaper, controlling for shifts in all other newspapers. To do that, I first sum the attention given to a certain frame in a given newspaper in the past day, week, month, or half year, up to the last survey. This allows me to assess whether choosing different lags affects my estimates. Then, I estimate the DiD, indicating how much a newspaper changed its attention to a given migration frame. These estimates are then matched and correlated with the DiDs estimating the opinion shifts. If increasing attention to a certain frame causes a shift in migration attitudes, these two measures should be highly correlated.
+I estimate the same DiDs to measure shifts in migration framing in a certain newspaper, controlling for shifts in all other newspapers. To do that, I first sum the attention given to a certain frame in a given newspaper in the past day, week, month, or half year, up to the last survey. This allows me to assess whether choosing different lags affects my estimates. Then, I estimate the DiD, indicating how much a newspaper changed its attention to a given migration frame, relative to all others. The DiDs estimating the opinion shifts described in \ref{sec:did_readers} are then matched and regressed on the shifts in migration framing. If increasing attention to a certain frame causes a shift in migration attitudes, these two measures should be highly correlated.
 
-Second, I estimate an individual-level model predicting immigration opinion with a lagged dependent variable and the exposure to each frame. Controlling for the lagged dependent variable means that I restrict the variance to the shift in opinions since the last wave. I measure exposure to each frame by summing up the frame attention of the past week in each newspaper the respondent claimed to have read in the past week and dividing it by the total number of newspapers read. This way, I estimate frame exposure for each individual respondent's interview date and news diet.
+Second, I fit individual-level fixed-effect models with individual news framing estimates for each survey interview. I measure exposure to each frame by summing up the frame attention of the past week (relative to the interview) in each newspaper the respondent claimed to have read in the past week and dividing it by the total number of newspapers read. This way, I estimate frame exposure for each individual respondent's interview date and news diet, which allows to estimate the correlation of changes in immigration opinion with the migration framing in recently consumed outlets.
+
+While the DiD's are causally better identified, controlling for shifts in other newspapers and reader groups, they suffer from the fact that surveys are conducted for several days, often up to two weeks, which makes the precise matching of newspaper content impossible. The fixed-effect models control for wave effects and (time-constant) individual characteristics, therefor restricting the explainable variance to everything beyond general trends and individual characteristics, but might include more noise. Another difference is that the DiD-models correlate relative shifts, while the fixed-effect models regress opinion levels on frame attention levels.
 
 
 \section{Results}
@@ -198,7 +200,7 @@ DiD-designs rest on the assumption that treated and untreated units would follow
 
 \subsection{Distribution of DiD-effect significance}
 
-As a first step, the DiDs for all wave-issue-paper combinations are estimated. This means I use all political issues included in the surveys (economic, issues, climate, ...) are used as dependent variable, and assess whether news consumption matters for opinion formation more generally. The upper panel of figure \ref{fig:p_values} shows the distribution of p-values for the DiD-term from 1,752 fixed-effect models with GLES Panel data. The distribution shows a considerable deviation from the expected uniform distribution (visible in the lower panel) were there no explaining variation in the DiD-term beyond the uniform effects of wave and paper readership. This means, more often than random, the opinions of consumers of certain news deviate from the opinions of other citizens. This strongly indicates that news consumption matters for opinion formation.
+These highly parallel trends might raise another problem, however. Possibly, no significant variation of reader groups' migration opinion from the general trend can be observed. To address this concern, I estimate DiDs for all wave-issue-paper combinations. This means I use attitudinal questions on all political issues included in the GLES Panel (economic, issues, climate, ...), and assess whether news consumption matters for opinion formation more generally. The upper panel of figure \ref{fig:p_values} shows the distribution of p-values for the DiD-term from 1,752 fixed-effect models with GLES Panel data. The distribution shows a considerable deviation from the expected uniform distribution (visible in the lower panel) were there no explaining variation in the DiD-term beyond the uniform effects of wave and paper readership. This means, more often than random (12\% vs 5\%), the opinions of consumers of certain news deviate from the opinions of other citizens. This is even more severe for the 192 wave-paper combinations concerning the immigration or integration item used in the remainder of this study, where 18\% of all estimated DiDs fall under the 5\%-threshold\footnote{See plot in appendix \ref{}}.  This strongly indicates that news consumption matters for opinion formation and that the data shows variation which can be explained, despite highly parallel trends.
 
 
 
@@ -220,59 +222,12 @@ To corroborate these results, I estimate another model directly predicting indiv
 
 Surprisingly, several frames show highly significant results in this model. Additionally, these effects can be considered fairly large. For example, a one-standard deviation increase in the attention to refugee numbers in the preceding week (compared to a week preceding the last interview) moves respondents 0.328 points towards the \textit{liberal} end of the 7-point immigration attitude scale. Similarly, respondents move 1.12 points towards the restrictive pole when discussion of the humanitarian crisis in the Mediterranean Sea increases by one standard deviation, and 2.43 points when the labour market frame is increasingly discussed.  Most interestingly, the labour market frame has the \textit{opposite} effect on integration attitudes, making people .34 points towards the liberal pole. Lastly, deportations have a slightly liberalising effect. None of these frames have the expected impact on opinions. Perhaps the clearest expectation can be formulated regarding the capital crime frame, which has pretty much no effect.
 
-
-\begin{table}[!htbp] \centering 
-  \caption{Individual-level Model} 
-  \label{tab:ind_model} 
-\begin{tabular}{@{\extracolsep{5pt}}lcc} 
-\\[-1.8ex]\hline 
-\hline \\[-1.8ex] 
- & \multicolumn{2}{c}{\textit{Dependent variable:}} \\ 
-\cline{2-3} 
-\\[-1.8ex] & Immigration & Integration \\ 
-\hline \\[-1.8ex] 
- Immigration (lag) & 0.816$^{***}$ &  \\ 
-  & (0.005) &  \\ 
-  & & \\ 
- Integration (lag) &  & 0.745$^{***}$ \\ 
-  &  & (0.012) \\ 
-  & & \\ 
- Petty Crime & 0.022 & $-$0.071 \\ 
-  & (0.019) & (0.069) \\ 
-  & & \\ 
- Capital Crime& 0.011 & 0.016 \\ 
-  & (0.015) & (0.041) \\ 
-  & & \\ 
- Refugee numbers & $-$0.328$^{***}$ & $-$0.163 \\ 
-  & (0.046) & (0.165) \\ 
-  & & \\ 
- Internment Camps & 0.011 & 0.183 \\ 
-  & (0.012) & (0.134) \\ 
-  & & \\ 
- Mediterranean & 0.112$^{***}$ & 0.035 \\ 
-  & (0.018) & (0.052) \\ 
-  & & \\ 
- Labour Market & 0.243$^{***}$ & 0.340$^{**}$ \\ 
-  & (0.029) & (0.148) \\ 
-  & & \\ 
- Deportations & $-$0.048$^{***}$ & $-$0.008 \\ 
-  & (0.012) & (0.065) \\ 
-  & & \\ 
- Constant & 0.168$^{***}$ & $-$0.092 \\ 
-  & (0.018) & (0.090) \\ 
-  & & \\ 
-\hline \\[-1.8ex] 
-Observations & 13,346 & 3,818 \\ 
-R$^{2}$ & 0.646 & 0.509 \\ 
-Adjusted R$^{2}$ & 0.646 & 0.508 \\ 
-Residual Std. Error & 1.083 (df = 13337) & 1.035 (df = 3809) \\ 
-F Statistic & 3,045.212$^{***}$ (df = 8; 13337) & 493.950$^{***}$ (df = 8; 3809) \\ 
-\hline 
-\hline \\[-1.8ex] 
-\textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
-\end{tabular} 
-\end{table} 
-
+\begin{figure}
+    \centering
+    \includegraphics[width=\textwidth]{paper/vis/effectplot_frames_fe_abs.png}
+    \caption{Caption}
+    \label{fig:mode_fe}
+\end{figure}
 
 \section{Discussion}
 
@@ -294,6 +249,9 @@ The extended migration dictionary for the pre-sampling of articles on migration 
     \includegraphics[width=2\textwidth]{paper/vis/mig_topics_plot.png}
     \label{fig:did_corr}
 \end{figure}
+
+\subsection{P-values immigration and integration issue}\label{app:p-val_imm}
+
 
 
 \end{document}
