@@ -256,7 +256,6 @@ attitude_dids$sig_fe <- (attitude_dids$p_fe < 0.05)
 attitude_dids$sig_lm <- (attitude_dids$p_lm < 0.05)
 
 prop.table(table(attitude_dids$sig_fe)) %>% round(2) # 12% instead of 5% -> significant effects overrepresented
-prop.table(table(attitude_dids$sig_lm)) %>% round(2) # 7%
 
 
 fe_plot <- attitude_dids %>% 
@@ -279,6 +278,37 @@ theoryplot <- data.frame(p = runif(1336, 0, 1)) %>%
 gridExtra::grid.arrange(fe_plot, theoryplot, nrow = 2) %>% 
   ggsave(plot = ., 
          filename = here("paper/vis/DiD_model_ps.png"),
+         width = 8, height = 6)
+
+
+## migration and integration only
+attitude_dids <- 
+  attitude_dids %>% 
+  filter(issue == '1130' | issue == '1210')
+
+prop.table(table(attitude_dids$sig_fe)) %>% round(2) # 18% instead of 5% -> significant effects overrepresented
+
+
+fe_plot <- attitude_dids %>% 
+  ggplot(aes(x = p_fe, y = ..count../nrow(attitude_dids))) +
+  geom_histogram(bins = 20, col = 'gray', breaks = seq(from = 0, to = 0.95, 0.05)) +
+  geom_hline(aes(yintercept = 0.05), col = 'red', lty = 2) +
+  ylim(0, 0.25) +
+  ylab('Density')+xlab('p')+
+  ggtitle(glue("P-values from {nrow(attitude_dids)} fixed-effect DiD-models"), 
+          "Treatment = wave, condition = media outlet consumption")
+
+theoryplot <- data.frame(p = runif(1336, 0, 1)) %>% 
+  ggplot(aes(x = p, y = ..count../1336)) +
+  geom_histogram(bins = 20, col = 'gray', breaks = seq(from = 0, to = 0.95, 0.05)) +
+  geom_hline(aes(yintercept = 0.05), col = 'red', lty = 2) +
+  ylim(0, 0.25) +
+  ylab('Density')+xlab('p')+
+  ggtitle(glue("Theoretical distribution of p-values with no effect of media consumption"))
+
+gridExtra::grid.arrange(fe_plot, theoryplot, nrow = 2) %>% 
+  ggsave(plot = ., 
+         filename = here("paper/vis/DiD_model_ps_immint.png"),
          width = 8, height = 6)
 
 
