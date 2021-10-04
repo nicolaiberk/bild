@@ -178,7 +178,8 @@ salience_sum %>%
   ggplot(aes(x = date_m, y = share_mig, col = paper)) +
   geom_line() +
   geom_vline(xintercept = survey_dates$date, col = 'darkgray') +
-  ggtitle('Migration salience in different newspapers', 'Gray lines indicate survey waves')
+  ggtitle('Migration salience in different newspapers', 'Gray lines indicate survey waves') +
+  xlab('') + ylab('Share of migration articles')
 ggsave(here('paper/vis/salience_papers.png'), width = 8, height = 5)
 
 sal_2017 <- 
@@ -188,7 +189,8 @@ sal_2017 <-
   ggplot(aes(x = date_m, y = share_mig, col = paper)) +
   geom_line() +
   geom_vline(xintercept = survey_dates$date, col = 'darkgray') +
-  ggtitle('Migration salience in different newspapers', 'Gray lines indicate survey waves')
+  ggtitle('Migration salience in different newspapers', 'Gray lines indicate survey waves') +
+  xlab('') + ylab('Share of migration articles')
 ggsave(sal_2017, filename = here('paper/vis/salience_papers_focus.png'), 
        width = 8, height = 5)
 
