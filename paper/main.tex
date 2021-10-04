@@ -217,16 +217,69 @@ There seems to be interesting variation in the dependent variable. Can these opi
 
 This is however not the case. As figure \ref{fig:did_corr} shows, even with different specifications, \textit{no} estimate has predictive power for our analysis. For example, in the upper left panel 'crime', we can see 5 different lags 'g', '6m', '1m', '1w', '1d' distinguished vertically, and the effects for two different issues in the two different panes. Additionally, the color of the points indicates whether the model was estimated only for readers of a single newspaper (lower N, but no treatment diffusion) or all readers of a newspaper (who might read another newspaper, say SZ readers who also read FAZ). All estimates are clearly clustering around the null, indicating no effect. While the 'exclusive reader' estimates show more variation, they also indicate far broader confidence intervals. There is no considerable difference across lags, and the variables only differ by the broader confidence intervals of the integration variable, owing to the fewer waves including this question. Generally, this analysis indicates no effect of media framing of migration on migration attitudes.
 
-To corroborate these results, I estimate another model directly predicting individual migration opinions with a lagged dependent and individual estimates of consumed migration frames (see section \ref{sec:models}). The results for migration and integration attitudes can be seen in table \ref{tab:ind_model}. 
+To corroborate these results, I estimate another model directly predicting individual migration opinions with a lagged dependent and individual estimates of consumed migration frames (see section \ref{sec:models}). The results for migration and integration attitudes can be seen in table \ref{tab:ind_model}. Maybe even more interesting, these frames differ for the two dependent variables. The effects for the frame variables can be read as "one standard deviation increase in frame attention increases the dependent variable by X points on a -3 to 3 scale". Note that higher values on the immigration variable indicate more restrictive attitudes, and vice versa for the integration variable.
+
+Surprisingly, several frames show highly significant results in this model. Additionally, these effects can be considered fairly large. For example, a one-standard deviation increase in the attention to refugee numbers in the preceding week (compared to a week preceding the last interview) moves respondents 0.328 points towards the \textit{liberal} end of the 7-point immigration attitude scale. Similarly, respondents move 1.12 points towards the restrictive pole when discussion of the humanitarian crisis in the Mediterranean Sea increases by one standard deviation, and 2.43 points when the labour market frame is increasingly discussed.  Most interestingly, the labour market frame has the \textit{opposite} effect on integration attitudes, making people .34 points towards the liberal pole. Lastly, deportations have a slightly liberalising effect. None of these frames have the expected impact on opinions. Perhaps the clearest expectation can be formulated regarding the capital crime frame, which has pretty much no effect.
 
 
+\begin{table}[!htbp] \centering 
+  \caption{Individual-level Model} 
+  \label{tab:ind_model} 
+\begin{tabular}{@{\extracolsep{5pt}}lcc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{2}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-3} 
+\\[-1.8ex] & Immigration & Integration \\ 
+\hline \\[-1.8ex] 
+ Immigration (lag) & 0.816$^{***}$ &  \\ 
+  & (0.005) &  \\ 
+  & & \\ 
+ Integration (lag) &  & 0.745$^{***}$ \\ 
+  &  & (0.012) \\ 
+  & & \\ 
+ Petty Crime & 0.022 & $-$0.071 \\ 
+  & (0.019) & (0.069) \\ 
+  & & \\ 
+ Capital Crime& 0.011 & 0.016 \\ 
+  & (0.015) & (0.041) \\ 
+  & & \\ 
+ Refugee numbers & $-$0.328$^{***}$ & $-$0.163 \\ 
+  & (0.046) & (0.165) \\ 
+  & & \\ 
+ Internment Camps & 0.011 & 0.183 \\ 
+  & (0.012) & (0.134) \\ 
+  & & \\ 
+ Mediterranean & 0.112$^{***}$ & 0.035 \\ 
+  & (0.018) & (0.052) \\ 
+  & & \\ 
+ Labour Market & 0.243$^{***}$ & 0.340$^{**}$ \\ 
+  & (0.029) & (0.148) \\ 
+  & & \\ 
+ Deportations & $-$0.048$^{***}$ & $-$0.008 \\ 
+  & (0.012) & (0.065) \\ 
+  & & \\ 
+ Constant & 0.168$^{***}$ & $-$0.092 \\ 
+  & (0.018) & (0.090) \\ 
+  & & \\ 
+\hline \\[-1.8ex] 
+Observations & 13,346 & 3,818 \\ 
+R$^{2}$ & 0.646 & 0.509 \\ 
+Adjusted R$^{2}$ & 0.646 & 0.508 \\ 
+Residual Std. Error & 1.083 (df = 13337) & 1.035 (df = 3809) \\ 
+F Statistic & 3,045.212$^{***}$ (df = 8; 13337) & 493.950$^{***}$ (df = 8; 3809) \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table} 
 
 
 \section{Discussion}
-\begin{itemize}
-    \item people could a) not react, b) stop reading their newspaper, c) change their opinion
-    \item add right-wing slant as second dependent using AfD-classifier
-\end{itemize}
+
+It is unclear so far what to make of these results. While I am fairly certain that I need to re-assess the code, it seems that null effects dominate the (more identified) DiD-model, while the individual-level model shows odd, significant effects, highly dependent on model specifications. It might be that these effects are conditional, perhaps dependent on pre-existing immigration attitudes, issue importance, or partisanship. While these interactions do seem to have an effect, no clear narrative seems to emerge. For example, Petty Crime news are de-polarising, while news on capital crime by refugees affect opinions in a polarising way. If I settle on the first model and argue for null-effects, it is unclear how to present more evidence. Look for alternative explanation of opinion shifts? Assess effect on issue definitions, as initially planned? Show that strong shifts in frame attention drive people to stop reading the newspaper? Run an alternative model with 'right-wingness' of the migration discourse as main independent variable?
+
+It seems I have crashed.
 
 \section{Appendix}
 
@@ -235,5 +288,12 @@ To corroborate these results, I estimate another model directly predicting indiv
 [add description and plot issue importance]
 
 \subsection{Structural Topic Model}\label{app:stm}
+
+\begin{figure}[!ht]
+    \centering
+    \includegraphics[width=2\textwidth]{paper/vis/mig_topics_plot.png}
+    \label{fig:did_corr}
+\end{figure}
+
 
 \end{document}
