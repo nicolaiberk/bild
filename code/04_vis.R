@@ -315,7 +315,7 @@ gridExtra::grid.arrange(fe_plot, theoryplot, nrow = 2) %>%
 ## vis effects across specifications ####
 load(here('data/efftable_did_2021-10-04.Rdata'))
 
-efftable$dv_lag_f <- factor(efftable$dv_lag, levels = c('6m', '1m', '1w', '1d'))
+efftable$dv_lag_f <- factor(efftable$dv_lag, levels = c('all', '6m', '1m', '1w', '1d'))
 
 plots <- list()
 for (frame in c('crime', 'capcrime', 'refnums', 'medit', 'camps', 'labmar', 'deport')){
