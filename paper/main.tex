@@ -14,8 +14,8 @@ citestyle=authoryear
  
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{Media Framing and Issue Attitudes}
-\lhead{Nicolai Berk}
+\rhead{The Effect of News Framing}
+\lhead{Berk}
 \cfoot{\thepage}
 
 \useunder{\uline}{\ul}{}
@@ -25,17 +25,22 @@ citestyle=authoryear
 
 \usepackage{xcolor}
 
-\title{The Effect of Media Frames on Issue Attitudes}
+\title{The Effect of News Framing on Issue Attitudes and Voting Behaviour}
 \author{Nicolai Berk\footnote{Doctoral Candidate, Dynamics Doctoral Program, Humboldt-Universität zu Berlin, \href{mailto:nicolai.berk@hu-berlin.de}{nicolai.berk@hu-berlin.de}}}
-\date{September 2021}
+\date{October 2021}
 
 \begin{document}
 
 \maketitle
 
+% \begin{center}
+%     \textit{Manuscript prepared for the Empirical Political Science in Progress Colloquium at Humboldt University Berlin}
+% \end{center}
+
+\medskip
 
 \begin{abstract}
-    A large body of literature debates the existence and extent of effects of media framing on consumers' issue attitudes. Combining panel data from the German Longitudinal Election Study with a fine-grained analyses of media framing, I address this debate with observational data, providing evidence from 1,752 fixed-effect, difference-in-differences models suggesting systematic differences in newspaper readers' opinion shifts. Second, I present evidence that such changes in consumers' attitudes towards immigration surrounding the German national election 2017 did \textit{not} correspond to changes in the migration framing of consumed media outlets. The findings contribute to our understanding of opinion formation processes and the relevance of the news media in the 21st century.
+    A large body of literature debates the extent to which media consumption affects consumers' issue attitudes and voting behaviour in contemporary media environments. Studies supporting the minimal effects hypothesis have often used designs estimating the effects of novel, previously unconsumed content on participants' attitudes. However, experimental evidence suggests that media consumers discount the bias of different outlets. Additionally, most studies assume rather than measure the extent of newspaper bias. Combining panel data with state-of-the-art methods of text analysis and exploiting an editorial change, I address both shortcomings with observational data. Results across different specifications indicate that even when assessing within-newspaper changes in issue framing, no effect on attitudes or voting behaviour can be found. These findings add further evidence that media effects in the viewers choice era are limited.
 \end{abstract}
 
 
@@ -58,7 +63,7 @@ A large amount of evidence underlines the importance of newspaper coverage for p
 
 This "maximal effects" view is contrasted by a body of evidence indicating weak to absent media effects as well. \citeauthor{Gentzkow2011} show that even historically, the entry and exit of newspapers in the US does affect turnout, but that the newspapers' slant does not affect either party's vote share. They conclude that "the persuasive effect of partisan newspapers is limited" (\citeyear[3011]{Gentzkow2011}). Recently, \citeauthor{Guess2021} incentivised participants of an online-panel to visit left- or right-leaning news websites, with no effect on opinions (\citeyear{Guess2021}). An experiment by \citeauthor{Lau2021} indicates that increasing the likelihood of encountering information about a fictitious candidate's stance on a given issue does not increase the importance of that issue in reaching a voting decision, directly contradicting theories of agenda setting (\citeyear{Lau2021}). This lack of evidence echos a general critique of the external validity of framing experiments and other experimental evidence about opinion formation (\cite{Barabas2010, Busby2019, Leeper2020}).
 
-What might explain these contradicting findings? Scope conditions for media effects seem to be surprisingly understudied given the contradicting body of evidence. \citeauthor{Chiang2011a} argue that endorsements from newspapers with ideological leanings neutral or opposite to the endorsed party/candidate should have stronger effects on voting behaviour, as voters discount the general bias of a newspaper (\citeyear{Chiang2011a}). \citeauthor{Spirig2020} shows that the takeover of a Swiss regional newspaper through a leading politician of the far-right and the subsequent change in its political slant had no effect on citizens' voting behaviour and suggests that this is a result of voters discounting the new owner's political slant and stopping to read the newspaper.
+What might explain these contradicting findings? Scope conditions of media effects seem to be surprisingly understudied given the contradicting body of evidence. \citeauthor{Chiang2011a} argue that endorsements from newspapers with ideological leanings neutral or opposite to the endorsed party/candidate should have stronger effects on voting behaviour, as voters discount the general bias of a newspaper (\citeyear{Chiang2011a}). \citeauthor{Durante2012} find that a rightwards shift in Italian public TV channels' slant after the takeover of the Berlusconi government led left-wing consumers to chose different outlets, rather than changing their political opinions  \citeyear{Durante2012}. \citeauthor{Spirig2020} shows that the takeover of a Swiss regional newspaper through a leading politician of the far-right and the subsequent change in its political slant had no effect on citizens' voting behaviour and suggests that this is a result of voters discounting the new owner's political slant and stopping to read the newspaper (\citeyear{Spirig2020}).
 
 If citizens discount the content of media outlets, they should not react to the presentation of news from outlets they do not usually consume. Instead, a most likely case for effects of news exposure would have to assess changing content \textit{within} the same newspapers and its effect on consumers' issue attitudes. This is precisely what this study aims to do.
 
@@ -76,7 +81,7 @@ If citizens discount the content of media outlets, they should not react to the 
 
 \subsection{Mechanisms of Framing}
 
-While news slant is a very general concept, and sometimes operationalised as similarity to specific parties' communication (\cite{Gentzkow2010}) or issue positions/tonality (\cite{Spirig2020}), framing theory provides a specific expectation about which treatment should affect which issue attitudes how. As \citeauthor{Nelson1997} write: "framing is the process by which a communication source, such as a news organisation, defines and constructs a political issue or public controversy" (\citeyear[567]{Nelson1997}). A "frame" is then the operating unit of this process, defining the issue at hand in a specific way. Different forms of frames have been conceptualised. When I talk about 'frames' here, I refer to \textit{emphasis frames}. These frames emphasise certain topics in relation to an issue, guiding the recipient to think about the issue with those considerations in mind that are promoted by the frame (\cite[153f]{Leeper2020}). For example, issues of increasing welfare benefits might be discussed with reference to inequality and providing chances to the poor, or by mentioning that higher welfare benefits might result in higher taxes. Individuals' support of a statement will differ dependent on the frame presented (\cite{sniderman2004structure}).
+While news slant is a very general concept, and sometimes operationalised as similarity to specific parties' communication (\cite{Gentzkow2010}) or issue positions/tonality (\cite{Spirig2020}), framing theory provides a specific expectation about which treatment should affect which issue attitudes how. As \citeauthor{Nelson1997} write: "framing is the process by which a communication source, such as a news organisation, defines and constructs a political issue or public controversy" (\citeyear[567]{Nelson1997}). A "frame" is then the operating unit of this process, defining the issue at hand in a specific way. Different forms of frames have been conceptualised. Some readers might think of loss and gain frames, as used in the famous experiments by \citeauthor{Kahneman1979prospect} (\citeyear{Kahneman1979prospect}). Others will think of ’generic’ frames, which describe frames that can be applied in different contexts. For example, an election might be described as a ’horse race’, where parties strive to ’win’ by getting to ﬁrst place. When I talk about 'frames' here, I refer to \textit{emphasis frames}. These frames emphasise certain topics in relation to an issue, guiding the recipient to think about the issue with those considerations in mind that are promoted by the frame (\cite[153f]{Leeper2020}). For example, issues of increasing welfare benefits might be discussed with reference to inequality and providing chances to the poor, or by mentioning that higher welfare benefits might result in higher taxes. Individuals' support of a statement will differ dependent on the frame presented (\cite{sniderman2004structure}).
 
 \begin{figure}
     \centering
@@ -85,7 +90,7 @@ While news slant is a very general concept, and sometimes operationalised as sim
     \label{fig:cogStor}
 \end{figure}
 
-While this broad definition gives a first idea of what framing is about, the concept of emphasis framing has been criticised for being too broad and imprecise to contribute anything meaningful to the field (\cite{Scheufele2012}). To address this shortcoming, I follow the framing literature building on the \textit{value-expectancy model} (\cite{Ajzen2000, Nelson1997}). This model suggests that an attitude on a given issue is a function of two things: considerations and their respective weights. The evaluation of the issue is subdivided into a number of considerations (to which political scientists might refer as "valence issues"), that will be easier to evaluate. For example, to decide whether a lockdown is necessary to battle the spread of Covid-19 in one's country, a person might consider the detrimental short-term effect on businesses and individuals' mental health (negative considerations), as well as the cost of overburdened hospitals and additional deaths (positive considerations, at least with respect to the evaluation of a lockdown). Individuals weigh each of these considerations to form an overall opinion on the subject. 
+While this broad definition gives a first idea of what framing is about, the concept of emphasis framing has been criticised for being too broad and imprecise to contribute anything meaningful to the field (\cite{Scheufele2012}). To address this shortcoming, I follow the framing literature building on the \textit{value-expectancy model} (\cite{Ajzen2000, Nelson1997}). This model suggests that an attitude on a given issue is a function of two things: considerations and their respective weights. The evaluation of the issue is subdivided into a number of considerations (to which political scientists might refer as "valence issues"), which will be easier to evaluate. For example, to decide whether a lockdown is necessary to battle the spread of Covid-19 in one's country, a person might consider the detrimental short-term effect on businesses and individuals' mental health (negative considerations), as well as the cost of overburdened hospitals and additional deaths (positive considerations, at least with respect to the evaluation of a lockdown). Individuals weigh each of these considerations to form an overall opinion on the subject. 
 
 
 Figure \ref{fig:cogStor} visualises this logic. A given issue is associated with an attitude $y$. The issue is related to a number of different considerations, each of which carries an associated evaluation $x_i$, e.g. that the prevention of overcrowded hospitals is a good thing. Each of these considerations is more or less associated with the issue. Based on the strength of this association $w_i$, a given consideration's evaluation is more or less reflected in the issue evaluation $y$, which is equal to the weighted sum of considerations. Emphasis framing affects the issue attitude $y$ by changing the weights of different considerations\footnote{Note that this concept of framing is identical to second-level or attribute agenda setting (\cite{Lopezescobar2017, McCombs2000}; see \cite[174]{Mclaren2018} for a discussion of the overlap of these literatures). I will stick to the framing perspective here as the literature is focused on issues rather than candidates' attributes, and the conceptualisation as frame allows to form expectations about citizens' reactions to changing news frames.}.
@@ -132,14 +137,14 @@ Figure \ref{fig:issues} shows the two main dependent variables for each group of
 
 To measure media attention to immigration, I collected 2.5 million newspaper articles from the most important German broadsheets \textit{Frankfurter Allgemeine Zeitung (FAZ), Spiegel Online (SPON), Süddeutsche Zeitung (SZ), Die Tageszeitung (TAZ), Die Welt} and the major German tabloid \textit{Bild} for the period 2013-2019. To identify whether an article is about migration, I train a BERT deep-learning classifier. 
 
-As migration content is rare, and my training data needs to be somewhat balanced, I first construct a dictionary of terms related to migration. I use dictionary extension based on German GloVe word-embeddings\footnote{Downloadable from \url{https://deepset.ai/german-word-embeddings}.} to construct a comprehensive dictionary, and apply it to the articles. Based on the relative share of migration words in an article, I draw a stratified sample of 300 articles (100 from the third with fewest migration terms, 100 from the third with most migration terms and 100 from the third in between) for each newspaper for a total of 1,800 papers. Then, a student assistant\footnote{Thank you Robin.} hand-coded these articles, assessing whether their main topic is related to migration. 
+As migration content is rare, and my training data needs to be somewhat balanced, I first construct a dictionary of terms related to migration. I use dictionary extension based on German GloVe word-embeddings\footnote{Downloadable from \url{https://deepset.ai/german-word-embeddings}.} to construct a comprehensive dictionary, and apply it to the articles. Based on the relative share of migration words in an article, I draw a stratified sample of 300 articles (100 from the third with fewest migration terms, 100 from the third with most migration terms and 100 from the third in between) for each newspaper for a total of 1,800 papers. Then, a student assistant\footnote{Thank you, Robin. I know it was painful.} hand-coded these articles, assessing whether their main topic is related to migration. 
 
 Using this sample, a BERT deep-learning classifier\footnote{\url{https://huggingface.co/bert-base-german-cased}} is fine-tuned on a subset of 1,400 annotated articles. After fine-tuning, the model correctly classifies 95.5\% of the test set (F1: 0.94, recall: 0.93, precision: 0.95). This classifier is then used to annotate all 2.5 million newspaper articles. For the time frame of relevance for this study (the entire year of 2017), out of the total of 388,617 articles, 13,589 (3.5\%) are identified to treat the issue of migration\footnote{Note that the classifier, as well as the following topic model, was trained on a corpus of documents spanning 2013-2019. This was largely a decision to maximise possible applications for the resulting dataset, but also enables to compare issue attention and frames across time for validity checks.}.
 
 
-Figure \ref{fig:salience} shows the share of migration articles in each newspaper. While the first few months of 2017 show rather high salience of the issue, attention decreases until May, before the share of articles covering this issue increases again in all newspapers except \textit{Bild}, which shows a stark decrease in July and maintains this level afterward. Most newspapers show similar levels of attention to the issue between 2.5\% and 6\%, with the exception of \textit{SZ}, which moves between 5\% and 12.5\%.
+Figure \ref{fig:salience} shows the share of migration articles in each newspaper. While the first few months of 2017 show rather high salience of the issue, attention decreases until May, before the share of articles covering this issue increases again in all newspapers except \textit{Bild}, which shows a stark decrease in July and maintains this level afterward. Most newspapers show similar levels of attention to the issue between 2.5\% and 6\% of all articles, with the exception of \textit{SZ}, which moves between 5\% and 12.5\%.
 
-\subsubsection{Measuring news frames}
+\subsubsection{Measuring news frames}\label{sec:frame_selection}
 
 To measure news frames, I estimate a structural topic model with 60 topics for the nearly 90,000 migration articles in the full period (2016-2019)\footnote{The topics' prevalence along with the most important words can be assessed in appendix \ref{app:stm}.}. The number of topics was chosen to strike a balance between the computational and human resources necessary to estimate and annotate the topics and finding appropriate topics for the large corpus of nearly 90,000 migration articles. Topic prevalence is estimated as a function of the release date of the article, as well as the newspaper it has been published in. The 60 topics' most predictive words and ten most representative articles were assessed to identify and label the content of each topic, and the most frequent and relevant topics that allow to form clear hypotheses regarding their effect on immigration attitudes are selected. 
 
@@ -149,7 +154,7 @@ With this procedure, the following seven 'large' migration frames were selected 
     \item Capital crime (sexual assault/rape/murder) committed by refugees (topic 48), 
     \item illegal entry and petty crime (topic 25),
     \item refugee numbers (topic 32),
-    \item labour market needs for and integration of refugees (topic 11),
+    \item labour market needs for and job market integration of refugees (topic 11),
     \item deportations (topic 44),
     \item internment camps (e.g. Moria; topic 27),
     \item drownings in the Mediterranean (topic 49).
@@ -165,7 +170,7 @@ I expect the capital crime, illegal entry/petty crime, and the refugee numbers f
 \end{figure}
 
 
-\subsection{Study design}
+\subsection{Estimation}
 
 \subsubsection{Differences in opinion formation across readers}\label{sec:did_readers}
 
@@ -173,16 +178,16 @@ To assess whether opinion shifts might be influenced by news consumption, I isol
 
 $$ y = \beta_1 * W + \beta_2 * R + \beta_3 * W * R, $$
 
-where $y$ is the dependent (attention to migration frame or migration opinion), $W$ indicates whether the interview took place ($W = 1$) in a given survey wave or in the preceding one ($W = 0$), and $R$ indicates whether the respondent is a reader of the newspaper of interest.
+where $y$ is the dependent (migration opinion), $W$ indicates whether the interview took place ($W = 1$) in a given survey wave or in the preceding one ($W = 0$), and $R$ indicates whether the respondent is a reader of the newspaper of interest.
 
 
 \subsubsection{Estimation of framing effect}\label{sec:models}
 
-I estimate the same DiDs to measure shifts in migration framing in a certain newspaper, controlling for shifts in all other newspapers. To do that, I first sum the attention given to a certain frame in a given newspaper in the past day, week, month, or half year, up to the last survey. This allows me to assess whether choosing different lags affects my estimates. Then, I estimate the DiD, indicating how much a newspaper changed its attention to a given migration frame, relative to all others. The DiDs estimating the opinion shifts described in \ref{sec:did_readers} are then matched and regressed on the shifts in migration framing. If increasing attention to a certain frame causes a shift in migration attitudes, these two measures should be highly correlated.
+I estimate the same DiDs to measure shifts in migration framing in a certain newspaper, controlling for shifts in all other newspapers. To do that, I first sum the attention given to a certain frame in a given newspaper in the past day, week, month, or half year, up to the last survey wave. This allows me to assess whether choosing different lags affects my estimates. Then, I estimate the DiD, indicating how much a newspaper changed its attention to a given migration frame, relative to all others. The DiDs estimating the opinion shifts described in \ref{sec:did_readers} are then matched and regressed on the shifts in migration framing. If increasing attention to a certain frame causes a shift in migration attitudes, these two measures should be highly correlated.
 
-Second, I fit individual-level fixed-effect models with individual news framing estimates for each survey interview. I measure exposure to each frame by summing up the frame attention of the past week (relative to the interview) in each newspaper the respondent claimed to have read in the past week and dividing it by the total number of newspapers read. This way, I estimate frame exposure for each individual respondent's interview date and news diet, which allows to estimate the correlation of changes in immigration opinion with the migration framing in recently consumed outlets.
+Second, I fit two-way fixed-effect models with individual news framing estimates for each survey interview. I measure exposure to each frame by summing up the frame attention of the past week (relative to the interview) in each newspaper the respondent claimed to have read in the past week and dividing it by the total number of newspapers read. This way, I estimate frame exposure for each individual respondent's interview date and news diet, which allows to estimate the correlation of changes in immigration opinion with the migration framing in recently consumed outlets.
 
-While the DiD's are causally better identified, controlling for shifts in other newspapers and reader groups, they suffer from the fact that surveys are conducted for several days, often up to two weeks, which makes the precise matching of newspaper content impossible. The fixed-effect models control for wave effects and (time-constant) individual characteristics, therefor restricting the explainable variance to everything beyond general trends and individual characteristics, but might include more noise. Another difference is that the DiD-models correlate relative shifts, while the fixed-effect models regress opinion levels on frame attention levels.
+While the DiD's are causally better identified, controlling for shifts in other newspapers and reader groups, they suffer from the fact that surveys are conducted for several days, often up to two weeks, which makes the precise matching of newspaper content impossible. The fixed-effect models control for wave effects and (time-constant) individual characteristics, therefor restricting the explainable variance to everything beyond general trends and individual characteristics, but might include more noise. Another difference is that the DiD-models correlate changes, while the fixed-effect models regress opinion levels on frame attention levels.
 
 
 \section{Results}
@@ -191,8 +196,8 @@ While the DiD's are causally better identified, controlling for shifts in other 
 
 \begin{figure}[!ht]
     \centering
-    \includegraphics[width=\textwidth]{paper/vis/DiD_model_ps.png}
-    \caption{Empirical and theoretical p-values of 1,752 DiD-models.}
+    \includegraphics[width=\textwidth]{paper/vis/DiD_model_ps_notheory.png}
+    \caption{P-values of 1,752 DiD-models estimating attitudinal shifts of media consumers, relative to consumers of other outlets.}
     \label{fig:p_values}
 \end{figure}
 
@@ -200,25 +205,29 @@ DiD-designs rest on the assumption that treated and untreated units would follow
 
 \subsection{Distribution of DiD-effect significance}
 
-These highly parallel trends might raise another problem, however. Possibly, no significant variation of reader groups' migration opinion from the general trend can be observed. To address this concern, I estimate DiDs for all wave-issue-paper combinations. This means I use attitudinal questions on all political issues included in the GLES Panel (economic, issues, climate, ...), and assess whether news consumption matters for opinion formation more generally. The upper panel of figure \ref{fig:p_values} shows the distribution of p-values for the DiD-term from 1,752 fixed-effect models with GLES Panel data. The distribution shows a considerable deviation from the expected uniform distribution (visible in the lower panel) were there no explaining variation in the DiD-term beyond the uniform effects of wave and paper readership. This means, more often than random (12\% vs 5\%), the opinions of consumers of certain news deviate from the opinions of other citizens. This is even more severe for the 192 wave-paper combinations concerning the immigration or integration item used in the remainder of this study, where 18\% of all estimated DiDs fall under the 5\%-threshold\footnote{See plot in appendix \ref{app:p-val_imm}}.  This strongly indicates that news consumption matters for opinion formation and that the data shows variation which can be explained, despite highly parallel trends.
-
+These highly parallel trends might raise another problem, however. Possibly, no significant variation of reader groups' migration opinion from the general trend can be observed. To address this concern, I estimate DiDs for all wave-issue-paper combinations. This means I use attitudinal questions on all political issues included in the GLES Panel (economic, issues, climate, ...), and assess whether news consumption matters for opinion formation more generally. Figure \ref{fig:p_values} shows the distribution of p-values for the DiD-term from 1,752 fixed-effect models with GLES Panel data. The distribution shows a considerable deviation from the expected uniform distribution (red line) were there no explaining variation in the DiD-term beyond the uniform effects of wave and paper readership. This means, more often than random (12\% vs 5\%), the opinions of consumers of certain news deviate from the opinions of other citizens. This is even more severe for the 192 wave-paper combinations concerning the immigration or integration item used in the remainder of this study, where 18\% of all estimated DiDs fall under the 5\%-threshold\footnote{See plot in appendix \ref{app:p-val_imm}}.  This strongly indicates that news consumption matters for opinion formation and that the data shows variation which can be explained, despite highly parallel trends.
 
 
 
 \subsection{Correlation of DiD with frame prevalence}
 
-\begin{figure}[!ht]
+There seems to be interesting variation in the dependent variable. Can these opinion shifts be explained by shifts in news content? Figure \ref{fig:did_corr} shows the core analysis to estimate the effect of migration framing on reader opinion. The displayed estimates are obtained by regressing the DiD-estimates for issue attitudes on the DiD-estimates for media attention, as described in section \ref{sec:models}. If opinion shifts among newspapers' readers - relative to other readers - can be explained by shifts in newspapers' issue framing, these two variables should be highly correlated.
+
+\begin{figure}
     \centering
-    \includegraphics[width=1.2\textwidth]{paper/vis/effectplot_frames_did.png}
+    \includegraphics[width=0.7\textwidth]{paper/vis/effectplot_frames_did.png}
     \caption{Regression coefficients from DiD-models with different specifications.}
     \label{fig:did_corr}
 \end{figure}
 
-There seems to be interesting variation in the dependent variable. Can these opinion shifts be explained by shifts in news content? Figure \ref{fig:did_corr} shows the core analysis to estimate the effect of media attention on reader opinion. The displayed estimates are obtained by regressing the resulting DiD-estimates for issue attitudes on the DiD-estimates for media attention. Each dot in this graph represents the coefficient of a model explaining standardised aggregate opinion shifts with standardised shifts in media attention to specific frames for a specific frame and a specific model specification, as outlined in section \ref{sec:models}. If opinion shifts among newspapers' readers - relative to other readers - can be explained by shifts in newspapers' issue framing, these two variables should be highly correlated.
+This is however not the case. Each panel in figure \ref{fig:did_corr} shows the effect of one frame on an attitude variable (controlling for all other frames mentioned in section \ref{sec:frame_selection}), across different lags and treatment definitions. Each dot in this graph represents the coefficient of a model explaining standardised\footnote{Meaning that independent and dependent variables were mean-corrected and re-scaled to standard deviations before regression. A coefficient of one means that a one-standard-deviation shift in the independent variable corresponds to a one-standard deviation shift in the dependent variable.} aggregate opinion shifts with standardised shifts in media attention to specific frames.  For example, in the upper left panel 'crime', we can see two different panes ('immigration' and 'integration') for each dependent variable. The vertical rows distinguish four different lags indicating the frame prevalence of the past day, week, month, half year, or the entire period up to the last survey date. Additionally, the color of the points indicates whether the model was estimated only for readers of a single newspaper (lower N, but no treatment diffusion) or all readers of a newspaper (who might read another newspaper, say SZ readers who also read FAZ). 
 
-This is however not the case. Figure \ref{fig:did_corr} shows standardised\footnote{Meaning that independent and dependent variables were mean-corrected and standardised before regression. A coefficient of one means that a one-standard-deviation shift in the independent variable corresponds to a one-standard deviation shift in the dependent variable.} regression coefficients for different specifications of the DiD-model. Each panel shows the effect of one frame on an attitude variable (controlling for all other frames), across different lags and different treatment definitions. For example, in the upper left panel 'crime', we can see two different panes ('immigration' and 'integration') for each dependent variable. The vertical rows distinguish four different lags indicating the frame prevalence of the past day, week, month, half year, or´the entire period up to the last survey date. Additionally, the color of the points indicates whether the model was estimated only for readers of a single newspaper (lower N, but no treatment diffusion) or all readers of a newspaper (who might read another newspaper, say SZ readers who also read FAZ). 
+Only very few estimates are significant and no trends emerge across specifications for any variable. All estimates are clearly clustering around zero, indicating no effect. Estimates of all relationships indicate both positive and negative relationships across specifications. While the 'exclusive reader' estimates show more variation, they also indicate far broader confidence intervals. There is no considerable difference across lags, and the variables only differ by the broader confidence intervals of the integration variable, owing to the fewer waves including this question. Generally, this analysis indicates no effect of media framing of migration on migration attitudes.
 
-Only very few estimates are significant, but no trends emerge across specifications for any variable. All estimates are clearly clustering around zero, indicating no effect. Estimates of all relationship indicate both positive and negative relationships across specifications. While the 'exclusive reader' estimates show more variation, they also indicate far broader confidence intervals. There is no considerable difference across lags, and the variables only differ by the broader confidence intervals of the integration variable, owing to the fewer waves including this question. Generally, this analysis indicates no effect of media framing of migration on migration attitudes.
+
+To corroborate these results, I estimate another model directly regressing individual migration opinions on individual estimates of consumed migration frames with fixed effects for survey wave and respondent (see section \ref{sec:models}). The results for migration and integration attitudes can be seen in figure \ref{fig:model_fe}.
+
+Again, most estimates are not significant, differ in direction across specifications, and cluster around 0. While some estimates are unidirectional (crime and labour market in the immigration issue), they show tiny effects (a standard deviation increase in attention to the labour market makes issue attitudes between 0.005 and 0.015 standard deviations more conservative) and are usually not significant. Most importantly, both models do not correspond to expectations. This is probably most visible for the capital and sex crime frame ('capcrime'), which should show strongly positive effects (leading to more restrictive attitudes), but also for the illegal immigration and petty crime frame ('crime'), which consistently shows insignificant negative (i.e. liberalising) effects.
 
 \begin{figure}
     \centering
@@ -227,15 +236,22 @@ Only very few estimates are significant, but no trends emerge across specificati
     \label{fig:model_fe}
 \end{figure}
 
-To corroborate these results, I estimate another model directly regressing individual migration opinions on individual estimates of consumed migration frames with fixed effects for survey wave and respondent. The results for migration and integration attitudes can be seen in figure \ref{fig:mode_fe}.
-
-Again, most estimates are not significant, differ in direction across specifications, and cluster around 0. While some estimates are unidirectional (crime and labour market in the immigration issue), they show tiny effects (a standard deviation increase in attention to the labour market ) and 
-
 
 \section{Discussion}
 
+This paper assessed the responsiveness of newspaper consumers' migration attitudes to the migration framing of their respective newspaper. Aggregate difference-in-differences models and individual estimates show that consumers' opinions on immigration and integration were not reacting to changes in the newspaper framing of the respective issue. However, several alternative explanations are possible. 
 
+Some other studies found that, instead of reacting with opinion shifts, readers might change their political preferences or mobilise to vote (\cite{Stetka2020}). Similarly, several studies indicate that changes in a media outlet's slant will result in a change in the composition of the consumers (ie those with conflicting attitudes stop reading the newspaper) rather than a change in a fixed readership's attitudes (\cite{Arceneaux2013, Durante2012, Spirig2020}). Whether similar effects can be observed when explicitly measuring newspaper framing are likely next steps for analysis.
 
+Another theoretical alternative might be the idea of \textit{issue evolution} (\cite{Carmines1986}). If a process of 'issue-sorting' took place in 2015, when the migration issue became very salient for the first time in a long time, citizens might have chosen a side and stuck to their opinion afterward. Hence, a second further avenue for analysis might look into opinion stability across a longer time horizon or a different case.
+
+On the empirical side, I cannot ensure that respondents actually received treatment when they say they read the newspaper. Some might only read the sports section, some might only read specific sub-issues (e.g. only the crime news about immigration, but not the news on migrants drowning in the Mediterranean). It also might be that survey responses regarding newspaper consumption are generally more statements of which paper respondents like rather than consume. It is therefor in no way clear whether the treatment actually reaches respondents, although similar studies connecting survey- and media data (\cite{Eberl2015}) have found effects of media content on attitudes and even voting behaviour.
+
+More could be done to measure emphasis frames as well. Recent innovations exploiting word embeddings are particularly noteworthy here, either extracting topics from the embedding space (\cite{Angelov2020, Urman2021}) or measuring conceptual associations across time with diachronic word embeddings (\cite{Rodman2019}).
+
+Beyond the improvement of the analysis, I could try to add a different case and/or exploit a natural experiment. The Bild had an editorial shift in 2017 which seems to have coincided with more emphasis of crime topics - in line with anecdotal evidence of the results of this change among journalists. Returning to an earlier framing of the paper, this case could be presented as additional evidence of null effects. It might also be possible to exploit the increasing attention to the climate issue in 2019 and again in 2020 to assess an opinion formation process from the beginning, although this would necessitate to leave the paper alone for a while, until the survey data is available.
+
+Lastly, if there were in fact no effect of news framing on respondents' attitudes towards migration, there is still a major open question: what does explain the variation that can be observed?
 
 \newpage
 
@@ -245,14 +261,17 @@ Again, most estimates are not significant, differ in direction across specificat
 
 The extended migration dictionary for the pre-sampling of articles on migration consists of 35 terms (matching both lower and upper case): \textit{asyl, asylant, asylanten, asylbewerber, asylbewerberin, auslander, einwanderer, einwandernde, einwanderung, migration, immigration, schutzsuchende, visa, visum, zuwanderung, zuwanderer, zuwandernde, ausländer, ausländerinnen, flüchtling, flüchtende, flüchtlinge, flüchtlingen, migranten, vertriebene, asylantinnen, asylbewerberinnen, auslanderinnen, einwandererin, einwandererinnen, fluchtling, fluchtende, fluchtlinge, schutzbedurftige, schutzbedürftige.}
 
+\newpage
 
 \subsection{Structural Topic Model}\label{app:stm}
 
 \begin{figure}[!ht]
     \centering
     \includegraphics[width=2\textwidth]{paper/vis/mig_topics_plot.png}
-    \label{fig:did_corr}
+    \label{fig:topics}
 \end{figure}
+
+\newpage
 
 \subsection{P-values immigration and integration issue}\label{app:p-val_imm}
 
