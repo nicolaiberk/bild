@@ -55,6 +55,11 @@ int_dids <-
   attitude_dids %>% 
   filter(issue == "1210")
 
+afd_dids <- 
+  attitude_dids %>%
+  filter(issue == "430i")
+  
+
 ## pivot frametable wide to get 1 var/frame
 framing_dids <- 
   framing_dids %>% 
@@ -63,7 +68,7 @@ framing_dids <-
 
 ## correlate with frames
 efftable <- data.frame()
-for (issue in c("immigration", "integration")){
+for (issue in c("immigration", "integration", "afd-support")){
   for (lag in c("all", "1d", "1w", "1m", "6m")){
     for (respons in unique(attitude_dids$respondents)){
     
@@ -72,10 +77,15 @@ for (issue in c("immigration", "integration")){
           imm_dids %>% 
           mutate(delta_att = coef_fe,
                  paper = paper_name)
-      }else{
+      }else if (issue == "integration"){
         dv_set <- 
           int_dids %>% 
           mutate(delta_att = coef_fe*(-1),
+                 paper = paper_name)
+      }else{
+        dv_set <- 
+          afd_dids %>% 
+          mutate(delta_att = coef_fe,
                  paper = paper_name)
       }
       
@@ -172,6 +182,7 @@ gles_p_long <-
     `1210_lag` = dplyr::lag(`1210_clean`),
     `1140_lag` = dplyr::lag(`1140_clean`),
     `1220_lag` = dplyr::lag(`1220_clean`),
+    `430i_lag` = dplyr::lag(`430i_clean`),
     date_str = as.character(date_clean)
   )
 
@@ -554,7 +565,7 @@ efftable_share <- data.frame()
 # could add one more specification for estimate vs treatment interaction (w paper_bin)
 for (spec in c('absolute', 'share')){
   for (lag in c('7d', '30d')){
-    for (issue in c('integration', 'immigration')){
+    for (issue in c('integration', 'immigration', 'afd-support')){
       for (respons in c('only readers', 'only exclusive readers')){
         
         if (respons == 'only exclusive readers'){
@@ -569,8 +580,10 @@ for (spec in c('absolute', 'share')){
         
         if (issue == "immigration"){
           tempdta$dv <- tempdta$`1130_clean` %>% scale()
-        }else{
+        }else if(issue == 'integration'){
           tempdta$dv <- tempdta$`1210_clean` %>% scale()
+        }else{
+          tempdta$dv <- tempdta$`430i_clean` %>% scale()
         }
         
         

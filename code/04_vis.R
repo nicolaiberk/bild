@@ -46,6 +46,8 @@ imm_mean <-
   ggtitle("Immigration attitude in Germany across time", 
           "Should immigration of foreigners be made easier (-3) or restricted (3) \nData: GLES Panel, waves 1-13, a1 & a2")
 
+### exclusive readers
+
 ## integration attitude across time
 int_mean <- 
   gles_p_long %>%
@@ -68,14 +70,20 @@ int_mean <-
 grid.arrange(imm_mean, int_mean, nrow = 2) %>% 
   ggsave(here('paper/vis/dv_plot.png'), plot = .)
 
+### exclusive readers
 
-### average per paper
+## afd-attitude across time
 
-#### pivot long paper
+### exclusive readers
+
+
+## average per paper
+
+### pivot long paper
 gles_p_long_paper <- 
   gles_p_long %>% 
   select(lfdn, wave, contains('clean')) %>% 
-  select(lfdn, wave, date_clean, contains('1661'), contains('1130'), contains('1210')) %>% 
+  select(lfdn, wave, date_clean, contains('1661'), contains('1130'), contains('1210'), contains('430i')) %>% 
   pivot_longer(cols = starts_with('1661'), names_prefix = '1661',
                names_to = 'paper', values_to = 'days_read') %>% 
   mutate(
@@ -92,11 +100,13 @@ gles_p_long_paper$paper[gles_p_long_paper$paper == 'f'] <- 'Welt'
 gles_p_long_paper$reader <- gles_p_long_paper$days_read > 0
 
 plots <- list()
-for (issue in c('Immigration', 'Integration')){
+for (issue in c('Immigration', 'Integration', 'AfD-support')){
   if (issue == 'Immigration'){
     gles_p_long_paper['dv'] <- gles_p_long_paper['1130_clean']
-  }else{
+  }else if (issue == 'Integration'){
     gles_p_long_paper['dv'] <- gles_p_long_paper['1210_clean']*(-1)
+  }else{
+    gles_p_long_paper['dv'] <- gles_p_long_paper['430i_clean']
   }
   
   
@@ -119,8 +129,10 @@ for (issue in c('Immigration', 'Integration')){
   
   if (issue == 'Integration'){
     scale_desc <- "Should foreigners be allowed to live according to their own culture (-3) or fully adapt to German culture (3) \n"
-  }else{
+  }else if (issue == 'Immigration'){
     scale_desc <- "Should immigration of foreigners be made easier (-3) or restricted (3) \n"
+  }else{
+    scale_desc <- "What do you think about the AfD? Don't like the party at all (-5), like the party a lot (5) \n"
   }
   
   plots[[issue]] <- 
@@ -138,6 +150,12 @@ grid.arrange(plots[['Immigration']], plots[['Integration']]) %>%
   ggsave(filename = here(glue('paper/vis/issues_readers.png')),
          width = 8, height = 8)
 
+
+ggsave(plot = plots[['Immigration']], 
+       here('pres/vis/imm_readers_pres.png'), width = 6, height = 4)
+
+ggsave(plot = plots[['AfD-support']], 
+       here('pres/vis/afd_readers_pres.png'), width = 6, height = 4)
 
 
 ## 2.2 vis independents ####
@@ -233,6 +251,56 @@ framing_sum %>%
   xlab('') + theme(legend.position = "none")
 ggsave(here('paper/vis/frames_papers.png'), width = 10, height = 6)
 
+## presi version
+framing_sum %>% 
+  filter(date < as.Date('2020-01-01')) %>%
+  filter(paper %in% c("Bild", "SZ")) %>% 
+  filter(frame %in% c("Camps", "Capital Crime", "Mediterranean", "Petty Crime")) %>% 
+  group_by(paper, frame) %>% 
+  ggplot(aes(x = date, y = attention, col = frame)) +
+  geom_line() +
+  facet_wrap(~paper, scales = 'free', nrow = 2) +
+  ggtitle('Migration framing in different newspapers') +
+  ylab('Share of all migration articles') +
+  xlab('') +
+  labs(col = "Frame")
+ggsave(here('pres/vis/frames_papers_pres.png'), width = 8, height = 5)
+
+framing_sum %>% 
+  filter(date < as.Date('2018-01-01')) %>%
+  filter(date > as.Date('2017-01-01')) %>% 
+  filter(paper %in% c("Bild", "SZ")) %>% 
+  filter(frame %in% c("Camps", "Capital Crime", "Mediterranean", "Petty Crime")) %>% 
+  group_by(paper, frame) %>% 
+  ggplot(aes(x = date, y = attention, col = frame)) +
+  geom_line() +
+  facet_wrap(~paper, scales = 'free', nrow = 2) +
+  ggtitle('Migration framing in different newspapers') +
+  ylab('Share of all migration articles') +
+  xlab('') +
+  labs(col = "Frame")
+ggsave(here('pres/vis/frames_papers_focus_pres.png'), width = 8, height = 5)
+ggsave(here('paper/vis/frames_papers_focus.png'), width = 10, height = 6)
+
+
+# effect of Diekmann leaving
+framing_sum %>% 
+  filter(date < as.Date('2020-01-01')) %>%  
+  filter(paper %in% c("Bild", "Welt")) %>% 
+  filter(frame %in% c("Camps", "Capital Crime", "Mediterranean", "Petty Crime")) %>%
+  group_by(paper, frame) %>% 
+  ggplot(aes(x = date, y = attention, col = frame)) +
+  geom_line() +
+  geom_smooth() +
+  geom_vline(xintercept = as.Date('2017-01-31'), lty = 2, col = 'red') +
+  facet_grid(frame~paper, scales = "free_y") +
+  xlab('') + theme(legend.position = "none")
+ggsave(here('pres/vis/frames_bild_diekmann_pres.png'), width = 8, height = 5)
+ggsave(here('paper/vis/frames_bild_diekmann.png'), width = 10, height = 6)
+
+
+
+
 framing_sum %>% 
   filter(date < as.Date('2018-01-01')) %>% 
   filter(date >= as.Date('2017-01-01')) %>% 
@@ -245,7 +313,11 @@ framing_sum %>%
   scale_x_date(date_labels = '%b') +
   ylab('Share of all migration articles') +
   xlab('') + theme(legend.position = "none")
+ggsave(here('pres/vis/frames_papers_focus_pres.png'), width = 8, height = 5)
 ggsave(here('paper/vis/frames_papers_focus.png'), width = 10, height = 6)
+
+
+
 
 
 ## 2.3 vis p-values attitude did ####
@@ -258,7 +330,7 @@ attitude_dids$sig_lm <- (attitude_dids$p_lm < 0.05)
 prop.table(table(attitude_dids$sig_fe)) %>% round(2) # 12% instead of 5% -> significant effects overrepresented
 
 
-fe_plot <- attitude_dids %>% 
+attitude_dids %>% 
   ggplot(aes(x = p_fe, y = ..count../nrow(attitude_dids))) +
   geom_histogram(bins = 20, col = 'gray', breaks = seq(from = 0, to = 0.95, 0.05)) +
   geom_hline(aes(yintercept = 0.05), col = 'red', lty = 2) +
@@ -266,55 +338,98 @@ fe_plot <- attitude_dids %>%
   ylab('Density')+xlab('p')+
   ggtitle(glue("P-values from {nrow(attitude_dids)} fixed-effect DiD-models"), 
           "Treatment = wave, condition = media outlet consumption")
+ggsave(filename = here("paper/vis/DiD_model_ps_notheory.png"),
+       width = 8, height = 3)
 
-theoryplot <- data.frame(p = runif(1336, 0, 1)) %>% 
-  ggplot(aes(x = p, y = ..count../1336)) +
-  geom_histogram(bins = 20, col = 'gray', breaks = seq(from = 0, to = 0.95, 0.05)) +
-  geom_hline(aes(yintercept = 0.05), col = 'red', lty = 2) +
-  ylim(0, 0.25) +
-  ylab('Density')+xlab('p')+
-  ggtitle(glue("Theoretical distribution of p-values with no effect of media consumption"))
-
-gridExtra::grid.arrange(fe_plot, theoryplot, nrow = 2) %>% 
-  ggsave(plot = ., 
-         filename = here("paper/vis/DiD_model_ps.png"),
-         width = 8, height = 6)
+# theoryplot <- data.frame(p = runif(1336, 0, 1)) %>% 
+#   ggplot(aes(x = p, y = ..count../1336)) +
+#   geom_histogram(bins = 20, col = 'gray', breaks = seq(from = 0, to = 0.95, 0.05)) +
+#   geom_hline(aes(yintercept = 0.05), col = 'red', lty = 2) +
+#   ylim(0, 0.25) +
+#   ylab('Density')+xlab('p')+
+#   ggtitle(glue("Theoretical distribution of p-values with no effect of media consumption"))
+# 
+# gridExtra::grid.arrange(fe_plot, theoryplot, nrow = 2) %>% 
+#   ggsave(plot = ., 
+#          filename = here("paper/vis/DiD_model_ps.png"),
+#          width = 8, height = 6)
 
 
 ## migration and integration only
-attitude_dids <- 
+mig_dids <- 
   attitude_dids %>% 
   filter(issue == '1130' | issue == '1210')
 
-prop.table(table(attitude_dids$sig_fe)) %>% round(2) # 18% instead of 5% -> significant effects overrepresented
+prop.table(table(mig_dids$sig_fe)) %>% round(2) # 18% instead of 5% -> significant effects overrepresented
 
 
-fe_plot <- attitude_dids %>% 
-  ggplot(aes(x = p_fe, y = ..count../nrow(attitude_dids))) +
+mig_dids %>% 
+  ggplot(aes(x = p_fe, y = ..count../nrow(mig_dids))) +
   geom_histogram(bins = 20, col = 'gray', breaks = seq(from = 0, to = 0.95, 0.05)) +
   geom_hline(aes(yintercept = 0.05), col = 'red', lty = 2) +
   ylim(0, 0.25) +
   ylab('Density')+xlab('p')+
-  ggtitle(glue("P-values from {nrow(attitude_dids)} fixed-effect DiD-models"), 
+  ggtitle(glue("P-values from {nrow(mig_dids)} fixed-effect DiD-models of migration attitudes"), 
           "Treatment = wave, condition = media outlet consumption")
+ggsave(filename = here("paper/vis/DiD_model_ps_immint_notheory.png"),
+       width = 8, height = 3)
 
-theoryplot <- data.frame(p = runif(1336, 0, 1)) %>% 
-  ggplot(aes(x = p, y = ..count../1336)) +
+
+## look at attitude dids across treatment specifications
+mig_dids$respondents[mig_dids$respondents == 'only readers'] <- 'all readers'
+
+mig_dids %>% 
+  ggplot(aes(x = p_fe, y = ..count../(nrow(mig_dids)/2))) +
+  geom_histogram(bins = 20, col = 'gray', breaks = seq(from = 0, to = 0.95, 0.05)) +
+  geom_hline(aes(yintercept = 0.05), col = 'red', lty = 2) +
+  ylab('Density')+xlab('p')+
+  facet_grid(~respondents)+
+  ggtitle(glue("P-values from {nrow(mig_dids)} fixed-effect DiD-models of migration attitudes"), 
+          "Treatment = wave, condition = media outlet consumption")
+ggsave(filename = here("paper/vis/DiD_model_ps_immint_bytreat.png"),
+       width = 8, height = 3)
+
+
+
+## afd-support
+afd_dids <- 
+  attitude_dids %>% 
+  filter(issue == '430i')
+
+prop.table(table(afd_dids$sig_fe)) %>% round(2) # 8% instead of 5% -> significant effects overrepresented
+
+
+afd_dids %>% 
+  ggplot(aes(x = p_fe, y = ..count../nrow(afd_dids))) +
   geom_histogram(bins = 20, col = 'gray', breaks = seq(from = 0, to = 0.95, 0.05)) +
   geom_hline(aes(yintercept = 0.05), col = 'red', lty = 2) +
   ylim(0, 0.25) +
   ylab('Density')+xlab('p')+
-  ggtitle(glue("Theoretical distribution of p-values with no effect of media consumption"))
+  ggtitle(glue("P-values from {nrow(afd_dids)} fixed-effect DiD-models of migration attitudes"), 
+          "Treatment = wave, condition = media outlet consumption")
+ggsave(filename = here("paper/vis/DiD_model_ps_afd_notheory.png"),
+       width = 8, height = 3)
 
-gridExtra::grid.arrange(fe_plot, theoryplot, nrow = 2) %>% 
-  ggsave(plot = ., 
-         filename = here("paper/vis/DiD_model_ps_immint.png"),
-         width = 8, height = 6)
+
+## look at attitude dids across treatment specifications
+afd_dids$respondents[afd_dids$respondents == 'only readers'] <- 'all readers'
+
+afd_dids %>% 
+  ggplot(aes(x = p_fe, y = ..count../(nrow(afd_dids)/2))) +
+  geom_histogram(bins = 20, col = 'gray', breaks = seq(from = 0, to = 0.95, 0.05)) +
+  geom_hline(aes(yintercept = 0.05), col = 'red', lty = 2) +
+  ylab('Density')+xlab('p')+
+  facet_grid(~respondents)+
+  ggtitle(glue("P-values from {nrow(afd_dids)} fixed-effect DiD-models of migration attitudes"), 
+          "Treatment = wave, condition = media outlet consumption")
+ggsave(filename = here("paper/vis/DiD_model_ps_afd_bytreat.png"),
+       width = 8, height = 3)
+
+
 
 
 ## vis effects across specifications ####
-load(here('data/efftable_did_2021-10-04.Rdata'))
-
+load(here('data/efftable_did_2021-10-25.Rdata'))
 efftable$dv_lag_f <- factor(efftable$dv_lag, levels = c('all', '6m', '1m', '1w', '1d'))
 
 plots <- list()
@@ -350,8 +465,7 @@ ggarrange(plotlist = plots, ncol = 1, nrow = 7,
 
 
 ## individual fe model
-load(here('data/efftable_fe_2021-10-04.Rdata'))
-
+load(here('data/efftable_fe_2021-10-25.Rdata'))
 efftable$dv_lag_f <- factor(efftable$dv_lag, levels = c('30d', '7d'))
 
 
@@ -413,3 +527,53 @@ ggarrange(plotlist = plots,  nrow = 4, ncol = 2,
           common.legend = T, legend = "bottom") %>% 
   ggsave(filename = here("paper/vis/effectplot_frames_fe_rel.png"),
          width = 7, height = 10)
+
+
+
+
+
+## for presi: visualise effect distribution
+
+### did model
+load(here('data/efftable_did_2021-10-25.Rdata'))
+efftable %>% 
+  select(!contains("lower")) %>% 
+  select(!contains("upper")) %>% 
+  pivot_longer(cols = contains("beta"), names_to = "frame", names_prefix = "beta_") %>%
+  mutate(frame = recode(frame,
+                        'camps_share' = 'Camps', 'crime_share' = 'Petty Crime',
+                        'capcrime_share' = 'Capital Crime', 'deport_share' = 'Deportations',
+                        'labmar_share' = 'Labour Market', 'medit_share' = 'Mediterranean',
+                        'refnums_share' = 'Refugee Numbers'
+  )) %>% 
+  filter(frame != "salience") %>% 
+  ggplot(aes(x = value, y = frame, col = frame)) +
+  geom_violin() +
+  geom_vline(xintercept = 0, col = "red", lty = 2) +
+  xlab("Standardised Effect") + ylab("Frame") +
+  ggtitle("Framing effects in DiD-models across specifications") +
+  theme(legend.position = "None") +
+  facet_wrap(~dv, scales = "free")
+ggsave(here("pres/vis/frame_effects_did.png"), width = 8, height = 5)
+
+### fe model
+load(here('data/efftable_fe_2021-10-25.Rdata'))
+efftable %>% 
+  select(!contains("lower")) %>% 
+  select(!contains("upper")) %>% 
+  pivot_longer(cols = contains("beta"), names_to = "frame", names_prefix = "beta_") %>%
+  mutate(frame = recode(frame,
+                        'camps_share' = 'Camps', 'crime_share' = 'Petty Crime',
+                        'capcrime_share' = 'Capital Crime', 'deport_share' = 'Deportations',
+                        'labmar_share' = 'Labour Market', 'medit_share' = 'Mediterranean',
+                        'refnums_share' = 'Refugee Numbers'
+  )) %>% 
+  filter(frame != "salience") %>% 
+  ggplot(aes(x = value, y = frame, col = frame)) +
+  geom_violin() +
+  geom_vline(xintercept = 0, col = "red", lty = 2) +
+  xlab("Standardised Effect") + ylab("Frame") +
+  ggtitle("Framing effects in 2-way FE-models across specifications") +
+  theme(legend.position = "None") +
+  facet_wrap(~dv, scales = "free")
+ggsave(here("pres/vis/frame_effects_fe.png"), width = 8, height = 5)

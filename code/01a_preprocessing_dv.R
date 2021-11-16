@@ -217,6 +217,20 @@ gles_p_long <-
   merge(gles_p_long, ., by = c("lfdn", "wave"), all.x = T)
 
 
+# afd scalometer
+gles_p_long <- 
+  gles_p %>% 
+  select(c(lfdn, contains('430i'))) %>% 
+  pivot_longer(
+    cols = c(ends_with('430i'))) %>% 
+  mutate(
+    wave = str_match(name, "kp(.*)_")[,2],
+    `430i` = value
+  ) %>% 
+  select(lfdn, wave, contains('430i')) %>% 
+  merge(gles_p_long, ., by = c("lfdn", "wave"), all.x = T)
+
+
 
 ## save
 fwrite(gles_p_long, file = here('data/gles/Panel/long.csv'))
@@ -226,6 +240,7 @@ fwrite(gles_p_long, file = here('data/gles/Panel/long.csv'))
 # 2. Cleaning ####
 
 # load raw data
+rm(list = ls())
 gles_p_long <- fread(file = here('data/gles/Panel/long.csv')) %>% as.data.frame()
 
 # define parameters
@@ -284,12 +299,17 @@ gles_p_long[gles_p_long$`190b_inter` == 4  &
 gles_p_long[gles_p_long$`190b_inter` == 5  & 
               !is.na(gles_p_long$`190b_inter`),'190b_clean'] <- 'FDP'
 gles_p_long[gles_p_long$`190b_inter` == 6  & 
-              !is.na(gles_p_long$`190b_inter`),'190b_clean'] <- 'Grüne'
+              !is.na(gles_p_long$`190b_inter`),'190b_clean'] <- 'GrÃ¼ne'
 gles_p_long[gles_p_long$`190b_inter` == 7  & 
               !is.na(gles_p_long$`190b_inter`),'190b_clean'] <- 'Linke'
 gles_p_long[gles_p_long$`190b_inter` == 322  & 
               !is.na(gles_p_long$`190b_inter`),'190b_clean'] <- 'AfD'
 
+
+## afd scalometer
+gles_p_long <- 
+  gles_p_long %>% 
+  mutate(`430i_clean` = ifelse(`430i` > 0, `430i` - 6, NA))
 
 
 

@@ -1,5 +1,5 @@
 # ______________________________________________
-# Media effecs on issue definitions
+# Media effects on issue definitions
 # Goal: estimate DiD opinion shifts
 # Procedure: load data, broad estimation, only paper estimates
 # ______________________________________________
@@ -50,7 +50,7 @@ for (medium in mediumlist){
       print(paste('Paper:', paper))
       for (issue in c(ego_issues, "1500", "1090", "1130", 
                       "1290", "1210", "1140", "1220", "1300", 
-                      "1411", "1250")){
+                      "1411", "1250", "430i")){
         print(paste('Issue:', issue))
         
         
