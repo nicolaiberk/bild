@@ -193,25 +193,8 @@ load(here("data/media_daily_2021-10-03.Rdata"))
 merged_media <- 
   merged_media %>% 
   mutate(
-    crime_7d    = roll_sum(crime,    7, fill=NA, align = 'right', na.rm = T),
-    capcrime_7d = roll_sum(capcrime, 7, fill=NA, align = 'right', na.rm = T),
-    medit_7d    = roll_sum(medit,    7, fill=NA, align = 'right', na.rm = T),
-    deport_7d   = roll_sum(deport,   7, fill=NA, align = 'right', na.rm = T),
-    refnums_7d  = roll_sum(refnums,  7, fill=NA, align = 'right', na.rm = T),
-    camps_7d    = roll_sum(camps,    7, fill=NA, align = 'right', na.rm = T),
-    labmar_7d   = roll_sum(labmar,   7, fill=NA, align = 'right', na.rm = T),
-    n_mig_7d    = roll_sum(n_mig_sal,7, fill=NA, align = 'right', na.rm = T),
-    n_tot_7d    = roll_sum(n_tot,    7, fill=NA, align = 'right', na.rm = T),
-    
-    crime_30d    = roll_sum(crime,    30, fill=NA, align = 'right', na.rm = T),
-    capcrime_30d = roll_sum(capcrime, 30, fill=NA, align = 'right', na.rm = T),
-    medit_30d    = roll_sum(medit,    30, fill=NA, align = 'right', na.rm = T),
-    deport_30d   = roll_sum(deport,   30, fill=NA, align = 'right', na.rm = T),
-    refnums_30d  = roll_sum(refnums,  30, fill=NA, align = 'right', na.rm = T),
-    camps_30d    = roll_sum(camps,    30, fill=NA, align = 'right', na.rm = T),
-    labmar_30d   = roll_sum(labmar,   30, fill=NA, align = 'right', na.rm = T),
-    n_mig_30d    = roll_sum(n_mig_sal,30, fill=NA, align = 'right', na.rm = T),
-    n_tot_30d    = roll_sum(n_tot,    30, fill=NA, align = 'right', na.rm = T)
+    across(n_mig_sal:capcrime, ~roll_sum(.x,    7, fill=NA, align = 'right', na.rm = T), .names = "{.col}_7d"),
+    across(n_mig_sal:capcrime, ~roll_sum(.x,    30, fill=NA, align = 'right', na.rm = T), .names = "{.col}_30d")
     
   )
 
@@ -229,56 +212,7 @@ merged_data <-
 ## replace missings
 merged_data <- 
   merged_data %>% 
-  mutate(
-    n_mig_7d_bild = ifelse(is.na(n_mig_7d_bild), 0, n_mig_7d_bild),
-    n_mig_7d_faz  = ifelse(is.na(n_mig_7d_faz),  0, n_mig_7d_faz),
-    n_mig_7d_sz   = ifelse(is.na(n_mig_7d_sz),   0, n_mig_7d_sz),
-    n_mig_7d_taz  = ifelse(is.na(n_mig_7d_taz),  0, n_mig_7d_taz),
-    n_mig_7d_welt = ifelse(is.na(n_mig_7d_welt), 0, n_mig_7d_welt),
-    
-    crime_7d_bild = ifelse(is.na(crime_7d_bild), 0, crime_7d_bild),
-    crime_7d_faz  = ifelse(is.na(crime_7d_faz),  0, crime_7d_faz),
-    crime_7d_sz   = ifelse(is.na(crime_7d_sz),   0, crime_7d_sz),
-    crime_7d_taz  = ifelse(is.na(crime_7d_taz),  0, crime_7d_taz),
-    crime_7d_welt = ifelse(is.na(crime_7d_welt), 0, crime_7d_welt),
-    
-    capcrime_7d_bild = ifelse(is.na(capcrime_7d_bild), 0, capcrime_7d_bild),
-    capcrime_7d_faz  = ifelse(is.na(capcrime_7d_faz),  0, capcrime_7d_faz),
-    capcrime_7d_sz   = ifelse(is.na(capcrime_7d_sz),   0, capcrime_7d_sz),
-    capcrime_7d_taz  = ifelse(is.na(capcrime_7d_taz),  0, capcrime_7d_taz),
-    capcrime_7d_welt = ifelse(is.na(capcrime_7d_welt), 0, capcrime_7d_welt),
-    
-    refnums_7d_bild = ifelse(is.na(refnums_7d_bild), 0, refnums_7d_bild),
-    refnums_7d_faz  = ifelse(is.na(refnums_7d_faz),  0, refnums_7d_faz),
-    refnums_7d_sz   = ifelse(is.na(refnums_7d_sz),   0, refnums_7d_sz),
-    refnums_7d_taz  = ifelse(is.na(refnums_7d_taz),  0, refnums_7d_taz),
-    refnums_7d_welt = ifelse(is.na(refnums_7d_welt), 0, refnums_7d_welt),
-    
-    camps_7d_bild = ifelse(is.na(camps_7d_bild), 0, camps_7d_bild),
-    camps_7d_faz  = ifelse(is.na(camps_7d_faz),  0, camps_7d_faz),
-    camps_7d_sz   = ifelse(is.na(camps_7d_sz),   0, camps_7d_sz),
-    camps_7d_taz  = ifelse(is.na(camps_7d_taz),  0, camps_7d_taz),
-    camps_7d_welt = ifelse(is.na(camps_7d_welt), 0, camps_7d_welt),
-    
-    medit_7d_bild = ifelse(is.na(medit_7d_bild), 0, medit_7d_bild),
-    medit_7d_faz  = ifelse(is.na(medit_7d_faz),  0, medit_7d_faz),
-    medit_7d_sz   = ifelse(is.na(medit_7d_sz),   0, medit_7d_sz),
-    medit_7d_taz  = ifelse(is.na(medit_7d_taz),  0, medit_7d_taz),
-    medit_7d_welt = ifelse(is.na(medit_7d_welt), 0, medit_7d_welt),
-    
-    deport_7d_bild = ifelse(is.na(deport_7d_bild), 0, deport_7d_bild),
-    deport_7d_faz  = ifelse(is.na(deport_7d_faz),  0, deport_7d_faz),
-    deport_7d_sz   = ifelse(is.na(deport_7d_sz),   0, deport_7d_sz),
-    deport_7d_taz  = ifelse(is.na(deport_7d_taz),  0, deport_7d_taz),
-    deport_7d_welt = ifelse(is.na(deport_7d_welt), 0, deport_7d_welt),
-    
-    labmar_7d_bild = ifelse(is.na(labmar_7d_bild), 0, labmar_7d_bild),
-    labmar_7d_faz  = ifelse(is.na(labmar_7d_faz),  0, labmar_7d_faz),
-    labmar_7d_sz   = ifelse(is.na(labmar_7d_sz),   0, labmar_7d_sz),
-    labmar_7d_taz  = ifelse(is.na(labmar_7d_taz),  0, labmar_7d_taz),
-    labmar_7d_welt = ifelse(is.na(labmar_7d_welt), 0, labmar_7d_welt)
-    
-  ) %>% 
+  mutate(across(n_mig_sal_7d_bild:capcrime_7d_welt, ~ifelse(is.na(.x), 0, .x))) %>% 
   mutate(
     n_read = # count n of newspapers consumed
         `1661a_bin`+
@@ -293,11 +227,11 @@ merged_data <-
   # 7-day lag absolute
   mutate(
     n_mig_tot_7d_wtd = 
-      n_mig_7d_bild*`1661a_clean`/n_read + # take sum of consumed newspapers, divided by n of newspapers consumed
-      n_mig_7d_faz*`1661c_clean`/n_read +
-      n_mig_7d_sz*`1661d_clean`/n_read +
-      n_mig_7d_taz*`1661e_clean`/n_read +
-      n_mig_7d_welt*`1661f_clean`/n_read,
+      n_mig_sal_7d_bild*`1661a_clean`/n_read + # take sum of consumed newspapers, divided by n of newspapers consumed
+      n_mig_sal_7d_faz*`1661c_clean`/n_read +
+      n_mig_sal_7d_sz*`1661d_clean`/n_read +
+      n_mig_sal_7d_taz*`1661e_clean`/n_read +
+      n_mig_sal_7d_welt*`1661f_clean`/n_read,
     crime_tot_7d_wtd = 
       crime_7d_bild*`1661a_clean`/n_read +
       crime_7d_faz*`1661c_clean`/n_read +
@@ -344,11 +278,11 @@ merged_data <-
   # 30-day lag absolute
   mutate(
     n_mig_tot_30d_wtd = 
-      n_mig_30d_bild*`1661a_clean`/n_read + # take sum of consumed newspapers, divided by n of newspapers consumed
-      n_mig_30d_faz*`1661c_clean`/n_read +
-      n_mig_30d_sz*`1661d_clean`/n_read +
-      n_mig_30d_taz*`1661e_clean`/n_read +
-      n_mig_30d_welt*`1661f_clean`/n_read,
+      n_mig_sal_30d_bild*`1661a_clean`/n_read + # take sum of consumed newspapers, divided by n of newspapers consumed
+      n_mig_sal_30d_faz*`1661c_clean`/n_read +
+      n_mig_sal_30d_sz*`1661d_clean`/n_read +
+      n_mig_sal_30d_taz*`1661e_clean`/n_read +
+      n_mig_sal_30d_welt*`1661f_clean`/n_read,
     crime_tot_30d_wtd = 
       crime_30d_bild*`1661a_clean`/n_read +
       crime_30d_faz*`1661c_clean`/n_read +
@@ -401,11 +335,11 @@ merged_data <-
       n_tot_7d_taz  +
       n_tot_7d_welt,
     n_mig_tot_7d_unw = 
-      n_mig_7d_bild + 
-      n_mig_7d_faz  +
-      n_mig_7d_sz   +
-      n_mig_7d_taz  +
-      n_mig_7d_welt,
+      n_mig_sal_7d_bild + 
+      n_mig_sal_7d_faz  +
+      n_mig_sal_7d_sz   +
+      n_mig_sal_7d_taz  +
+      n_mig_sal_7d_welt,
     crime_tot_7d_unw = 
       crime_7d_bild +
       crime_7d_faz  +
@@ -450,6 +384,15 @@ merged_data <-
       deport_7d_welt
   ) %>% 
   mutate(
+    crime_share_7d_wtd = crime_tot_7d_wtd/n_mig_tot_7d_wtd,
+    capcrime_share_7d_wtd = capcrime_tot_7d_wtd/n_mig_tot_7d_wtd,
+    refnums_share_7d_wtd = refnums_tot_7d_wtd/n_mig_tot_7d_wtd,
+    camps_share_7d_wtd = camps_tot_7d_wtd/n_mig_tot_7d_wtd,
+    medit_share_7d_wtd = medit_tot_7d_wtd/n_mig_tot_7d_wtd,
+    labmar_share_7d_wtd = labmar_tot_7d_wtd/n_mig_tot_7d_wtd,
+    deport_share_7d_wtd = deport_tot_7d_wtd/n_mig_tot_7d_wtd
+  ) %>% 
+  mutate(
     crime_share_7d_unw = crime_tot_7d_unw/n_mig_tot_7d_unw,
     capcrime_share_7d_unw = capcrime_tot_7d_unw/n_mig_tot_7d_unw,
     refnums_share_7d_unw = refnums_tot_7d_unw/n_mig_tot_7d_unw,
@@ -467,11 +410,11 @@ merged_data <-
       n_tot_30d_taz  +
       n_tot_30d_welt,
     n_mig_tot_30d_unw = 
-      n_mig_30d_bild + 
-      n_mig_30d_faz  +
-      n_mig_30d_sz   +
-      n_mig_30d_taz  +
-      n_mig_30d_welt,
+      n_mig_sal_30d_bild + 
+      n_mig_sal_30d_faz  +
+      n_mig_sal_30d_sz   +
+      n_mig_sal_30d_taz  +
+      n_mig_sal_30d_welt,
     crime_tot_30d_unw = 
       crime_30d_bild +
       crime_30d_faz  +
@@ -516,6 +459,15 @@ merged_data <-
       deport_30d_welt
   ) %>% 
   mutate(
+    crime_share_30d_wtd = crime_tot_30d_wtd/n_mig_tot_30d_wtd,
+    capcrime_share_30d_wtd = capcrime_tot_30d_wtd/n_mig_tot_30d_wtd,
+    refnums_share_30d_wtd = refnums_tot_30d_wtd/n_mig_tot_30d_wtd,
+    camps_share_30d_wtd = camps_tot_30d_wtd/n_mig_tot_30d_wtd,
+    medit_share_30d_wtd = medit_tot_30d_wtd/n_mig_tot_30d_wtd,
+    labmar_share_30d_wtd = labmar_tot_30d_wtd/n_mig_tot_30d_wtd,
+    deport_share_30d_wtd = deport_tot_30d_wtd/n_mig_tot_30d_wtd
+  ) %>% 
+  mutate(
     crime_share_30d_unw = crime_tot_30d_unw/n_mig_tot_30d_unw,
     capcrime_share_30d_unw = capcrime_tot_30d_unw/n_mig_tot_30d_unw,
     refnums_share_30d_unw = refnums_tot_30d_unw/n_mig_tot_30d_unw,
@@ -526,37 +478,91 @@ merged_data <-
   )
 
 
-## vis vars - 7d and 30d aggregation looks very different ???
-merged_data %>% 
-  mutate(date_month = floor_date(date_clean, 'month')) %>%
-  group_by(date_month) %>%
-  dplyr::select(contains('7d'), contains('30d')) %>%
-  summarise_all(mean, na.rm = T) %>%
-  ggplot(aes(x = date_month)) +
-  geom_line(aes(y = crime_share_7d_unw, col = 'crime')) +
-  geom_line(aes(y = capcrime_share_7d_unw, col = 'capcrime')) +
-  geom_line(aes(y = refnums_share_7d_unw, col = 'refnums')) +
-  geom_line(aes(y = camps_share_7d_unw, col = 'camps')) +
-  geom_line(aes(y = medit_share_7d_unw, col = 'medit')) +
-  geom_line(aes(y = labmar_share_7d_unw, col = 'labmar')) +
-  geom_line(aes(y = deport_share_7d_unw, col = 'deport'))
-
-merged_data %>% 
-  mutate(date_month = floor_date(date_clean, 'month')) %>%
-  group_by(date_month) %>%
-  dplyr::select(contains('7d'), contains('30d')) %>%
-  summarise_all(mean, na.rm = T) %>%
-  ggplot(aes(x = date_month)) +
-  geom_line(aes(y = crime_share_30d_unw, col = 'crime')) +
-  geom_line(aes(y = capcrime_share_30d_unw, col = 'capcrime')) +
-  geom_line(aes(y = refnums_share_30d_unw, col = 'refnums')) +
-  geom_line(aes(y = camps_share_30d_unw, col = 'camps')) +
-  geom_line(aes(y = medit_share_30d_unw, col = 'medit')) +
-  geom_line(aes(y = labmar_share_30d_unw, col = 'labmar')) +
-  geom_line(aes(y = deport_share_30d_unw, col = 'deport'))
-
 
 ## 3.2 individual-level model ####
+
+## visualise simple correlations frame exposure X opinion
+
+### immigration attitude
+  
+merged_data %>% 
+  filter(!is.na(`1130_clean`), wave %in% c(1, 3:8)) %>% 
+  ggplot(aes(as.factor(`1130_clean`), crime_share_7d_wtd)) +
+  stat_summary(geom = "bar", fun = mean) +
+  stat_summary(geom = "errorbar", fun.data = mean_se) +
+  facet_wrap(~wave) +
+  theme_minimal() +
+  xlab('less restrictive <- migration opinion -> more restrictive') +
+  ylab('Share of crime frame in migration coverage in consumed newspapers') +
+  ggtitle('Exposure to crime frames on immigration and migration opinions across waves')
+ggsave(here('paper/vis/crime_imm_att.png'))
+
+merged_data %>% 
+  filter(!is.na(`1130_clean`), wave %in% c(1, 3:8)) %>% 
+  ggplot(aes(as.factor(`1130_clean`), n_mig_tot_7d_unw/n_tot_tot_7d_unw)) +
+  stat_summary(geom = "bar", fun = mean) +
+  stat_summary(geom = "errorbar", fun.data = mean_se) +
+  facet_wrap(~wave) +
+  theme_minimal() +
+  xlab('less restrictive <- migration opinion -> more restrictive') +
+  ylab('Migration content exposure') +
+  ggtitle('Exposure to migration content and migration opinions across waves')
+ggsave(here('paper/vis/salience_imm_att.png'))
+
+
+### integration attitude
+merged_data %>% 
+  filter(!is.na(`1210_clean`), wave %in% c(1, 4:8)) %>% 
+  ggplot(aes(as.factor(`1210_clean`), crime_share_7d_wtd)) +
+  stat_summary(geom = "bar", fun = mean) +
+  stat_summary(geom = "errorbar", fun.data = mean_se) +
+  facet_wrap(~wave) +
+  theme_minimal() +
+  xlab('less restrictive <- integration opinion -> more restrictive') +
+  ylab('Share of crime frame in migration coverage in consumed newspapers') +
+  ggtitle('Exposure to crime frames on immigration and integration opinions across waves')
+ggsave(here('paper/vis/crime_int_att.png'))
+
+merged_data %>% 
+  filter(!is.na(`1210_clean`), wave %in% c(1, 4:8)) %>% 
+  ggplot(aes(as.factor(`1210_clean`), n_mig_tot_7d_unw/n_tot_tot_7d_unw)) +
+  stat_summary(geom = "bar", fun = mean) +
+  stat_summary(geom = "errorbar", fun.data = mean_se) +
+  facet_wrap(~wave) +
+  theme_minimal() +
+  xlab('less restrictive <- integration opinion -> more restrictive') +
+  ylab('Migration content exposure') +
+  ggtitle('Exposure to migration content and integration opinions across waves')
+ggsave(here('paper/vis/salience_int_att.png'))
+
+### afd support
+merged_data %>% 
+  filter(!is.na(`1130_clean`), wave %in% c(1, 3:8)) %>% 
+  ggplot(aes(as.factor(`1130_clean`), crime_share_7d_wtd)) +
+  stat_summary(geom = "bar", fun = mean) +
+  stat_summary(geom = "errorbar", fun.data = mean_se) +
+  facet_wrap(~wave) +
+  theme_minimal() +
+  xlab('less <- AfD support -> more') +
+  ylab('Share of crime frame in migration coverage in consumed newspapers') +
+  ggtitle('Exposure to crime frames on immigration and AfD support across waves')
+ggsave(here('paper/vis/crime_afd_att.png'))
+
+merged_data %>% 
+  filter(!is.na(`430i_clean`), wave %in% c(1, 3:8)) %>% 
+  ggplot(aes(as.factor(`430i_clean`), n_mig_tot_7d_unw/n_tot_tot_7d_unw)) +
+  stat_summary(geom = "bar", fun = mean) +
+  stat_summary(geom = "errorbar", fun.data = mean_se) +
+  facet_wrap(~wave) +
+  theme_minimal() +
+  xlab('less <- AfD support -> more') +
+  ylab('Migration content exposure') +
+  ggtitle('Exposure to migration content and AfD support across waves')
+ggsave(here('paper/vis/salience_afd_att.png'))
+
+
+## estimation
+
 library(fixest)
 
 efftable_absolute <- data.frame()
@@ -741,3 +747,6 @@ efftable <- rbind(efftable_absolute, efftable_share)
 ## 3.3 save fe model ####
 datum <- Sys.Date()
 save(efftable, file = here(paste0('data/efftable_fe_', datum, '.Rdata')))
+
+
+
