@@ -262,6 +262,17 @@ gles_p_long$date_clean[gles_p_long$date_clean == '-95 nicht teilgenommen'] <- NA
 gles_p_long$date_clean <- as.Date(gles_p_long$date_clean)
 
 ## media vars
+
+### non-readers
+gles_p_long$`1661h_bin` <- NA
+gles_p_long$`1661h_bin`[(!is.na(gles_p_long$`1661h` > 0)) & 
+                          (gles_p_long$`1661h` > 0)] <- 
+  gles_p_long$`1661h`[(!is.na(gles_p_long$`1661h` > 0)) & 
+                        (gles_p_long$`1661h` > 0)] == 1
+
+
+
+### all others
 for (varname in media_vars){
   varname_clean <- paste0(varname, '_clean')
   varname_bin <- paste0(varname, '_bin')
@@ -352,6 +363,56 @@ for (varname in salience_vars){
 
 gles_p_long <- gles_p_long %>% 
   select(lfdn, wave, date_new, ends_with('_clean'), ends_with('_bin'))
+
+
+## assign to single newspaper (random according to days read)
+
+col_names <- 
+  gles_p_long %>% 
+  select(contains("1661") &
+           contains("clean") &
+           !contains("h")) %>% 
+  colnames()
+  
+ra_wtd <- function(row){
+  sample(col_names,
+         size = 1, 
+         prob = row/sum(row, na.rm = T)) %>% 
+    return()
+}
+
+subset_read <- 
+  gles_p_long %>% 
+  select(contains("1661") &
+           contains("clean") &
+           !contains("h")) %>% 
+  mutate(readership_var = 
+           case_when(rowSums(.) == 0 ~ "None",
+                     is.na(rowSums(.)) ~ "Missing"))
+
+subset_read[is.na(subset_read$readership_var), "readership_var"] <- 
+  subset_read %>% 
+  filter(is.na(readership_var)) %>% 
+  select(-readership_var) %>% 
+  apply(., 1, ra_wtd)
+
+subset_read$readership <- 
+  case_when(
+    subset_read$readership_var == "1661a_clean" ~ "Bild",
+    subset_read$readership_var == "1661b_clean" ~ "FR",
+    subset_read$readership_var == "1661c_clean" ~ "FAZ",
+    subset_read$readership_var == "1661d_clean" ~ "SZ",
+    subset_read$readership_var == "1661e_clean" ~ "taz",
+    subset_read$readership_var == "1661f_clean" ~ "Welt",
+    subset_read$readership_var == "1661g_clean" ~ "Other",
+    subset_read$readership_var == "None"        ~ "None",
+    subset_read$readership_var == "Missing"     ~ NA_character_
+    )
+
+gles_p_long$readership <- subset_read$readership
+gles_p_long$readership_var <- subset_read$readership_var
+
+rm(subset_read)
 
 ## save
 gles_p_long %>% 
