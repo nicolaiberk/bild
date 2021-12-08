@@ -22,105 +22,199 @@ library(fixest)
 # load data ####
 gles_p_long <- fread(here('data/gles/Panel/long_cleaned.csv')) %>% as.data.frame()
 
-# broad estimates (all outlets) ####
+
+# DiD with treatment X readership var
+
 coeftable <- data.frame()
-mediumlist <- c('1681', '1661')
-ego_issues <- 
-  str_match(
-    string = colnames(gles_p_long), 
-    pattern = "2880(.*)_clean"
-  )[,2] %>% 
-  unique()
-ego_issues <- paste0("2880", ego_issues[!is.na(ego_issues)])
+sample_set <- c("exclusive readers", "all readers", "all respondents")
 
+for (sample_restriction in sample_set){
 
-
-for (medium in mediumlist){
-  print(paste('Medium:', medium))
-  if (medium == '1661'){
-    papers_list <- letters[1:7]
-    non_reader_var <- letters[8]
-  } else if (medium == '1681'){
-    papers_list <- letters[1:5]
-    non_reader_var <- letters[6]
+  if (sample_restriction == 'exclusive readers'){
+    
+    # filter only exclusive readers
+    tempdta_res <- 
+      gles_p_long %>% 
+      mutate(n_papers = rowSums(gles_p_long %>% 
+                                  select(contains("1661")) %>% 
+                                  select(!contains("1661h")) %>% 
+                                  select(contains('bin')))) %>% 
+      filter(n_papers == 1)
+    
+  }else if (sample_restriction == "all readers"){
+    
+    tempdta_res <- 
+      gles_p_long %>% 
+      filter(!is.na(readership) & (readership != "")) %>% 
+      filter(readership != "None")
+    
+  }else if (sample_restriction == "all respondents"){
+    
+    tempdta_res <- 
+      gles_p_long %>% 
+      filter(!is.na(readership) & (readership != ""))
+    
+  }else{
+    stop(paste0("Unknown sample restriction: ", sample_restriction))
   }
-  for (sample_restriction in c('only readers', 'only exclusive readers')){
-    print(paste('Sample restriction:', sample_restriction))
-    for (paper in papers_list){
-      print(paste('Paper:', paper))
-      for (issue in c(ego_issues, "1500", "1090", "1130", 
-                      "1290", "1210", "1140", "1220", "1300", 
-                      "1411", "1250", "430i")){
-        print(paste('Issue:', issue))
+  
+  if (nrow(tempdta_res) == 0){next}
+  
+  post_wave_set <- 
+    tempdta_res %>% 
+    filter(wave != "1") %>% 
+    select(wave) %>% 
+    unique() %>% 
+    unlist() %>% 
+    as.character()
+  
+  
+
+  for (post_wave in post_wave_set){
+  
+    
+    min_date_post <- 
+      tempdta_res %>% 
+      filter(wave == post_wave) %>% 
+      filter(!is.na(date_clean)) %>% 
+      select(date_clean) %>% 
+      unlist() %>% 
+      min() %>% 
+      as.Date(origin = "1970-01-01")
+  
+    if (!is.finite(min_date_post) | is.na(min_date_post)){
+      
+      stop(cat("No available date for post-wave:",
+               "\n\t- Sample: ", sample_restriction,
+               "\n\t- Post-wave: ", post_wave
+               ))
+    
+    }
+  
+    tempdta_res$post <- tempdta_res$date_clean >= min_date_post
+  
+    for (reference in c("Other", "Pooled", "Welt", "None")){
+      
+      # Skip duplicate reference categories 
+      
+      ## "Other" and "Welt" same for readers only and full
+      if (sample_restriction == "All" & 
+          ((reference == "Pooled") | (reference == "Welt"))){next}
+      
+      ## "None" undefined for readers only samples
+      if (sample_restriction != "All" & (reference == "None")){next}
+    
+      for (dv in c("imm", "int", "afd")){
         
-        
-        if (sample_restriction == 'only exclusive readers'){
-          
-          # filter only exclusive readers
-          tempdta <- 
-            gles_p_long %>% 
-            mutate(n_papers = rowSums(gles_p_long %>% 
-                                        select(contains(medium)) %>% 
-                                        select(!contains(paste0(medium, non_reader_var))) %>% 
-                                        select(contains('bin')))) %>% 
-            filter(n_papers == 1)
-          
+        if (dv == "imm"){
+          tempdta_res$dv <- tempdta_res$`1130_clean`
+        }else if (dv == "int"){
+          tempdta_res$dv <- tempdta_res$`1210_clean`*(-1)
+        }else if (dv == "afd"){
+          tempdta_res$dv <- tempdta_res$`430i_clean`
         }else{
-          
-          # additional estimate with relaxed treatment restriction
-          gles_p_long$non_reader <- gles_p_long[, c(paste0(medium, non_reader_var, '_clean'))] == 1
-            
-          tempdta <- 
-            gles_p_long %>% 
-            filter(non_reader != T)
-          
+          stop(paste0("Error: Unexpected dependent '", dv, "'."))
         }
         
-        tempdta$paper_reader <- tempdta[, paste0(medium, paper, '_bin')]
+        tempdta_dv <- 
+          tempdta_res %>% 
+          filter(!is.na(dv))
         
-        tempdta$issue <- scale(tempdta[, paste0(issue, '_clean')], center = T, scale = T)
+        if (nrow(tempdta_dv) == 0){next}
         
-        tempdta <- 
-          tempdta %>% 
-          filter(!is.na(issue))
-        
-        wavelist <- sort(unique(as.integer(tempdta$wave)))
-        
-        if (length(wavelist) >= 2){
+        for (sample_period in c("all", "pre-post")){
           
-          # estimate DiD ####
-          for (wave_id in 2:length(wavelist)){
-            tempdta_model <- 
-              tempdta %>%
-              mutate(treat = ifelse(wave == as.character(wavelist[wave_id]), 1, NA)) %>%
-              mutate(treat = ifelse(wave == as.character(wavelist[(wave_id-1)]), 0, treat)) %>% 
-              filter(!is.na(treat))
+          if (sample_period == "all"){
             
-            if ((length(unique(tempdta_model$paper_reader)) == 2) &
-              (length(unique(tempdta_model$treat)) == 2)){
-  
-              ## fes dropped bc takes too long
-              sum_lm <- summary(lm(issue ~ treat*paper_reader, data = tempdta_model))
-              sum_fe <- summary(feglm(issue ~ treat*paper_reader | lfdn, data = tempdta_model))
+            tempdta_per <- tempdta_dv
+              
+          }else if (sample_period == "pre-post"){
+            
+            max_pre_date <- 
+              tempdta_dv %>% 
+              filter(post == F) %>% 
+              select(date_clean) %>% 
+              unlist() %>% 
+              max() %>% 
+              as.Date(origin = "1970-01-01")
+            
+            pre_wave <- 
+              tempdta_dv %>% 
+              filter(date_clean == max_pre_date) %>% 
+              select(wave) %>% unlist %>% unique()
+            
+            tempdta_per <- 
+              tempdta_dv %>% 
+              filter(wave %in% c(pre_wave, post_wave))
+            
+          }else{
+            stop(paste0("Error: Unexpected period: '", sample_period, "'."))
+          }
+          
+          for (paper in unique(tempdta_per$readership)){
+            
+            if (paper != reference){
+              
+              tempdta_paper <- 
+                tempdta_per %>% 
+                filter(readership %in% 
+                         if(reference == "Pooled"){
+                           unique(gles_p_long$readership)
+                         }else{
+                           c(paper, reference) 
+                         }) %>% 
+                mutate(paper_reader = readership == paper)
+            
+              if (nrow(tempdta_paper) == 0){
+                
+                cat("No observations:",
+                      "\n\t- Paper:", paper,
+                      "\n\t- DV:", dv, 
+                      "\n\t- Sample:", sample_restriction,
+                      "\n\t- Wave (post):", post_wave,
+                      "\n\t- Reference category:", reference,
+                      "\n\t- Sample period:", sample_period,
+                      "\n\n Skipping iteration. \n\n")
+                
+                next
+                
+              }
+              
+              if (table(tempdta_paper$post, tempdta_paper$paper_reader) %>% 
+                  dim() %>% min() != 2 |
+                  (table(tempdta_paper$post, tempdta_paper$paper_reader) %>% 
+                   min() == 0)){
+                cat("Empty cell in exposure-post-table:",
+                    "\n\t- Paper:", paper,
+                    "\n\t- DV:", dv, 
+                    "\n\t- Sample:", sample_restriction,
+                    "\n\t- Wave (post):", post_wave,
+                    "\n\t- Reference category:", reference,
+                    "\n\t- Sample period:", sample_period,
+                    "\n\n Skipping iteration. \n\n")
+                next
+              }
+                  
+              model_did <- 
+                tempdta_paper %>% 
+                lm(formula = dv ~ post * paper_reader, data = .)
+          
               
               coeftable <- 
                 data.frame(
-                medium   = medium,
-                paper    = paper,
-                issue    = issue,
-                wave     = wavelist[wave_id],
-                date     = max(tempdta_model$date_new[tempdta_model$wave == wavelist[wave_id]]),
-                coef_fe  = sum_fe$coeftable['treat:paper_readerTRUE', 1],
-                p_fe     = sum_fe$coeftable['treat:paper_readerTRUE', 4],
-                coef_lm  = sum_lm$coefficients['treat:paper_readerTRUE',][1],
-                p_lm     = sum_lm$coefficients['treat:paper_readerTRUE', ][4],
-                respondents = sample_restriction,
-                sample_n = nrow(tempdta_model)
+                  est   = model_did$coefficients[["postTRUE:paper_readerTRUE"]],
+                  lower = confint(model_did)["postTRUE:paper_readerTRUE", 1],
+                  upper = confint(model_did)["postTRUE:paper_readerTRUE", 2],
+                  paper = paper,
+                  period = sample_period,
+                  reference = reference,
+                  dv = dv,
+                  sample = sample_restriction,
+                  post_wave = post_wave
                 ) %>% 
                 rbind(coeftable)
-              
-              
                 
+              
             }
           }
         }
@@ -129,5 +223,5 @@ for (medium in mediumlist){
   }
 }
 
-  
 write.csv(coeftable, here('data/coeftable_gles_noimp.csv'))
+
