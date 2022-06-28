@@ -12,5 +12,13 @@ log.txt
 paper
 pres
 !paper/Manuscript_Framing.pdf
+!paper/Manuscript_Framing.Rmd
 !pres/Presentation.html
-!pres/Abstract.pdf
+!pres/Presentation.Rmd
+!pres/vis
+!pres/xaringan_themer.css
+!paper/vis
+!paper/preamble.tex
+!paper/PhD.bib
+!paper/appendix.pdf
+!paper/appendix.Rmd
