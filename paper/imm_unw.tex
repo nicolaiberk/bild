@@ -1,0 +1,55 @@
+
+% Table created by stargazer v.5.2.2 by Marek Hlavac, Harvard University. E-mail: hlavac at fas.harvard.edu
+% Date and time: Do, Sep 30, 2021 - 09:42:41
+\begin{table}[!htbp] \centering 
+  \caption{Individual-level Model} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lcc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{2}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-3} 
+\\[-1.8ex] & `1130\_clean` & `1210\_clean` \\ 
+\\[-1.8ex] & (1) & (2)\\ 
+\hline \\[-1.8ex] 
+ `1130\_lag` & 0.818$^{***}$ &  \\ 
+  & (0.005) &  \\ 
+  & & \\ 
+ `1210\_lag` &  & 0.748$^{***}$ \\ 
+  &  & (0.012) \\ 
+  & & \\ 
+ scale(crime\_tot\_7d\_unw, center = T, scale = T) & 0.016 & $-$0.059 \\ 
+  & (0.015) & (0.067) \\ 
+  & & \\ 
+ scale(capcrime\_tot\_7d\_unw, center = T, scale = T) & 0.020 & 0.007 \\ 
+  & (0.013) & (0.041) \\ 
+  & & \\ 
+ scale(refnums\_tot\_7d\_unw, center = T, scale = T) & $-$0.274$^{***}$ & $-$0.161 \\ 
+  & (0.041) & (0.155) \\ 
+  & & \\ 
+ scale(camps\_tot\_7d\_unw, center = T, scale = T) & 0.007 & 0.175 \\ 
+  & (0.012) & (0.125) \\ 
+  & & \\ 
+ scale(medit\_tot\_7d\_unw, center = T, scale = T) & 0.103$^{***}$ & 0.037 \\ 
+  & (0.017) & (0.050) \\ 
+  & & \\ 
+ scale(labmar\_tot\_7d\_unw, center = T, scale = T) & 0.232$^{***}$ & 0.294$^{**}$ \\ 
+  & (0.027) & (0.143) \\ 
+  & & \\ 
+ scale(deport\_tot\_7d\_unw, center = T, scale = T) & $-$0.053$^{***}$ & $-$0.017 \\ 
+  & (0.011) & (0.063) \\ 
+  & & \\ 
+ Constant & 0.171$^{***}$ & $-$0.119 \\ 
+  & (0.016) & (0.084) \\ 
+  & & \\ 
+\hline \\[-1.8ex] 
+Observations & 15,373 & 3,968 \\ 
+R$^{2}$ & 0.650 & 0.510 \\ 
+Adjusted R$^{2}$ & 0.650 & 0.509 \\ 
+Residual Std. Error & 1.075 (df = 15364) & 1.035 (df = 3959) \\ 
+F Statistic & 3,565.925$^{***}$ (df = 8; 15364) & 515.265$^{***}$ (df = 8; 3959) \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{2}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table} 
