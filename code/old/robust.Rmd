@@ -1,0 +1,300 @@
+---
+title: "Robustness and additional estimates"
+author: "Nicolai Berk"
+date: "14 3 2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+knitr::opts_chunk$set(echo = FALSE, message = F, warning = F, cache = T, fig.align='center', eval = T, dev = "svg")
+# knitr::opts_knit$set(root.dir = 'C:/Users/nicol/Dropbox/PhD/Papers/Bild/github/bild')
+
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(fixest)
+library(lubridate)
+library(patchwork)
+```
+
+
+## Why is the direct effect of the crime treatment negative? Shouldn't it be positive?
+
+### Standard model
+
+```{r}
+gles_p_long <- fread('C:/Users/nicol/Dropbox/PhD/Papers/Bild/github/bild/data/gles/Panel/long_cleaned.csv')
+
+gles_p_long$dv <- gles_p_long$`1130_clean`
+gles_p_long$treat <- gles_p_long$`1661a_clean` > 0
+gles_p_long$treat[is.na(gles_p_long$`1661a_clean`)] <- NA
+
+gles_p_long$post <- gles_p_long$date_clean>= as.Date("2017-02-01")
+gles_p_long <- 
+  gles_p_long %>% 
+  select(lfdn, date_clean, `1130_clean`) %>% 
+  filter(!is.na(`1130_clean`)) %>% 
+  arrange(lfdn, date_clean) %>% 
+  group_by(lfdn) %>% 
+  slice(1) %>% 
+  mutate(init_mig = `1130_clean`) %>% 
+  select(lfdn, init_mig) %>% 
+  right_join(gles_p_long, by = "lfdn")
+
+gles_p_long <- 
+  gles_p_long %>% 
+  mutate(mip_mig_crime_lag = lag(mip_mig_crime)) %>% 
+  filter(!is.na(mip_mig_crime)) %>% 
+  arrange(lfdn, date_clean) %>% 
+  group_by(lfdn) %>% 
+  slice(1) %>% 
+  mutate(mip_mig_crime_init = mip_mig_crime) %>% 
+  select(lfdn, mip_mig_crime_init) %>% 
+  right_join(gles_p_long, by = "lfdn")
+
+gles_p_long_1617 <- 
+  gles_p_long %>% 
+        filter(date_clean >= as.Date("2016-01-01"),
+               date_clean <  as.Date("2018-01-01"))
+rm(gles_p_long)
+
+# model 1: direct effect
+ate <- 
+  feglm(dv ~ post * treat | lfdn, 
+      cluster = c("lfdn"), 
+      data = gles_p_long_1617)
+
+inter <- 
+  feglm(dv ~ post * treat * init_mig, 
+      cluster = c("lfdn"), 
+      data = gles_p_long_1617)
+
+points <- ate$coefficients
+ests <- cbind(points, confint(ate))
+plot_did_ate <- 
+  ests %>% 
+  # mutate(name = factor(row.names(.), levels = row.names(.))) %>% 
+  ggplot(aes(y = row.names(.), x = points, xmin = `2.5 %`, xmax = `97.5 %`)) +
+  geom_pointrange() +
+  geom_vline(xintercept = 0, col = "red", lty = 2) +
+  ylab("") + xlab("Estimate") +
+  scale_y_discrete(limits=rev(row.names(ests)),
+                   labels = rev(c("Post", "Treatment", "Post X Treatment")))
+
+points <- inter$coefficients
+ests <- cbind(points, confint(inter))
+
+plot_did_inter <- 
+  ests %>% 
+  filter(row.names(.) %in% c("postTRUE:treatTRUE", "postTRUE:treatTRUE:init_mig")) %>% 
+  mutate(name = fct_reorder(row.names(.), desc(row.names(.)))) %>% 
+  ggplot(aes(y = name, x = points, xmin = `2.5 %`, xmax = `97.5 %`)) +
+  geom_pointrange() +
+  geom_vline(xintercept = 0, col = "red", lty = 2) +
+  ylab("") + xlab("Estimate") +
+  ggtitle("DiD-estimate with interaction") +
+  xlim(-0.1, 0.4) + 
+  scale_y_discrete(labels = rev(c("Post X Treatment", "Post X Treatment X Initial Opinion")))
+
+
+plot_did_ate/plot_did_inter
+
+```
+
+## Direct effect, controlling for initial attitude
+
+```{r}
+
+ctrl <- 
+  feglm(dv ~ post * treat + init_mig, 
+      cluster = c("lfdn"), 
+      data = gles_p_long_1617)
+
+
+points <- ctrl$coefficients
+ests <- cbind(points, confint(ctrl))
+plot_did_ctrl <- 
+  ests %>% 
+  mutate(name = factor(row.names(.), levels = row.names(.))) %>%
+  filter(!name %in% c("", "(Intercept)", "init_mig")) %>% 
+  ggplot(aes(y = row.names(.), x = points, xmin = `2.5 %`, xmax = `97.5 %`)) +
+  geom_pointrange() +
+  geom_vline(xintercept = 0, col = "red", lty = 2) +
+  ylab("") + xlab("Estimate") +
+  scale_y_discrete(limits=rev(row.names(ests)[!row.names(ests) %in% c("", "(Intercept)", "init_mig")]),
+                   labels = rev(c("Post", "Treatment", "Post X Treatment"))) +
+  xlim(-0.1, 0.4) + 
+  ggtitle("Controlling for initial attitude")
+
+
+plot_did_ctrl
+
+```
+
+## Distribution of Bild readers on pre-treatment outcome
+
+```{r}
+
+bild_readers <- 
+  gles_p_long_1617 %>% 
+  arrange(lfdn, date_clean) %>% 
+  group_by(lfdn) %>% 
+  slice(1) %>% 
+  filter(`1661a_bin`) %>% 
+  ggplot(aes(x = `1130_clean`, after_stat(density))) +
+  geom_histogram(binwidth = .5) + 
+  ggtitle("Bild readers") + xlab("") +
+  theme_minimal() +
+  ylim(0, 0.75)
+
+
+rest_readers <- 
+  gles_p_long_1617 %>% 
+  arrange(lfdn, date_clean) %>% 
+  group_by(lfdn) %>% 
+  slice(1) %>% 
+  filter(!`1661a_bin`) %>% 
+  ggplot(aes(x = `1130_clean`, after_stat(density))) +
+  geom_histogram(binwidth = .5) + 
+  ggtitle("Not bild readers") +xlab("") +
+  theme_minimal() +
+  ylim(0, 0.75)
+
+bild_readers/rest_readers
+  
+
+```
+
+## estimate effect based on pre-treatment groups
+
+```{r}
+
+gles_p_long_1617 <- 
+  gles_p_long_1617 %>% 
+  filter(wave == "1") %>% 
+  mutate(bild_init = ifelse(is.na(`1661a_clean`), NA, `1661a_clean` > 0)) %>% 
+  select(bild_init, lfdn) %>% 
+  right_join(gles_p_long_1617, by = "lfdn")
+
+
+treat_alt_ate <- 
+  feglm(dv ~ post * bild_init, 
+      cluster = c("lfdn"), 
+      data = gles_p_long_1617)
+
+
+points <- treat_alt_ate$coefficients
+ests <- cbind(points, confint(treat_alt_ate))
+plot_did_alt_ate <- 
+  ests %>% 
+  mutate(name = factor(row.names(.), levels = row.names(.))) %>%
+  filter(!name %in% c("", "(Intercept)", "init_mig")) %>% 
+  ggplot(aes(y = row.names(.), x = points, xmin = `2.5 %`, xmax = `97.5 %`)) +
+  geom_pointrange() +
+  geom_vline(xintercept = 0, col = "red", lty = 2) +
+  ylab("") + xlab("Estimate") +
+  scale_y_discrete(limits=rev(row.names(ests)[!row.names(ests) %in% c("", "(Intercept)", "init_mig")]),
+                   labels = rev(c("Post", "Treatment", "Post X Treatment"))) +
+  xlim(-0.1, 0.4) + 
+  ggtitle("Controlling for initial attitude")
+
+
+plot_did_alt_ate
+
+
+```
+
+## interaction with alternative treatment definition
+
+```{r}
+
+
+treat_alt_inter <- 
+  feglm(dv ~ post * bild_init * init_mig, 
+      cluster = c("lfdn"), 
+      data = gles_p_long_1617)
+
+
+points <- treat_alt_inter$coefficients
+ests <- cbind(points, confint(treat_alt_inter))
+plot_did_alt_inter <- 
+  ests %>% 
+  mutate(name = factor(row.names(.), levels = row.names(.))) %>%
+  filter(name %in% c("postTRUE:bild_initTRUE", "postTRUE:bild_initTRUE:init_mig")) %>% 
+  ggplot(aes(y = row.names(.), x = points, xmin = `2.5 %`, xmax = `97.5 %`)) +
+  geom_pointrange() +
+  geom_vline(xintercept = 0, col = "red", lty = 2) +
+  ylab("") + xlab("Estimate") +
+  scale_y_discrete(limits=rev(row.names(ests)[row.names(ests) %in% c("postTRUE:bild_initTRUE", "postTRUE:bild_initTRUE:init_mig")]),
+                   labels = rev(c("Post X Treatment", "Post X Treatment X Initial Attitude"))) +
+  xlim(-0.1, 0.4) + 
+  ggtitle("Controlling for initial attitude")
+
+
+plot_did_alt_inter
+
+
+```
+
+
+## Nicer visualisation of interaction effect
+
+
+### new treatment definition
+
+```{r}
+
+## run bootstrap to estimate 1000 direct and conditional effects
+
+library(rsample)
+library(purrr)
+
+set.seed(42)
+B <- 1000
+
+modeldata <- 
+  gles_p_long_1617 %>% 
+  filter(!is.na(bild_init) & !is.na(dv) & !is.na(init_mig)) %>% 
+  select(lfdn, dv, init_mig, bild_init, post) %>% 
+  nest(-lfdn)
+
+bs <- bootstraps(modeldata, times = B)
+bs_ests <- map(bs$splits, ~as.tibble(.) %>% 
+                       unnest %>% 
+                       summarize(DiD = 
+                                   feglm(dv ~ post * bild_init * init_mig, 
+                                    cluster = c("lfdn"), 
+                                    data = .) %>% 
+                                   coef() %>% 
+                                   .["postTRUE:bild_initTRUE"],
+                                 IA = 
+                                   feglm(dv ~ post * bild_init * init_mig, 
+                                    cluster = c("lfdn"), 
+                                    data = .) %>% 
+                                   coef() %>% 
+                                   .["postTRUE:bild_initTRUE:init_mig"],
+                                 )) %>% 
+  bind_rows(.id = 'boots')
+
+direct <- coef(treat_alt_inter)["postTRUE:bild_initTRUE"]
+interact <- coef(treat_alt_inter)["postTRUE:bild_initTRUE:init_mig"]
+
+ggplot() +
+  geom_histogram(data = gles_p_long_1617 %>% filter(wave == "1"), mapping = aes(x = init_mig, after_stat(density)), alpha = 0.4, bins = 8) +
+  geom_abline(data = bs_ests, aes(slope = IA, intercept = DiD, group = boots), alpha= 0.05) +
+  geom_abline(slope = interact, intercept = direct, col = "red") +
+  theme_minimal() +
+  geom_hline(yintercept = 0, col = "black") +
+  scale_x_continuous(limits=c(-3,3)) +
+  scale_y_continuous(limits=c(0,.6)) +
+  ggtitle(paste0(B, " bootstrap estimates of heterogenous treatment effect")) +
+  ylab("Estimate") + xlab("Initial migration attitude")
+
+ggsave('C:/Users/nicol/Dropbox/PhD/Papers/Bild/github/bild/paper/vis/DiDXinit_imm.svg', device = "svg")
+
+```
+
+### old treatment definition (probably shouldn't be used anymore)
+

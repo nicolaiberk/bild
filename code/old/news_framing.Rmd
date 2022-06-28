@@ -1,0 +1,136 @@
+---
+title: "Factor analysis migration framing"
+author: "Nicolai Berk"
+date: "7 7 2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = T)
+
+# import libraries
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(tidytext)
+library(data.table)
+library(here)
+library(stm)
+
+# library(psych)
+# library(GPArotation)
+# library(psy)
+# library(corrplot)
+# library(anacor)
+
+# load data
+mig_dta <- fread(here("data/_migration_btgrams.csv")) # migration articles with bi- and trigram dtm
+
+# clean
+mig_dta$paper[mig_dta$paper == "weltonline"] <- "welt"
+mig_dta$date_new <- NA
+mig_dta$date_new[mig_dta$paper == "bild"] <- mig_dta$date[mig_dta$paper == "bild"] %>% as.Date()
+mig_dta$date_new[mig_dta$paper == "faz"] <- mig_dta$date[mig_dta$paper=="faz"] %>% as.integer() %>% lubridate::days() + as.Date("1970-01-01")
+mig_dta$date_new[mig_dta$paper == "spon"] <- mig_dta$date[mig_dta$paper=="spon"] %>% as.Date(format = "%d.%m.%Y")
+mig_dta$date_new[mig_dta$paper == "sz"] <- mig_dta$date[mig_dta$paper=="sz"] %>% as.integer() %>% lubridate::days() + as.Date("1970-01-01")
+mig_dta$date_new[mig_dta$paper == "taz"] <- mig_dta$date[mig_dta$paper=="taz"] %>% as.integer() %>% lubridate::days() + as.Date("1970-01-01")
+mig_dta$date_new[mig_dta$paper == "welt"] <- mig_dta$date[mig_dta$paper=="welt"] %>% as.integer() %>% lubridate::days() + as.Date("1970-01-01")
+mig_dta$date_new <- as.Date(mig_dta$date_new, origin = '1970-01-01')
+mig_dta <- mig_dta[mig_dta$date_new > as.Date('2010-01-01'),]
+
+```
+
+<!-- ## Factor analysis -->
+
+<!-- ```{r preprocessing} -->
+<!-- items <- mig_dta[complete.cases(mig_dta[, 9:(ncol(mig_dta)-1)]), 9:(ncol(mig_dta)-1)] -->
+
+<!-- # smoothing -->
+<!-- items <- items + .01 -->
+<!-- items <- log(items/sum(items)) -->
+
+<!-- cormtrx <- cor(items) -->
+
+<!-- ``` -->
+
+
+<!-- Calculate eigenvalues -->
+<!-- ```{r eigen} -->
+<!-- # eigen_d <- eigen(cormtrx) -->
+<!-- # sum(eigen_d$values > 1.5) -->
+<!-- # nfactors(items) -->
+<!-- ``` -->
+
+<!-- Scree plot -->
+<!-- ```{r scree} -->
+<!-- scree.plot(eigen_d$values, type = "E") -->
+<!-- scree.plot(eigen_d$values[1:100], type="E") -->
+<!-- scree.plot(eigen_d$values[1:50], type="E")  -->
+
+<!-- ``` -->
+
+<!-- No clear elbow, far too many factors with eigenvalue $>$ 1.5, trying with 8 factors for now based on scree plot. -->
+
+<!-- ```{r fa_model} -->
+<!-- # fa_model <- fa(cormtrx, n.obs = nrow(items), nfactors=8, use = "pairwise.complete.obs") -->
+<!-- fa_model <- factanal(items, 8, rotation="varimax") -->
+
+<!-- ``` -->
+
+
+<!-- Are the factors meaningful? - assessment of 20 items with highest correlation for each factor -->
+
+<!-- ```{r fa_asses} -->
+
+<!-- ``` -->
+
+<!-- ## Correspondence Analysis -->
+
+<!-- Since factor analysis doesn't seem to work at the moment, we'll try to make do with correspondence analysis, as suggested by @Lowe2016. -->
+
+<!-- [Try to figure out how to plot sigma (canonical correlation), see @Lowe2016, Fig. 3] -->
+
+
+<!-- ```{r ca} -->
+<!-- res <- anacor(cormtrx) -->
+<!-- summary(res) -->
+
+<!-- ``` -->
+
+
+## STM
+
+As I am interested in different topics within the discourse about immigration rather than the different positions on immigration, I opt for the commonly used STM (Stewart 2016).
+
+```{r stm}
+
+## assess token count
+token_count <- mig_dta[,9:(ncol(mig_dta)-1)] %>% 
+  colSums()
+names(token_count) <- colnames(items)
+token_count %>% sort(decreasing = T) %>% head(30)
+
+## pre-processing
+mig_dta <- mig_dta[complete.cases(mig_dta),]
+mig_dta <- mig_dta[rowSums(mig_dta[, 9:(ncol(mig_dta)-1)]) > 0, ] # drop empty documents
+meta <- mig_dta[, c('date_new', 'paper')]
+mig_dtm <- quanteda::as.dfm(mig_dta[, 9:(ncol(mig_dta)-1)])
+
+stm_model <- stm(documents = mig_dtm,
+                 K = 0, # sets an ideal number of topics, however should be tested with searchK()
+                 prevalence =~ paper * date_new, 
+                 max.em.its = 75, 
+                 data = meta, 
+                 init.type = "Spectral")
+
+labelTopics(stm_model)
+
+
+```
+
+
+
+## Migration Framing of Bild vs others
+
+## AfD slant in migration coverage
+

@@ -3,7 +3,8 @@
 .RData
 .Ruserdata
 Bild.Rproj
-code/old
 data
-paper/ReportThomas
-paper/vis/old
+pres
+paper
+log.txt
+**/glove*

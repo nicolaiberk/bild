@@ -1,0 +1,5 @@
+- run ordered logit and ols and figure out whether they return the same
+- if different results, look for subgroups
+- think about latent underying scales
+- transform all data with within-transformation - regression of confounders into
+- random effects? 
