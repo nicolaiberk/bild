@@ -9,4 +9,8 @@ log.txt
 **\_emb_models
 **\html
 **\old
-paper/nul
+paper
+pres
+!paper/Manuscript_Framing.pdf
+!pres/Presentation.html
+!pres/Abstract.pdf
