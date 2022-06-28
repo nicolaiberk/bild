@@ -223,7 +223,9 @@ EffectPlot <- function(multi = F,
                        dv_var = "1130_clean",
                        dv_name = "Migration Attitude",
                        scaled = T,
-                       size = 1) {
+                       size = 1,
+                       boundary_share = 1,
+                       theoretical_effect_size = 0.1) {
   
   gles_p_long <- 
     fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
@@ -329,8 +331,8 @@ EffectPlot <- function(multi = F,
       facet = T, 
       ) +
       geom_vline(xintercept = 0, lty = 2, col = "red", size = size) +
-      geom_vline(xintercept = ifelse(scaled, 0.25, 0.05), lty = 2, col = "darkgreen", size = size) +
-      geom_vline(xintercept = ifelse(scaled, -0.25, -0.05), lty = 2, col = "darkgreen", size = size)
+      geom_vline(xintercept = ifelse(scaled, boundary_share, theoretical_effect_size*boundary_share), lty = 2, col = "darkgreen", size = size) +
+      geom_vline(xintercept = ifelse(scaled, -1*boundary_share, -1*theoretical_effect_size*boundary_share), lty = 2, col = "darkgreen", size = size)
 
   }else{
     
@@ -363,19 +365,21 @@ EffectPlot <- function(multi = F,
       # indicate either 0.5 SDs or 10% of the sclae (adjusted to scale in raw case)
       geom_vline(xintercept = 0, lty = 2, col = "red", size = size) +
       geom_vline(xintercept = ifelse(scaled == "raw", 
-                                     0.05*(max(gles_p_long$dv, na.rm = T) - min(gles_p_long$dv, na.rm = T)),
-                                     ifelse(scaled, 0.25, 0.05)), 
+                                     boundary_share*theoretical_effect_size*(max(gles_p_long$dv, na.rm = T) - min(gles_p_long$dv, na.rm = T)),
+                                     ifelse(scaled, boundary_share, theoretical_effect_size*boundary_share)), 
                  lty = 2, col = "darkgreen", size = size) +
       geom_vline(xintercept = ifelse(scaled == "raw", 
-                                     -0.05*(max(gles_p_long$dv, na.rm = T) - min(gles_p_long$dv, na.rm = T)),
-                                     ifelse(scaled, -0.25, -0.05)), 
+                                     boundary_share*-1*theoretical_effect_size*(max(gles_p_long$dv, na.rm = T) - min(gles_p_long$dv, na.rm = T)),
+                                     ifelse(scaled, boundary_share, -1*theoretical_effect_size*boundary_share)), 
                  lty = 2, col = "darkgreen", size = size)
     
   }
 
 }
 
-EffectByWavePlot <- function(dv = "1130_clean", size = 1) {
+EffectByWavePlot <- function(dv = "1130_clean", size = 1,
+                             boundary_share = 1,
+                             theoretical_effect_size = 0.1) {
   
   gles_p_long <- 
     fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
@@ -421,9 +425,9 @@ EffectByWavePlot <- function(dv = "1130_clean", size = 1) {
     ggplot(aes(x = date, y= point, ymin = upper, ymax = lower)) +
     geom_pointrange(size = size) +
     geom_hline(yintercept = 0) +
-    geom_hline(yintercept = 0.05*(max(gles_p_long$dv, na.rm = T) - min(gles_p_long$dv, na.rm = T)),
+    geom_hline(yintercept = boundary_share*theoretical_effect_size*(max(gles_p_long$dv, na.rm = T) - min(gles_p_long$dv, na.rm = T)),
                lty = 2, col = "darkgreen", size = size) +
-    geom_hline(yintercept = -0.05*(max(gles_p_long$dv, na.rm = T) - min(gles_p_long$dv, na.rm = T)), 
+    geom_hline(yintercept = boundary_share*-1*theoretical_effect_size*(max(gles_p_long$dv, na.rm = T) - min(gles_p_long$dv, na.rm = T)), 
                lty = 2, col = "darkgreen", size = size) +
     geom_vline(xintercept = as.Date(postdate), lty = 2, col = "red", size = size) +
     geom_vline(xintercept = as.Date("2017-06-01"), lty = 2, col = "orange", size = size) +
