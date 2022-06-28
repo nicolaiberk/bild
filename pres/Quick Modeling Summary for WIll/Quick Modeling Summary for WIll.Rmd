@@ -1,0 +1,92 @@
+---
+title: "Modeling Report for Will"
+author: Nicolai Berk
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(
+  echo = FALSE, 
+  message = F, 
+  warning = F, 
+  cache = T, 
+  # out.width="80%", 
+  fig.height=4, 
+  fig.width=6, 
+  fig.align='center', 
+  eval = T, 
+  dev = "svg"
+  )
+# knitr::opts_knit$set(root.dir = 'C:/Users/nicol/Dropbox/PhD/Papers/Bild/github/bild')
+
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(fixest)
+library(lubridate)
+library(patchwork)
+library(here)
+
+# load self-made functions
+for (filename in list.files(here("code/functions"))){
+  source(here(paste0('code/functions/', filename)))
+}
+
+```
+
+
+# OLS
+
+```{r did_imm_att}
+
+DiDModels(dv_name = "1130_clean", 
+          ctrl_var  = "cond",
+          ctrl_name = "Initial Migration Att.")
+
+```
+
+
+---
+
+# Tobit (no FEs, no Clustering)
+
+
+```{r tobit_direct, results = 'markup'}
+
+TobitDiD("1130_clean")
+
+```
+
+---
+
+# Effect dependent on prior position
+
+```{r}
+
+InterLinear()
+
+```
+
+
+
+---
+
+# Descriptive Plot
+
+```{r}
+
+DiDDist()
+
+```
+
+---
+
+# Current Questions
+
+- Interaction effect seems like an artifact?
+- Main problem the inclusion of FEs similar to e.g. `fixest`.
+- Seems like best estimation strategy is ordinal logit/probit.

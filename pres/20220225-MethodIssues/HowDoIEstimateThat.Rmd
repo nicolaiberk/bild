@@ -1,0 +1,393 @@
+---
+title: "How do I estimate that?"
+subtitle: "The perils of panel data"
+author: "Nicolai Berk"
+institute: "Humboldt Universität Berlin"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    seal: false
+    css: xaringan-themer.css
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      ratio: 16:9
+    includes:
+      after_body: insert-logo.html
+---
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_accent(
+  base_color = "#03396d", background_color = "#bfbfbf",
+  base_font_size = "35px",
+  header_h1_font_size = "1.5rem",
+  header_h2_font_size = "1.25rem",
+  header_h3_font_size = "1.1rem",
+  header_font_google = google_font("Montserrat", 'Thin 100'),
+  text_font_google   = google_font("Montserrat", "300", "300i"),
+  code_font_google   = google_font("Fira Mono"),
+  footnote_font_size = "0.75rem"
+)
+
+
+```
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, message = F, warning = F, cache = T, out.width="75%", fig.height=4, fig.width=10, fig.align='center', eval = T)
+knitr::opts_knit$set(root.dir = 'C:/Users/nicol/Dropbox/PhD/Papers/Bild/github/bild')
+
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(fixest)
+library(lubridate)
+
+
+```
+
+
+
+class: inverse, center, middle
+
+
+# Interactions in panel data and other shenanigans
+
+
+### Nicolai Berk<sup>*</sup>
+
+Presentation prepared for Will Lowe's Research Design course at Hertie School
+
+`r Sys.Date()`
+
+
+.left[.footnote[<sup>*</sup> Dynamics RTG & Humboldt Universität Berlin]]
+
+---
+
+class: inverse, middle, center
+
+## The research question
+
+### How do issue definitions in the media affect individual attitudes?
+
+---
+
+## The model
+
+```{r fig.height=5, fig.width=8}
+library(dagitty)
+dag <- dagitty("dag {
+  Information -> Consideration -> Attitude
+               }", layout = T)
+plot( graphLayout( dag ) )
+
+```
+
+---
+
+## Starting point: Fixed-effect model
+
+
+
+$$y_{it} = I_{it} + c_i + c_w + \epsilon_{it}$$
+
+- $y_{it}$ $:=$ attitude of individual $i$ at time $t$
+- $I_{it}$ $:=$ Information consumed by individual $i$ at time $t$
+- $c_{i}$ $:=$ individual fixed effect (i.e. average individual opinion across time)
+- $c_{w}$ $:=$ wave fixed effect (i.e. average opinion across individuals)
+
+
+---
+
+## However.... (Problem I)
+
+### Zaller: effects of information dependent on
+
+- **individual core values**
+  + Depend which considerations are formed in response to information
+  + e.g. perceiving a homeless person: bum or unlucky?
+- **individual attentiveness to politics**
+  + increases receptiveness
+  + but also ability to relate information to own values
+
+
+---
+
+## Modeling
+
+- for direct effect: could just use 2-way FEs (or could I?)
+- However, values and attentiveness are (considered to be) **stable across time**
+- Hence, including them in the model seems to make FEs rather superfluous
+
+... right?
+
+---
+
+## Candidate I
+
+.left-column[
+
+
+```{r out.width="100%", fig.height=5, fig.width= 3, fig.align='right'}
+library(dagitty)
+dag <- dagitty("dag {
+  Information -> Attitude
+  Information <-  Confounder -> Attitude
+  
+               }", layout = T)
+plot( graphLayout( dag ) )
+
+```
+
+]
+
+.right-column[
+
+
+### No individual FEs<sup>1</sup>:
+
+$$y_{it} = I_{it} * V_{i} * A_{i} + c_w + \epsilon_{it}$$
+
+>- Issue: not controlling for time-constant individual differences
+
+.footnote[<sup>1</sup>: Imagine constitutive terms.]
+
+]
+
+---
+
+## Candidate II
+
+
+### Lagged DV: 
+
+$$y_{it} = I_{it} * V_{i} * A_{i} + y_{i, t-1} + c_w + \epsilon_{it}$$
+
+>- Issue: post-treatment bias when it comes to values? (values correlate with dv)
+
+---
+
+## Can PTB be an issue here?
+
+
+.center[There should be a figure here.]
+
+
+
+
+---
+
+## Candidate III
+
+
+### With FEs: 
+
+$$y_{it} = I_{it} * V_{i} * A_{i} + c_{i} + \epsilon_{it}$$
+
+>- Issue: Collinearity
+
+
+___
+
+$\rightarrow$ Currently leaning towards first version (no FEs).
+
+---
+
+class: center, middle, inverse
+
+## Suggestions? Hot takes? Emotions?
+
+
+---
+
+## Problem II: No real control in individual model
+
+### DiD: no problem
+
+```{r case_crimev}
+
+## define survey dates
+
+
+
+gles_p_long <- 
+  fread('data/gles/Panel/long_cleaned.csv')
+
+survey_dates <- 
+  gles_p_long %>% 
+  filter(!is.na(date_clean)) %>% 
+  filter(!is.na('1130_clean') & !is.na('1661a_clean')) %>%  
+  filter(date_clean < as.Date("2018-01-01")) %>% 
+  group_by(wave) %>% 
+  summarise(date = max(date_clean)) %>% 
+  ungroup() %>% 
+  select(date)
+
+rm(gles_p_long)
+
+## load & transform data frame attention
+load("data/media_daily_2022-02-02.Rdata")
+
+merged_media <- 
+  merged_media %>% 
+  mutate(paper = recode(paper, 
+                        'bild' = 'Bild', 'faz' = 'FAZ', 'spon' = 'Spiegel',
+                        'sz' = 'SZ', 'taz' = 'TAZ', 'welt' = 'Welt'),
+         post = date_new > as.Date("2017-02-01"),
+         date_month = floor_date(as.Date(date_new), 'month'))
+
+## visualise
+trendplot <- 
+  merged_media %>% 
+  filter(date_new < as.Date("2018-01-01"), date_new >= as.Date("2016-01-01")) %>% 
+  mutate(
+    date_month = floor_date(as.Date(date_new), 'month')
+  ) %>%
+  group_by(paper != "Bild", date_month) %>%
+  summarise(across(share_mig:hungary_referendum_share, mean, na.rm = T),
+            across(n_mig_sal:n_tot, sum, na.rm = T)) %>%
+  mutate(crime_share = crime_schlepp_share + sexual_assault_share,
+         post = date_month >= as.Date("2017-02-01")) %>% 
+  filter(date_month < as.Date("2020-01-01")) %>% 
+  ggplot(aes(x = date_month, y = crime_share, col = `paper != "Bild"`)) +
+  geom_line() +
+  geom_rug(data = survey_dates, aes(x = date),sides = 't', inherit.aes = F) +
+  # geom_point() +
+  # geom_smooth(alpha = 0.1) +
+  geom_vline(xintercept = as.Date("2017-02-01"), lty = 2, col = "red") +
+  ggtitle("Monthly Share of Migration Content Devoted to Crime Frames", "Bild vs. other major daily newspapers, 2016-2017") + 
+  xlab("Date") + ylab("Share of Migration Content") +
+  # facet_wrap(~paper)
+  theme_minimal() +
+  theme(legend.position = "none")
+
+
+# DiD with placebo papers, 2016-17
+merged_media <- 
+  merged_media %>% 
+  filter(date_new < as.Date("2018-01-01"),
+         date_new >= "2016-01-01")
+
+
+treatment_ests <- 
+  data.frame()
+
+merged_media$dv    <-  merged_media[["crime_schlepp_share"]] + merged_media[["sexual_assault_share"]] + merged_media[["bild_footer_share"]]
+merged_media$post  <-  merged_media$date_new >= as.Date("2017-02-01")
+
+for (p in unique(merged_media$paper)){
+  
+  merged_media$treatment <-  merged_media$paper == p
+  
+  did_model <- lm(dv ~ post*treatment, data = merged_media)
+  
+  est <- did_model$coefficients["postTRUE:treatmentTRUE"][[1]]
+  lower <- confint(did_model)["postTRUE:treatmentTRUE", 1]
+  upper <- confint(did_model)["postTRUE:treatmentTRUE", 2]
+  
+  treatment_ests <- 
+    rbind(treatment_ests,
+          data.frame(
+            model = "DiD",
+            paper = p,
+            est   = est,
+            lower = lower,
+            upper = upper
+          ))
+}
+
+## vis
+treatment_ests$paper <- 
+  factor(treatment_ests$paper,
+          levels = treatment_ests %>%
+                    filter(model == "DiD") %>% 
+                    arrange(est) %>% 
+                    select(paper) %>%
+                    unlist()
+    )
+
+
+placebo_papers <- 
+  treatment_ests %>% 
+  ggplot(aes(x = est, xmin = lower, xmax = upper, 
+             y = paper, col = paper != "Bild")) +
+  geom_pointrange() +
+  geom_vline(xintercept = 0,
+             col = "red", lty = 2) +
+  theme_minimal() +
+  xlab("Estimated DiD") + ylab("") +
+  # ggtitle("Papers' Change in Crime Framing (DiD), 2016-2017") +
+  theme(legend.position = "None") +
+  coord_flip()
+
+
+gridExtra::grid.arrange(trendplot, placebo_papers, nrow = 1)
+
+rm(merged_media)
+
+```
+
+
+
+---
+
+### Individual estimates: problem?
+
+```{r}
+
+# load data ####
+merged_data <- 
+  fread('data/merged_2022-02-22.csv') %>% 
+  mutate(crime_share = crime_schlepp_share + sexual_assault_share)
+
+merged_data %>% 
+  filter(!is.na(crime_share)) %>% 
+  ggplot(aes(x = crime_share)) +
+  geom_histogram(fill = "lightblue", alpha = 0.7) +
+  ggtitle("Individual exposure to crime frame") +
+  xlab("Share of crime news out of all news on migration") + ylab("Count")+
+  theme_minimal() 
+  # facet_wrap(~wave)
+
+```
+
+
+
+
+---
+
+## Potential solutions?
+
+- Create bins for different levels of exposure?
+- Actually not a problem to estimate 2-way FE model? (but *reverse causality*?)
+- something else?
+
+
+
+---
+
+class: center, middle, inverse
+
+## Suggestions? Hot takes? Emotions?
+
+
+---
+
+## Mo' problems
+
+- DiD standard errors: all solved with bootstrap?
+- do 2-way FEs account for switching in DiD groups?
+- standard error clustering
+- test for endogeneity
+
+---
+
+class: center, middle, inverse
+
+## Like and subscribe for more research riddled with problems
+
+

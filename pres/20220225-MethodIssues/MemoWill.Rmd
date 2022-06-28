@@ -1,0 +1,135 @@
+---
+title: "Questions Concerning Model Choice when Facing Collinearity"
+author: "Nicolai Berk"
+date: "4 3 2022"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+```{r data, include=FALSE}
+
+
+# Setup ####
+library(tidyverse)
+library(dplyr)
+library(data.table)
+library(fixest)
+
+# run other scripts (only once)
+
+# source(here("code/01a_preprocessing_dv.R")) # clean survey data
+# rm(list = ls())
+# source(here("code/03a_merge.R")) # merge to text estimates
+# rm(list = ls())
+
+
+# load ####
+merged_data <- fread(file = "C:/Users/nicol/Dropbox/PhD/Papers/Bild/github/bild/data/merged_2022-03-03.csv")
+
+merged_data <- 
+  merged_data %>% 
+  mutate(crime_share = crime_schlepp_share + sexual_assault_share,
+         # imm_att = factor(imm_att, levels = c("conservative", "moderate", "liberal", "miss")),
+         dv = `1130_clean`) %>% 
+  filter(lag == 7)
+
+merged_data <- 
+  merged_data %>% 
+  filter(!is.na(`1130_clean`)) %>% 
+  group_by(lfdn) %>% 
+  arrange(lfdn, date_clean.x) %>% 
+  select(`1130_clean`, lfdn) %>% 
+  slice(1) %>% 
+  mutate(init_mig = `1130_clean`) %>%
+  select(init_mig, lfdn) %>% 
+  right_join(merged_data, by = "lfdn")
+
+# add lagged crime_share and dv
+merged_data <- 
+  merged_data %>%
+  ungroup() %>% 
+  arrange(lfdn, date_clean.x) %>% 
+  group_by(lfdn) %>% 
+  filter(!is.na(crime_share)) %>% 
+  mutate(crime_share_lag = lag(crime_share),
+         dv_lag = lag(dv))
+
+
+```
+
+Dear Will,
+
+apologies for annoying you with this, but I am increasingly confused by the estimates of models I tried to present in last week's course.
+
+The basic problem I am interested in is whether news exposure affects issue attitudes. More specifically, I am interested in whether increased emphasis of crime in immigration news changes migration attitudes, and whether this effect is conditioned by past attitude on the issue (I described this as values in class, but I believe the prior issue stance is a more appropriate measure of the concept I am trying to capture). I believe the model for the direct effect would look something like this:
+
+$$ y_{it} = \alpha + \beta_1*CrimeExposure_{it} + \rho_i + \phi_t + \epsilon_{it}  $$
+
+With $y_{it}$ being the immigration attitude of individual $i$ at time $t$, $CrimeExposure_{it}$ symbolising the estimated exposure of individual $i$ to crime news in immigration coverage in the week preceding the interview at time $t$, and $\rho_i$ & $\phi_t$ describing individual fixed effects.
+
+The above mentioned model returns a weak positive correlation of crime exposure and migration attitude that might well arise by chance:
+
+```{r rawmodel_2fe}
+
+summary(feglm(dv ~ crime_share | wave + lfdn,
+      cluster = c("lfdn"), data = merged_data))
+
+```
+
+Now what about the conditioning effect of past migration opinions? First, I tried the model discussed in class:
+
+$$ y_{it} = \alpha + \beta_1*CrimeExposure_{it} + \beta_2*PastOpinion + \beta_3*CrimeExposure*PastOpinion + \rho_i + \phi_t + \epsilon_{it}  $$
+Using the initial migration attitude of a respondent as conditioning variable creates collinearity issues:
+
+```{r int_1}
+
+summary(feglm(dv ~ crime_share*init_mig | wave + lfdn,
+      cluster = c("lfdn"), data = merged_data))
+
+```
+
+We find a significant decrease with more restrictive (higher) migration attitudes, but the direct effect of initial migration attitudes isn't taken into account. I wouldn't consider this a huge problem, as the individual fixed effects should take care of this, but I am cautious so I try different models.
+
+```{r int_1b}
+
+summary(feglm(dv ~ crime_share*init_mig | wave,
+      cluster = c("lfdn"), data = merged_data))
+
+```
+
+Dropping the fixed effects and controlling for initial migration opinion (init_mig) returns an even larger estimate. So far, so good - but this entire thing could also be modelled with a lagged dependent variable instead of the initial migration opinion. This also solves the multicollinearity issue.
+
+
+```{r int_2}
+
+summary(feglm(dv ~ crime_share*dv_lag | wave + lfdn,
+      cluster = c("lfdn"), data = merged_data))
+
+```
+
+In this model, the interaction effect disappears. The lagged dependent has a negative effect, which i interpret as regression to the mean around some underlying migration opinion captured by the fixed effects. However, given this I am also worried that controlling for the lagged dependent is overdoing it (since the individual fixed effects should take care of this). I go against the holy wisdom of Brambor et al and drop a constitutive term:
+
+```{r int_2b}
+
+summary(feglm(dv ~ crime_share:dv_lag + crime_share | wave + lfdn,
+      cluster = c("lfdn"), data = merged_data))
+
+```
+
+Which returns a significant direct and interaction effect again. I am however still unsure about the preceding model, which seems to control for too much but might also be showing some cross-temporal variation I should take into account - the news content of last week should not be predictable from some opinion four months ago. I also added estimated the same model with the initial opinion as a moderator, which again returned significant effects:
+
+```{r add}
+feglm(dv ~ crime_share:init_mig + crime_share | wave + lfdn,  
+      cluster = c("lfdn"), data = merged_data)
+
+```
+
+
+I hoped for some guidance here. My main idea for now is to present the four significant models and add an analysis where I regress the news content of the week *following* the interview on the migration opinion given in the interview to show that this is not a result of respondents actively seeking out news content on crime. However, if the model including the lagged dependent variable shows some serious flaw, I might dig deeper to see what is going on -  I am just not sure where yet. Additionally, I see the reviewer comment "but Brambor et al tell us to include constitutive terms" coming (could be me) and would love to have a convincing answer.
+
+Thank you so much for taking a look, all the best,
+Nico

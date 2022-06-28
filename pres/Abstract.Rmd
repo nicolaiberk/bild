@@ -1,0 +1,13 @@
+---
+title: "Assessing Media Influence in Contemporary News Environments"
+author: "Nicolai Berk"
+date: "`r Sys.Date()`"
+output: pdf_document
+abstract: "A large body of literature debates the extent to which media consumption affects consumers' issue attitudes and voting behaviour in contemporary news environments. Studies arguing that the media has minimal influence on opinion formation have often used designs estimating the effects of novel, previously unconsumed content on participants' attitudes. However, experimental evidence suggests that media consumers discount the bias of different outlets. Additionally, most studies assume rather than measure the extent of newspaper bias. I address both shortcomings with observational evidence exploiting a change in migration framing following an editorial shift in Germany's largest tabloid, *Bild*. The study combines panel data with state-of-the-art methods of text analysis and assesses the effect of changing migration frames in respondents' media diet on their attitudes towards migration. Results across different specifications indicate that even when assessing within-newspaper changes in issue framing, no effect on attitudes or voting behaviour can be found. These findings add further evidence that short-term media effects in the viewers choice era are limited."
+subtitle: Right-wing Media, Crime, and Anti-Immigration Attitudes
+bibliography: PhD-Proposal.bib
+institute: Humboldt Universität Berlin
+---
+
+
+
