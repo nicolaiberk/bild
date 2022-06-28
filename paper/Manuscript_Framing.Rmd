@@ -11,7 +11,7 @@ output:
 subtitle: Manuscript prepared for the 12th Annual Conference of the European Political Science Association in Prague, Czech Republic
 fontsize: 12pt
 geometry: margin=1.5in
-abstract: "A vast body of research is devoted to the persuasive effects of news framing. However, the study of the effects of framing has almost exclusively taken an experimental approach, with limited external validity. Existing observational work has so far mostly studied correlational data or assessed 'media effects' broadly. I contribute to these bodies of research by exploiting a unique case from Germany, where an editorial change in Germany's largest tabloid - *Bild* - led to a substantial shift in the paper's migration framing. Combining panel data from over 15,000 individuals with content analysis of 2.5 million newspaper articles using transformer models and a difference-in-differences design, I show that a substantial increase in the emphasis of crime in migration coverage did not affect immigration attitudes, nor did it increase the association of migration attitudes with attitudes about crime. These findings question the generalizability of framing effects research and add to a recent body of empirical studies questioning the role of the news media for opinion formation in the twentyfirst century."
+abstract: "A vast body of research is devoted to the persuasive effects of news framing. However, the study of the effects of framing has almost exclusively taken an experimental approach, with limited external validity. I provide the first real-world study of framing effects by exploiting a unique case from Germany, where an editorial change in Germany's largest tabloid - *Bild* - led to a substantial shift in the paper's migration framing. Combining panel data from over 15,000 individuals with content analysis of 2.5 million newspaper articles using transformer models and a difference-in-differences design, I show that a substantial increase in the emphasis of crime in migration coverage did not affect immigration attitudes, nor did it increase the association of migration attitudes with attitudes about crime. These findings fundamentally challenge the generalizability of framing effects research and add to a recent body of empirical studies questioning the role of the news media for opinion formation in the twentyfirst century."
 bibliography: C:/Users/nicol/Dropbox/Studium/BibTex/PhD.bib
 ---
 
@@ -37,7 +37,10 @@ for (filename in list.files(here("code/functions"))){
 
 ```
 
-*I am thankful for extensive feedback on earlier stages of this draft from Christian Arnold, Daniel Bischof, Jóhanna Ýr Bjarnadóttir, Elias Dinas, Florian Foos, Felix Hagemann, Julian Heid, Christina Gahn, Matthew Levendusky, Heike Klüver, Thomas M. Meyer, Rune Slothuus, Antonio Valentim as well as participants in the EPSIP Colloquium at HU Berlin, CIVICA EGN Workshop at the EUI, CompText Conference 2022, and the Political Behaviour Section at Aarhus University.*
+
+\center{WORD COUNT: 6,596}
+
+*I am thankful for extensive feedback on earlier stages of this draft from Christian Arnold, Daniel Bischof, Philipp Broniecki, Jóhanna Ýr Bjarnadóttir, Elias Dinas, Florian Foos, Felix Hagemann, Julian Heid, Christina Gahn, Heike Klüver, Martin Vinæs Larsen, Matthew Levendusky, Will Lowe, Thomas M. Meyer, Rune Slothuus, Judith Spirig, Antonio Valentim as well as participants in the EPSIP Colloquium at HU Berlin, CIVICA EGN Workshop at the EUI, CompText Conference 2022, and the Political Behaviour Section at Aarhus University. I also thank the two RAs, Robin Groß and Nathalie Aerts, for annotating the news articles. All remaining confusions are my own.*
 
 # Introduction: Does Framing Matter?
 
@@ -104,11 +107,6 @@ Applying this to the issue of migration policy and the consideration of criminal
 ***Association hypothesis*****: When an individual is exposed to a specific consideration about an issue, their association of the issue with this consideration should be strengthened.**
 
 ***Evaluation hypothesis*****: When an individual is exposed to a specific negative consideration about an issue, their attitude about the overall issue should become more negative.**
-
-However, not all those exposed to a frame should respond similarly. As theories of motivated reasoning suggest, individuals should differ in their evaluation of an argument based on the attitudinal congruence of the statement with one's pre-existing attitudes. Those exposed to counter-attitudinal information will evaluate it as less convincing, spend more time counter-arguing it and be less likely to expose themselves to it in the first place [@Kunda1990; @Taber2006]. Hence, those who already hold attitudes congruent with the idea that migration promotes crime - namely that migration should be restricted - should be most likely to react to increased exposure to migration coverage emphasising crime, whereas those with the most liberal migration attitudes should either not react to information they avoid and find unconvincing, or react by developing *more liberal* migration attitudes. Consistent with this hypothesis, existing media effects studies find ideological inertia and even backlash when individuals are exposed to content from opposing political outlets [@Bail2018; @Broockman2022; @Guess2021].
-
-***Motivated reasoning hypothesis*****: The effect of exposure to a specific frame should be stronger for individuals with congruent attitudes.**
-
 
 # Research Design
 
