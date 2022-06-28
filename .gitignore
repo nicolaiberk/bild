@@ -9,4 +9,11 @@ log.txt
 **\_emb_models
 **\html
 **\old
-paper/nul
+paper
+pres
+!paper/Manuscript_Framing.pdf
+!paper/Manuscript_Framing.Rmd
+!pres/Presentation.html
+!pres/Presentation.Rmd
+!pres/vis
+!pres/xaringan_themer.css
