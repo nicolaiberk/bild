@@ -17,3 +17,8 @@ pres
 !pres/Presentation.Rmd
 !pres/vis
 !pres/xaringan_themer.css
+!paper/vis
+!paper/preamble.tex
+!paper/PhD.bib
+!paper/appendix.pdf
+!paper/appendix.Rmd
