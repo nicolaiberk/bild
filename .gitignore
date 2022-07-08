@@ -7,6 +7,7 @@ Bild.Rproj
 data
 log.txt
 **\_emb_models
-**\html
+pres/Presentation_cache
 **\old
 paper/Manuscript_commented.pdf
+!**\trendplot-1.svg

@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Framing Effects in the Wild</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Nicolai Berk" />
+    <meta name="date" content="2022-07-08" />
+    <script src="libs/header-attrs-2.11/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+
+
+
+
+
+
+
+
+class: inverse, center, middle
+
+# Framing Effects in the Wild
+
+### Does News Framing Affect Public Opinion?
+
+
+#### Nicolai Berk&lt;sup&gt;*&lt;/sup&gt;
+
+Presentation prepared for the `\(12^{th}\)` Annual Conference of the European Political Science Association in Prague
+
+25.06.2022
+
+
+.left[.footnote[&lt;sup&gt;*&lt;/sup&gt; Dynamics RTG &amp; Humboldt Universität Berlin]]
+
+
+---
+
+## A classic framing experiment
+
+
+### Would you support increased welfare spending...
+
+.pull-left[
+
+### in order to support the poor?
+
+&lt;img src="Presentation_files/figure-html/hista-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+
+
+]
+
+
+.pull-right[
+
+### even if it means higher taxes?
+
+
+&lt;img src="Presentation_files/figure-html/histb-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+
+]
+
+.footnote[(Very liberal after Sniderman and Theriault 2004)]
+
+---
+
+## Are framing experiments externally valid?
+
+&lt;br&gt;
+
+- Plenty of evidence from experiments &lt;font size="5" color="#004A95"&gt; (Busby Flynn, et al., 2019; Leeper and Slothuus, 2020) &lt;/font&gt;
+- But limited capacity to emulate real world environments &lt;font size="5" color="#004A95"&gt; (Barabas and Jerit, 2010) &lt;/font&gt;.
+- Strongest theoretical critique: **selective exposure** &lt;font size="5" color="#004A95"&gt; (Bennett and Iyengar, 2008; Lau Rogers, et al., 2021) &lt;/font&gt;.
+
+--
+
+### "A more balanced reading [...] requires methodological diversification, experiments and studies oriented to the world outside” &lt;font size="5" color="#004A95"&gt; (Kinder, 2007: 157) &lt;/font&gt;.
+
+---
+
+# Evidence from Observational Studies
+
+&lt;br&gt;
+
+- Few observational studies with mixed findings and endogeneity concerns &lt;font size="5" color="#004A95"&gt; (Jerit, 2008; Jerit, 2009) &lt;/font&gt;.
+- Causal inference work not concerned with framing &lt;font size="5" color="#004A95"&gt; (Durante and Knight, 2012; Foos and Bischof, 2020; Martin and Yurukoglu, 2017; Spirig, 2020) &lt;/font&gt;.
+
+--
+
+&lt;br&gt;
+
+## No observational studies assessing causal effect of framing!
+
+---
+
+## What is necessary for the study of framing effects?
+
+&lt;br&gt;
+
+# 1. Precisely identifiable, sharp change of frames in communication.
+# 2. Good measure of frames in mind.
+
+
+---
+
+class: inverse, center, middle
+
+# Case
+
+---
+
+
+## Bild's migration coverage following 2015
+
+.left-column[
+
+&lt;img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Logo_BILD.svg/848px-Logo_BILD.svg.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+
+
+![Source: Wikipedia](https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/2018-11-07-Julian_Reichelt-Maischberger-1141.jpg/800px-2018-11-07-Julian_Reichelt-Maischberger-1141.jpg)
+
+]
+
+.right-column[
+
+
+&lt;br&gt;
+
+- Editorial change in the largest German tabloid newspaper, **Bild**.
+- Increasingly **framed migrants as criminals** &lt;font size="5" color="#004A95"&gt; &lt;/font&gt;.
+- Potentially exogenous timing.
+
+]
+
+---
+
+## Bild's migration coverage following 2015
+
+
+.left-column[
+
+
+&lt;img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Logo_BILD.svg/848px-Logo_BILD.svg.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+![Source: Wikipedia](https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/2018-11-07-Julian_Reichelt-Maischberger-1141.jpg/800px-2018-11-07-Julian_Reichelt-Maischberger-1141.jpg)
+
+]
+
+.right-column[
+
+### Interesting because:
+
+- **Clearly identifiable short-term-change** in migration coverage.
+- Clear expectations regarding impact.
+- Change not debated in the media `\(\rightarrow\)`__No co-treatment__! &lt;font size="5" color="#004A95"&gt; (Spirig, 2020)&lt;/font&gt;.
+
+]
+
+
+---
+
+class: inverse, center, middle
+
+# How does this affect migration attitudes?
+
+---
+
+
+## Theoretical Expectations
+
+
+.pull-left[
+
+![](vis/CognitiveStorage.png)
+
+]
+
+
+.pull-right[
+
+### Increased exposure to crime frames will lead to...
+- H1: **more conservative** attitudes towards migration.
+- H2: **stronger association** of crime and migration attitudes.
+
+]
+
+---
+
+class: inverse, center, middle
+
+# Measurement &amp; Estimation
+
+---
+
+## Frames in Communication
+
+- Collected 2.5M news articles from major German daily newspapers' websites.
+- Two-step identification of crime frames:
+  1. **Select migration content**:
+    + Generate dictionary, oversample migration content.
+    + Annotate 1800 articles.
+    + Supervised deep-learning model (BERT) to **identify migration content**.
+  2. **Select crime frames**.
+    + Same, but subset of articles about migration content.
+
+
+
+---
+
+## A sharp, identifiable change in frames in communication
+
+&lt;img src="Presentation_files/figure-html/trendplot-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+## Frames in Mind
+
+German Longitudinal Election Study (GLES) Panel &lt;font size="5" color="#004A95"&gt; (Debus Faas, et al., 2017)&lt;/font&gt;.
+
+.pull-left[
+
+
+### Immigration Attitudes
+- **Opportunities for immigration** of foreigners should be 
+  + extended (-3) or
+  + restricted (3).
+- Asked in **13** waves (1 pre).
+
+]
+
+.pull-right[
+
+
+
+### Integration Attitudes
+- Foreigners should...
+  + completely **adapt to German culture** (-3) or
+  + be able to live according to their own culture (3).
+- Asked in **4** waves (1 pre)
+
+]
+
+---
+
+## Frames in Mind (continued)
+
+.pull-left[
+
+### Support for radical-right AfD
+- Attitude towards **AfD**
+  + strongly dislike (-5) to
+  + strongly like (5).
+- Asked in **14** waves (1 pre)
+
+### MIP: Migration
+- Binary indicator, 1 if most important problem is migration.
+
+]
+
+.pull-right[
+
+
+### Attitude towards crime policy
+- "state should get **more competences in fighting crime**, even if this means more surveillance"
+  + strongly disagree (1) to
+  + strongly agree (5).
+- Asked in **4** waves (1 pre)
+
+
+]
+
+
+---
+
+## Estimation
+
+### Difference-in-Differences Design
+
+
+
+`$$y_{it} = \delta * Post_t *  Bild_i + \lambda * Post_t + \rho_i +  \epsilon_{it}$$`
+
+.pull-left[
+
+&lt;img src="Presentation_files/figure-html/didtheory-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+
+
+]
+
+.pull-right[
+
+
+
+
+- Compare those reading *Bild* in W1 to *never*-readers.
+- ATT = `\(\Delta\)` attitude Bild readers - `\(\Delta\)` control group.
+
+]
+
+---
+
+class: inverse, center, middle
+
+# Results
+
+---
+
+## Effect on Immigration Attitudes
+
+&lt;br&gt;
+
+&lt;img src="Presentation_files/figure-html/singledv-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+
+.footnote[(Green lines indicate effect equivalent to 5% of scale. Effect size in (Nelson Clawson, et al., 1997): 0.65/11% of scale.)]
+
+
+---
+
+
+## Effect of Changing Framing on Alternative DVs
+
+
+
+&lt;img src="Presentation_files/figure-html/multidv-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Effect on Migration Attitudes across Waves
+
+&lt;img src="Presentation_files/figure-html/migwaves-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+## Effect on other Attitudes across Waves
+
+.pull-left[
+
+### Crime
+
+&lt;img src="Presentation_files/figure-html/crimewaves-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+
+
+]
+
+.pull-left[
+
+### Integration
+
+&lt;img src="Presentation_files/figure-html/intwaves-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+## Effect on other DVs across time I
+
+
+.pull-left[
+
+### AfD Vote
+
+&lt;img src="Presentation_files/figure-html/afdwaves-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+
+]
+
+.pull-left[
+
+### MIP: Migration
+
+&lt;img src="Presentation_files/figure-html/mipwaves-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+
+]
+
+---
+
+## Association of Immigration and Crime Attitudes
+
+&lt;img src="Presentation_files/figure-html/corplot-1.svg" width="90%" style="display: block; margin: auto;" /&gt;
+
+---
+
+## Selecting out
+
+&lt;br&gt;
+
+- No change in association of migration attitudes and Bild readership.
+- No differential out-selection across prior attitudes.
+
+---
+
+## Takeaways
+
+&lt;br&gt;
+
+## 1. News framing effects do not easily translate into real world.
+
+- Questions external validity of decades of framing studies.
+- Single media outlets have limited influence on public opinion.
+
+## 2. Media effects literature should pay more attention to precise changes in *content*.
+
+
+---
+
+class: inverse, center, middle
+
+## Fin
+
+### This research is generously funded by
+
+&lt;img src="vis/banner_new.png" width="50%" style="display: block; margin: auto;" /&gt;
+
+&lt;img src="vis/dfg_logo_englisch_blau_en.jpg" width="50%" style="display: block; margin: auto;" /&gt;
+
+
+
+---
+
+# Resources I
+
+.footnote[
+
+Barabas, J. and J. Jerit (2010). "Are survey experiments externally
+valid?". In: _American Political Science Review_ 104.2, pp. 226-242.
+ISSN: 00030554. DOI:
+[10.1017/S0003055410000092](https://doi.org/10.1017%2FS0003055410000092).
+
+Bennett, W. L. and S. Iyengar (2008). "A new era of minimal effects?
+The changing foundations of political communication". In: _Journal of
+Communication_ 58.4, pp. 707-731. ISSN: 00219916. DOI:
+[10.1111/j.1460-2466.2008.00410.x](https://doi.org/10.1111%2Fj.1460-2466.2008.00410.x).
+
+Busby, E. C., D. J. Flynn, et al. (2019). "Studying Framing Effects on
+Political Preferences". In: _Doing News Framing Analysis II_, pp.
+27-50. DOI:
+[10.4324/9781315642239-2](https://doi.org/10.4324%2F9781315642239-2).
+
+Debus, M., T. Faas, et al. (2017). _GLES Panel 2016-2021, Wellen 1-15_.
+Köln. URL:
+[https://doi.org/10.4232/1.13783](https://doi.org/10.4232/1.13783).
+
+]
+
+
+---
+
+# Resources II
+
+.footnote[
+
+Durante, R. and B. Knight (2012). "Partisan control, media bias, and
+viewer responses: Evidence from berlusconi's italy". In: _Journal of
+the European Economic Association_ 10.3, pp. 451-481. ISSN: 15424766.
+DOI:
+[10.1111/j.1542-4774.2011.01060.x](https://doi.org/10.1111%2Fj.1542-4774.2011.01060.x).
+
+Foos, F. and D. Bischof (2020). "Can the tabloid media create
+Eurosceptic attitudes? A quasi-experiment on media innuence in
+England".
+
+Jerit, J. (2008). "Issue framing and engagement: Rhetorical strategy in
+public policy debates". In: _Political Behavior_ 30.1, pp. 1-24. ISSN:
+01909320. DOI:
+[10.1007/s11109-007-9041-x](https://doi.org/10.1007%2Fs11109-007-9041-x).
+
+Jerit, J. (2009). "How predictive appeals affect policy opinions". In:
+_American Journal of Political Science_ 53.2, pp. 411-426. ISSN:
+00925853. DOI:
+[10.1111/j.1540-5907.2009.00378.x](https://doi.org/10.1111%2Fj.1540-5907.2009.00378.x).
+
+]
+
+
+---
+
+# Resources III
+
+.footnote[
+
+
+Kinder, D. R. (2007). "Curmudgeonly advice". In: _Journal of
+Communication_ 57.1, pp. 155-162. ISSN: 00219916. DOI:
+[10.1111/j.1460-2466.2006.00335.x](https://doi.org/10.1111%2Fj.1460-2466.2006.00335.x).
+
+Lau, R. R., K. Rogers, et al. (2021). "Media Effects in the Viewer's
+Choice Era: Testing Revised Agenda-Setting and Priming Hypotheses". In:
+_Political Communication_ 38.3, pp. 199-221. ISSN: 10917675. DOI:
+[10.1080/10584609.2020.1763526](https://doi.org/10.1080%2F10584609.2020.1763526).
+URL:
+[https://doi.org/10.1080/10584609.2020.1763526](https://doi.org/10.1080/10584609.2020.1763526).
+
+Leeper, T. J. and R. Slothuus (2020). "How the News Media Persuades".
+In: _The Oxford Handbook of Electoral Persuasion_, pp. 150-168. DOI:
+[10.1093/oxfordhb/9780190860806.013.4](https://doi.org/10.1093%2Foxfordhb%2F9780190860806.013.4).
+
+Martin, G. J. and A. Yurukoglu (2017). "Bias in cable news: Persuasion
+and polarization". In: _American Economic Review_ 107.9, pp. 2565-2599.
+ISSN: 00028282. DOI:
+[10.1257/aer.20160812](https://doi.org/10.1257%2Faer.20160812).
+
+Nelson, T. E., R. A. Clawson, et al. (1997). "Media Framing of a Civil
+Liberties Conflict and Its Effect on Tolerance". In: _American
+Political Science Review_ 91.3, pp. 567-583.
+
+Spirig, J. (2020). "Media Take-Over and Voting Behavior : Can
+Politician-Owned Newspapers Sway Voters ?".
+
+]
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": true,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+<style>
+.logo {
+  background-image: url(vis/hu_logo.png);
+  background-size: contain;
+  background-repeat: no-repeat;
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  width: 80px;
+  height: 93px;
+  z-index: 0;
+}
+
+</style>
+
+<script>
+document
+  .querySelectorAll(
+    '.remark-slide-content' +
+    ':not(.title-slide)' +
+    // add additional classes to exclude here, e.g.
+    // ':not(.inverse)' +
+    ':not(.hide-logo)'
+  )
+  .forEach(el => {
+    el.innerHTML += '<div class="logo"></div>';
+  });
+</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
