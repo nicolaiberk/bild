@@ -54,7 +54,7 @@ knitr::opts_chunk$set(
   echo = FALSE, 
   message = F, 
   warning = F, 
-  cache = F, 
+  cache = T, 
   out.width="90%", 
   fig.height=8, 
   fig.width=15, 
