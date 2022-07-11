@@ -186,6 +186,25 @@ The dependent variable $y_{it}$ indicates a respondent's migration attitude in a
 
 
 
+```{r multidv, fig.cap="Standardised Effect of Change in Framing on Alternative Dependent Variables"}
+
+EffectPlot(multi = T, scaled = T, boundary_share = 0.2) # 0.2 SD suggested by Peyton 2020, 599
+
+```
+
+
+```{r migwaves, fig.cap="Effect of Change in Framing on Immigration Attitudes across Waves"}
+
+EffectByWavePlot(boundary_share = 1) 
+# would add 2 (or 3) lines here: 
+#   minimal relevant effect (5%/0.3 on 7-point scale); 
+#   conservative experimental effect (10%/0.6)
+#   large (not maximum) experimental effect (30%/2.4)
+
+
+```
+
+
 ## Tracing the Mechanism: the Association of Crime and Migration Attitudes
 
 As outlined above, framing theory suggests that increased exposure to a specific consideration about an issue leads to stronger association of an issue with this consideration. In the present case, this should mean that the correlation of attitudes on immigration with attitudes about crime should increase. The GLES Panel data contains a variable asking respondents whether "the state's capabilities to fight crime should be extended, even if that would entail more surveillance", asked in three waves overlapping with the migration attitude question. Figure \@ref(fig:corplot) shows the correlation of crime- and migration attitudes in treatment and control group, pre- and post-treatment. I added a counterfactual, applying the change in the control group to the treatment group, for easier interpretation. As we can see, the treatment group actually saw a *smaller* increase in the correlation of crime and migration attitudes than the control group, *despite weaker pre-treatment association*. Following [@Nelson1996], table \@ref(tab:cortable) regresses immigration attitudes on attitudes towards crime and investigates whether this association is generally different between the two groups\footnote{These differences are however in the opposite direction as the (substantial) differences in the descriptive correlations outlined in the plot. I am currently not sure how to interpret this.}, changes post-treatment, and whether it changes more in the treatment group using interaction terms. I find minor differences between the groups, but no significant difference when interacted with the DiD-term - respondents do not seem to associate crime more strongly with migration following the change in migration coverage in *Bild*.
