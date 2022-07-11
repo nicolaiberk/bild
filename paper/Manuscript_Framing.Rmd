@@ -38,7 +38,7 @@ for (filename in list.files(here("code/functions"))){
 ```
 
 
-\center{WORD COUNT: 6,596}
+WORD COUNT: 6,596
 
 *I am thankful for extensive feedback on earlier stages of this draft from Christian Arnold, Daniel Bischof, Philipp Broniecki, Jóhanna Ýr Bjarnadóttir, Elias Dinas, Florian Foos, Felix Hagemann, Julian Heid, Christina Gahn, Heike Klüver, Martin Vinæs Larsen, Matthew Levendusky, Will Lowe, Thomas M. Meyer, Rune Slothuus, Judith Spirig, Antonio Valentim as well as participants in the EPSIP Colloquium at HU Berlin, CIVICA EGN Workshop at the EUI, CompText Conference 2022, and the Political Behaviour Section at Aarhus University. I also thank the two RAs, Robin Groß and Nathalie Aerts, for annotating the news articles. All remaining confusions are my own.*
 
@@ -161,9 +161,9 @@ TreatmentTrendPlot() + TreatmentDiDPlot()
 
 TenMostCrime()
 
-The left panel of figure \@ref(fig:treatment) shows the share of migration coverage devoted to crime news (solid, red line), once for Bild and once for all other newspapers (dashed, black line). As we can see, *Bild*'s attention to crime news in its migration coverage substantially increased briefly following the takeover of Julian Reichelt, while it focused less on the issue preceding the editorial change. The trends run largely parallel to each other preceding the treatment, with the major exception being the few months following the events at new year's eve in Cologne 2015/16. The right-hand panel shows difference-in-difference estimates of the crime emphasis in migration coverage of one newspaper compared to all others, before and after the editorial change in Bild. One can see that *Bild* was the only newspaper which substantially changed its emphasis of the frame, while other newspapers maintained their levels of attention. Note that estimates using a structural topic model to identify migration framing yield similar results (see appendix 2.1).
-
 ```
+
+The left panel of figure \@ref(fig:treatment) shows the share of migration coverage devoted to crime news (solid, red line), once for Bild and once for all other newspapers (dashed, black line). As we can see, *Bild*'s attention to crime news in its migration coverage substantially increased briefly following the takeover of Julian Reichelt, while it focused less on the issue preceding the editorial change. The trends run largely parallel to each other preceding the treatment, with the major exception being the few months following the events at new year's eve in Cologne 2015/16. The right-hand panel shows difference-in-difference estimates of the crime emphasis in migration coverage of one newspaper compared to all others, before and after the editorial change in Bild. One can see that *Bild* was the only newspaper which substantially changed its emphasis of the frame, while other newspapers maintained their levels of attention. Note that estimates using a structural topic model to identify migration framing yield similar results (see appendix 2.1).
 
 ## Measuring Immigration Attitudes and News Exposure
 
