@@ -193,20 +193,6 @@ DiDModels(dv_name = "1130_clean",
 
 ```
 
-Recall that I hypothesized that readers are motivated reasoners, who will evaluate new evidence in line with their pre-existing attitudes. Those with liberal immigration attitudes should reject news about migrant crime, therefor show inertia or even backlash, while those with more conservative attitudes should be more inclined to accept the message. Model 3 and 4 suggest, contrary to my hypothesis, that more liberal readers show the strongest shift towards more conservative migration attitudes. This effect is substantial: for a neutral reader reporting $0$ on the $[-3; 3]$ scale, the model predicts a 0.346 point change, controlling for individual fixed effects. This effect *doubles* to $0.709$ ($.346 + (-.121)*(-3)$), a full 10% of the scale, among the most liberal readers, and decreases to essentially $0$ ($0.017$) among the most conservative readers. It seems that liberal readers are *more* motivated to incorporate the crime framing into their worldview.
-
-```{r DiDPlot, fig.height=6, fig.width=10, fig.cap="Mean Immigration Attitude across Survey Waves, by Readership and Initial Immigration Attitude"}
-
-DiDPlot(legend_position = "None") +
-  DiDPlot(placebo = T)
-
-```
-
-The left panel of figure \@ref(fig:DiDPlot) shows this descriptively by initial migration attitude. As one can see, all groups diverge from each other after treatment, however this process is most pronounced (and substantial in size) among those with liberal initial migration attitudes, smaller for those who reported a neutral attitude towards migration, and smallest for those reporting conservative attitudes. Whereas all groups seem to regress to a common mean, it seems that - especially among initially neutral respondents - Bild readers move substantially towards the conservative pole, while non-readers show more stability in their attitudes.
-
-This might be a true effect of the change in newspaper content, however given that treatment assignment is not random, it might also constitute the outcome of a selection bias: Bild readers, differing from those who never read Bild, might converge to a different mean than the general population. This "gravitational pull" towards a common mean should be more pronounced among the most liberal Bild readers, as Bild readers generally hold more conservative immigration attitudes ($\hat{x}_{Bild} = 1.44; \hat{x}_{!Bild} = 1.00$; see appendix 3.1). To assess this possibility, the right-hand panel of figure \@ref(fig:DiDPlot) shows the average migration attitude using a placebo treatment, namely defining Bild readership in the post-election wave of the panel (the last wave containing a question on news consumption), well after the emphasis on crime in Bild increased. Despite the lack of changing content, we can observe similar regression to the mean following the placebo date, despite the shorter post-treatment period. Those with the most liberal immigration attitudes show the strongest divergence from their control group counterparts, whereas the difference is less pronounced in the conservative group. Theoretically, this might be driven by long-term changes among those who were treated in W1. However, as appendix 3.2.1.5 shows, even if we exclude those reading Bild in the original survey wave (i.e. the original treatment group), similar differences arise.
-
-Summarised, these estimates reject two of the three hypotheses outlined above. Neither is there evidence for a direct effect (evaluation hypothesis), nor are there moderated effects beyond what we would expect given selection bias (motivated reasoning hypothesis). The next section will therefor assess the last hypothesis, association, before I discuss the generalizability of these estimates.
 
 
 ## Tracing the Mechanism: the Association of Crime and Migration Attitudes
