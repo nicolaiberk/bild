@@ -157,9 +157,13 @@ TreatmentTrendPlot() + TreatmentDiDPlot()
 
 ```
 
+```{r exampleArticles}
+
+TenMostCrime()
 
 The left panel of figure \@ref(fig:treatment) shows the share of migration coverage devoted to crime news (solid, red line), once for Bild and once for all other newspapers (dashed, black line). As we can see, *Bild*'s attention to crime news in its migration coverage substantially increased briefly following the takeover of Julian Reichelt, while it focused less on the issue preceding the editorial change. The trends run largely parallel to each other preceding the treatment, with the major exception being the few months following the events at new year's eve in Cologne 2015/16. The right-hand panel shows difference-in-difference estimates of the crime emphasis in migration coverage of one newspaper compared to all others, before and after the editorial change in Bild. One can see that *Bild* was the only newspaper which substantially changed its emphasis of the frame, while other newspapers maintained their levels of attention. Note that estimates using a structural topic model to identify migration framing yield similar results (see appendix 2.1).
 
+```
 
 ## Measuring Immigration Attitudes and News Exposure
 
@@ -179,6 +183,7 @@ $$
 The dependent variable $y_{it}$ indicates a respondent's migration attitude in a given survey wave, measured on the Likert scale described above. The conditioning variable $BildReader_i$ is a simple binary variable indicating whether respondents read *Bild* in the past week and is measured in the pre-treatment wave. $Post_t$ indicates whether an interview took place preceding or following the editorial change. The estimator of interest is $\beta_3$, which indicates the change in migration attitudes of *Bild* readers following the editorial change, controlling for pre-treatment differences ($BildReader_i$), as well as general pre-post shifts in migration attitudes ($Post_t$).
 
 
+<!-- equivalence boundaries (following Lakens & Peyton) -->
 
 # Results
 

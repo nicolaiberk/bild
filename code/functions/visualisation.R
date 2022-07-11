@@ -19,7 +19,8 @@ library(data.table)
 
 MigSaliencePlot <- function(aggregation = "months"){
   
-  mig_salience_plot <- fread(here("data/processed/bert_crime_daily.csv")) %>% 
+  mig_salience_plot <- 
+    fread(here("data/processed/bert_crime_daily.csv")) %>% 
     select(date_clean, paper, mig_share) %>% 
     mutate(date_new = floor_date(date_clean, aggregation)) %>% 
     group_by(date_new, paper) %>% 
@@ -35,13 +36,23 @@ MigSaliencePlot <- function(aggregation = "months"){
   return(mig_salience_plot)
 }
 
+TenMostCrime <- function(){
+  fread(here('data/processed/bert_crime_clean.csv'), encoding = "UTF-8") %>% 
+    filter(crime_label > 0, paper == "Bild") %>% 
+    arrange(crime_prob) %>% 
+    select(title) %>% tail(5) %>% 
+    knitr::kable(col.names = "Five headlines with highest crime score") %>% 
+    return()
+}
 
 # Treatment: shift in attention to crime
 
 TreatmentTrendPlot <- function(size = 1, 
                                cntrl_col = "black",
                                treat_col = "red",
-                               maxdate = as.Date("2020-01-01")) {
+                               maxdate = as.Date("2020-01-01"),
+                               mindate = as.Date("2016-01-01"),
+                               aggregation = "quarter") {
   
   ## load BERT data
   bert_ests_raw <- 
@@ -49,16 +60,16 @@ TreatmentTrendPlot <- function(size = 1,
     
     bert_ests <- 
       bert_ests_raw %>% 
-      mutate(month = lubridate::floor_date(date_clean, "quarter")) %>% 
+      mutate(month = lubridate::floor_date(date_clean, aggregation)) %>% 
       group_by(paper, month) %>% 
       summarise(
-        crime_share = mean(crime_label)
+        crime = mean(crime_label)
       ) %>% 
       mutate(paper = ifelse(paper %in% c("bild", "Bild"), "Bild", "Other")) %>%
       group_by(month, paper) %>%
-      select(crime_share) %>% 
+      select(crime) %>% 
       summarise(
-        crime_share = mean(crime_share)
+        crime = mean(crime)
       )
     
     survey_dates <- 
@@ -68,14 +79,15 @@ TreatmentTrendPlot <- function(size = 1,
     ## visualise
     trendplot <- 
       bert_ests %>% 
-      filter(month < maxdate, month >= as.Date("2016-01-01")) %>% 
-      ggplot(aes(x = month, y = crime_share, col = paper, lty = paper)) +
+      filter(month < maxdate, month >= mindate) %>% 
+      ggplot(aes(x = month, y = crime, col = paper, lty = paper)) +
       geom_line(size = size) +
       geom_rug(data = survey_dates, aes(x = date), sides = 't', inherit.aes = F) +
       geom_vline(xintercept = as.Date("2017-02-01"), lty = 2, col = "red", size = size) +
       ggtitle("Quarterly Share of Migration Content Devoted to Crime Frames", 
               paste0("Bild vs. other major daily newspapers, 2016-", lubridate::year(maxdate))) + 
-      xlab("Date") + ylab("Share of Migration Content") +
+      xlab("Date") + 
+      ylab("Share of Migration Articles Containing Crime Frame") +
       theme_minimal() +
       theme(legend.position = "none") +
       scale_color_manual(values = c(treat_col, cntrl_col))
@@ -87,14 +99,15 @@ TreatmentTrendPlot <- function(size = 1,
 TreatmentDiDPlot <- function(size = 1, 
                              cntrl_col = "black",
                              treat_col = "red",
-                             maxdate = as.Date("2020-01-01")){
+                             maxdate = as.Date("2020-01-01"),
+                             mindate = as.Date("2016-01-01")){
   
   
   ## load BERT data
   bert_ests_raw <- 
     fread(here('data/processed/bert_crime_clean.csv')) %>% 
     filter(paper != "Spiegel") %>%  # as Spiegel not part of the analysis
-    filter(date_clean < maxdate & date_clean >= as.Date("2016-01-01"))
+    filter(date_clean < maxdate & date_clean >= mindate)
   
   # DiD with placebo papers, 2016-17
   merged_bert_daily <- 
