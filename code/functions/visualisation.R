@@ -17,11 +17,11 @@ library(data.table)
 
 # Migration Salience ####
 
-MigSaliencePlot <- function(){
+MigSaliencePlot <- function(aggregation = "months"){
   
   mig_salience_plot <- fread(here("data/processed/bert_crime_daily.csv")) %>% 
     select(date_clean, paper, mig_share) %>% 
-    mutate(date_new = floor_date(date_clean, "month")) %>% 
+    mutate(date_new = floor_date(date_clean, aggregation)) %>% 
     group_by(date_new, paper) %>% 
     summarise_all(mean) %>% 
     filter(date_new < as.Date('2019-01-01')) %>%
@@ -45,7 +45,7 @@ TreatmentTrendPlot <- function(size = 1,
   
   ## load BERT data
   bert_ests_raw <- 
-    fread('../data/processed/bert_crime_clean.csv')
+    fread(here('data/processed/bert_crime_clean.csv'))
     
     bert_ests <- 
       bert_ests_raw %>% 
