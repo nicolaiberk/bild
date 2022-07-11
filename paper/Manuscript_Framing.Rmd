@@ -184,15 +184,6 @@ The dependent variable $y_{it}$ indicates a respondent's migration attitude in a
 
 ## Framing Effects on Migration Attitudes
 
-Did increased exposure to crime frames about immigration affect individuals' attitudes? My results, displayed in \@ref(tab:DiDResults) seem to suggest that this was not the case. The dependent variable is a seven-point Likert-scale capturing immigration preferences from -3 (liberalize immigration) to 3 (restrict immigration).  Model 1 shows the simple DiD estimate, comparing changes among Bild-readers to those who never read Bild, even post-treatment. The estimate for the average treatment effect is a moderate 0.131 on the seven-point scale (about 2% of the scale), which is significant at the .05-level. This changes once we include individual fixed effects in model 2: The effect shrinks to a negligible 0.048 and is not significant at any common levels. The average treatment effect of exposure to more crime news at the individual seems negligible. However, do readers react differently, dependent on their prior attitudes?
-
-```{r DiDResults, results='asis', fig.cap="Difference-in-Differences Models"}
-
-DiDModels(dv_name = "1130_clean",
-          cond_name = "\n Initial Attitude")
-
-```
-
 
 
 ## Tracing the Mechanism: the Association of Crime and Migration Attitudes
@@ -211,35 +202,6 @@ MigCrimeCorPlot()
 MigCrimeCorTable()
 
 ```
-
-
-
-## Generalization
-
-Is this null effect specific to Bild readers or does exposure to crime framing affect readers of all newspapers similarly? In order to generalize these findings, I estimate the average exposure of each respondent to crime frames in migration coverage in the week preceding an interview. Immigration attitudes are then regressed on this measure, it's interaction with prior attitudes, as well as fixed effects for individual and wave. This way, it is possible to assess the correlation of changes in migration attitudes with changing exposure to crime framing beyond general time-trends.
-
-Surprisingly, results suggest a significant correlation of individual crime exposure and changes in respondents' immigration attitude. This association is not significant once controlling for the salience of migration content in a respondents diet (i.e. the share of articles concerned with migration out of all articles), which is surprisingly negatively related to migration attitudes, meaning the more salient migration content in a respondents' news content, the less conservative that person's attitude towards migration.
-
-
-```{r TWFEResults, results='asis', fig.cap="Two-way fixed-effect Models of Direct Exposure", out.width = "50%"}
-
-TWFEModels(dv_name = "1130_clean",
-          cond_name = "\n Initial Attitude")
-
-```
-
-Similarly, I do find an interaction effect, which is robust to controlling for exposure to general migration content. The correlation of exposure to crime frames and migration attitudes is strongest among respondents with most liberal initial migration attitudes, and negligible among the most conservative respondents. The finding again contradicts our initial hypothesis that conservative readers should be *most* inclined to react to the exposure. A change in migration framing from 0% to 100% about crime corresponds to a 0.9 point change on the seven-point scale for the most liberal individuals. Note that since there is no biased definition of a treatment group here, this cannot be explained by regression to the mean, but might be related to ceiling effects (which would suggest an even larger true effect).
-
-These findings are rather puzzling. The DiD estimates show absolutely no effect of a substantial increase in crime framing on migration attitudes, nor an increase in the association of migration and crime attitudes. The TWFE model, however, shows a significant correlation of migration attitudes and migration coverage about crime, as well as a stronger reaction of more liberal-minded respondents to such news. As the model presents mere correlations of immigration attitudes and crime content in the news, controlling for time trends, it cannot address endogeneity concerns. Hence, the effects in the TWFE model likely capture selection effects, as individuals developing a more liberal/conservative attitude towards migration choose more liberal/conservative news outlets. 
-
-In order to explore this alternative explanation, I estimate a TWFE Model regressing newspaper readership on respondents' migration attitude. The results indicate that changing migration attitudes are only weakly linked to newspaper consumption. A significant effect can only be observed for the left-leaning *SZ* and *taz*, in the expected direction: as individuals develop more conservative (liberal) attitudes, they report reading these two newspapers less (more). The association is however tiny: as respondents move one point towards the conservative pole of the seven point migration attitude scale, their likelihood to report reading SZ (taz) drops by 6 (8) percentage points. 
-
-```{r TWFEReadership, results='asis', fig.cap="Two-way fixed-effect Models of Newspaper Readership"}
-
-TWFEReadership()
-
-```
-
 
 
 # Conclusion: Framing Effects in the Real World
