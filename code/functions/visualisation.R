@@ -263,8 +263,21 @@ EffectPlot <- function(multi = F,
     }
     
     mig_att_model <- 
-      fixest::feglm(dv ~ post*treat | lfdn, 
-                    data = gles_p_long)
+      fixest::feglm(dv ~ post*treat | lfdn + wave_ctrl, 
+                    data = 
+                      # add control for different post-waves
+                      gles_p_long %>% 
+                      filter(!is.na(dv)) %>% 
+                      mutate(
+                        wave_ctrl = 
+                          ifelse(
+                            wave %in% unique(.$wave[c(1,2)]),
+                            "reference",
+                            wave
+                          ) 
+                      ) %>% 
+                      select(dv, post, treat, lfdn, wave_ctrl)
+                    )
     
     if(scaled == "raw"){
       stop("scaled = 'raw' not supported for multi = T.")
@@ -280,8 +293,20 @@ EffectPlot <- function(multi = F,
     }
     
     int_att_model <- 
-      fixest::feglm(dv ~ post*treat | lfdn, 
-                    data = gles_p_long)
+      fixest::feglm(dv ~ post*treat | lfdn + wave_ctrl, 
+                    data = 
+                      # add control for different post-waves
+                      gles_p_long %>% 
+                      filter(!is.na(dv)) %>% 
+                      mutate(
+                        wave_ctrl = 
+                          ifelse(
+                            wave %in% unique(.$wave[c(1,2)]),
+                            "reference",
+                            wave
+                          ) 
+                      ) %>% 
+                      select(dv, post, treat, lfdn, wave_ctrl))
     
     if(scaled == "raw"){
       stop("scaled = 'raw' not supported for multi = T.")
@@ -297,8 +322,20 @@ EffectPlot <- function(multi = F,
     }
     
     mip_model <- 
-      fixest::feglm(dv ~ post*treat | lfdn, 
-                    data = gles_p_long)
+      fixest::feglm(dv ~ post*treat | lfdn + wave_ctrl, 
+                    data = 
+                      # add control for different post-waves
+                      gles_p_long %>% 
+                      filter(!is.na(dv)) %>% 
+                      mutate(
+                        wave_ctrl = 
+                          ifelse(
+                            wave %in% unique(.$wave[c(1,2)]),
+                            "reference",
+                            wave
+                          ) 
+                      ) %>% 
+                      select(dv, post, treat, lfdn, wave_ctrl))
     
     if(scaled == "raw"){
       stop("scaled = 'raw' not supported for multi = T.")
@@ -314,8 +351,20 @@ EffectPlot <- function(multi = F,
     }
     
     afd_model <- 
-      fixest::feglm(dv ~ post*treat | lfdn, 
-                    data = gles_p_long)
+      fixest::feglm(dv ~ post*treat | lfdn + wave_ctrl, 
+                    data = 
+                      # add control for different post-waves
+                      gles_p_long %>% 
+                      filter(!is.na(dv)) %>% 
+                      mutate(
+                        wave_ctrl = 
+                          ifelse(
+                            wave %in% unique(.$wave[c(1,2)]),
+                            "reference",
+                            wave
+                          ) 
+                      ) %>% 
+                      select(dv, post, treat, lfdn, wave_ctrl))
     
     modelsummary::modelplot(
       list("AfD thermometer" = afd_model,
@@ -325,9 +374,11 @@ EffectPlot <- function(multi = F,
       coef_map = list("postTRUE:treatTRUE" = ""),
       facet = T, 
       ) +
-      geom_vline(xintercept = 0, lty = 2, col = "red", size = size) +
-      geom_vline(xintercept = ifelse(scaled, boundary_share, theoretical_effect_size*boundary_share), lty = 2, col = "darkgreen", size = size) +
-      geom_vline(xintercept = ifelse(scaled, -1*boundary_share, -1*theoretical_effect_size*boundary_share), lty = 2, col = "darkgreen", size = size)
+      geom_vline(xintercept = 0, lty = 1, col = "red", size = size) +
+      # geom_vline(xintercept = theoretical_effect_size*boundary_share, lty = 3, col = "orange", size = size) +
+      # geom_vline(xintercept = -1*theoretical_effect_size*boundary_share, lty = 3, col = "orange", size = size) +
+      geom_vline(xintercept = theoretical_effect_size, lty = 3, col = "black", size = size) +
+      geom_vline(xintercept = -1*theoretical_effect_size, lty = 3, col = "black", size = size)
 
   }else{
     
@@ -349,8 +400,20 @@ EffectPlot <- function(multi = F,
     }
     
     single_model <- 
-      fixest::feglm(dv ~ post*treat | lfdn, 
-                    data = gles_p_long)
+      fixest::feglm(dv ~ post*treat | lfdn + wave_ctrl, 
+                    data = 
+                      # add control for different post-waves
+                      gles_p_long %>% 
+                      filter(!is.na(dv)) %>% 
+                      mutate(
+                        wave_ctrl = 
+                          ifelse(
+                            wave %in% unique(.$wave[c(1,2)]),
+                            "reference",
+                            wave
+                          ) 
+                      ) %>% 
+                      select(dv, post, treat, lfdn, wave_ctrl))
     
     modelsummary::modelplot(
       list(dv_name = single_model),
@@ -358,21 +421,23 @@ EffectPlot <- function(multi = F,
       facet = T
     ) +
       # indicate either 0.5 SDs or 10% of the sclae (adjusted to scale in raw case)
-      geom_vline(xintercept = 0, lty = 2, col = "red", size = size) +
-      geom_vline(xintercept = ifelse(scaled == "raw", 
-                                     boundary_share*theoretical_effect_size*(max(gles_p_long$dv, na.rm = T) - min(gles_p_long$dv, na.rm = T)),
-                                     ifelse(scaled, boundary_share, theoretical_effect_size*boundary_share)), 
-                 lty = 2, col = "darkgreen", size = size) +
-      geom_vline(xintercept = ifelse(scaled == "raw", 
-                                     boundary_share*-1*theoretical_effect_size*(max(gles_p_long$dv, na.rm = T) - min(gles_p_long$dv, na.rm = T)),
-                                     ifelse(scaled, boundary_share, -1*theoretical_effect_size*boundary_share)), 
-                 lty = 2, col = "darkgreen", size = size)
+      geom_vline(xintercept = 0, lty = 1, col = "red", size = size) +
+      geom_vline(xintercept = boundary_share*theoretical_effect_size, 
+                 lty = 3, col = "black", size = size) +
+      geom_vline(xintercept = boundary_share*-1*theoretical_effect_size, 
+                 lty = 3, col = "black", size = size) +
+      geom_vline(xintercept = theoretical_effect_size, 
+                 lty = 2, col = "black", size = size) +
+      geom_vline(xintercept = -1*theoretical_effect_size, 
+                 lty = 2, col = "black", size = size)
     
   }
 
 }
 
-EffectByWavePlot <- function(dv = "1130_clean", size = 1,
+EffectByWavePlot <- function(dv = "1130_clean", 
+                             size = 1,
+                             scaled = F,
                              boundary_share = 1,
                              theoretical_effect_size = 0.1) {
   
@@ -380,7 +445,18 @@ EffectByWavePlot <- function(dv = "1130_clean", size = 1,
     fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
     as_tibble()
   
-  gles_p_long[["dv"]] <- gles_p_long[[dv]]
+  if(scaled){
+    
+    gles_p_long[["dv"]] <- scale(gles_p_long[[dv]])
+    
+  }else if (!scaled){
+
+    gles_p_long[["dv"]] <- gles_p_long[[dv]]
+    
+  }else{
+    stop("'dv' must be logical!")
+  }
+  
   postdate <- as.Date("2017-02-01")
   
   waves <- 
@@ -418,15 +494,20 @@ EffectByWavePlot <- function(dv = "1130_clean", size = 1,
   
   ests %>% 
     ggplot(aes(x = date, y= point, ymin = upper, ymax = lower)) +
-    geom_pointrange(size = size) +
-    geom_hline(yintercept = 0) +
-    geom_hline(yintercept = boundary_share*theoretical_effect_size*(max(gles_p_long$dv, na.rm = T) - min(gles_p_long$dv, na.rm = T)),
-               lty = 2, col = "darkgreen", size = size) +
-    geom_hline(yintercept = boundary_share*-1*theoretical_effect_size*(max(gles_p_long$dv, na.rm = T) - min(gles_p_long$dv, na.rm = T)), 
-               lty = 2, col = "darkgreen", size = size) +
+    geom_hline(yintercept = 0, col = "red", size = size) +
+    geom_hline(yintercept = boundary_share*theoretical_effect_size,
+               lty = 3, col = "black", size = size) +
+    geom_hline(yintercept = boundary_share*-1*theoretical_effect_size, 
+               lty = 3, col = "black", size = size) +
+    geom_hline(yintercept = theoretical_effect_size,
+               lty = 2, col = "black", size = size) +
+    geom_hline(yintercept = -1*theoretical_effect_size,
+               lty = 2, col = "black", size = size) +
     geom_vline(xintercept = as.Date(postdate), lty = 2, col = "red", size = size) +
     geom_vline(xintercept = as.Date("2017-06-01"), lty = 2, col = "orange", size = size) +
-    xlab("Date") + ylab("Effect") %>% 
+    geom_pointrange(size = size) +
+    xlab("Date") + ylab("Effect") +
+    theme_minimal() %>% 
     return()
 }
 
