@@ -165,32 +165,77 @@ $$
 
 The dependent variable $y_{it}$ indicates a respondent's migration attitude in a given survey wave, measured on the Likert scale described above. The conditioning variable $BildReader_i$ is a simple binary variable indicating whether respondents read *Bild* in the past week and is measured in the pre-treatment wave. $Post_t$ indicates whether an interview took place preceding or following the editorial change. The estimator of interest is $\beta_3$, which indicates the change in migration attitudes of *Bild* readers following the editorial change, controlling for pre-treatment differences ($BildReader_i$), as well as general pre-post shifts in migration attitudes ($Post_t$).
 
+## Expected Effect Size
+
+Despite the abundance of framing effects studies, no common standard of the magnitude of framing effects exists. Even the correct measurement of the magnitude is a contested question, as different control groups can be compared [see @Chong2007a, 109f for a discussion]. Additionally, framing effects differ based on the polarization and salience of the issue [@Lecheler2009a], repeated exposure [@Chong2007competitiveFraming], the sender [@Slothuus2010], political knowledge [@Chong2007b], as well as the reference of certain groups [@Nelson1996]. Generally, reported effect size around 30% of the scale are not uncommon [@Slothuus2010], sometimes even over 40% [@Chong2007a, 104], but most results seem to lie in between 10% and 25% of the scale when comparing pro and con arguments [@Lecheler2009a; @Nelson1997Psychology; @Nelson1997Rally; @Slothuus2008; @Slothuus2010], as most studies lack a neutral control group. As experimental treatments are likely designed in order to elicit strong responses, and given biases towards null effects in the production of scientific knowledge [SOURCE], reported effects likely display a selection bias towards strong treatments. The treatment can be considered rather strong here, as the crime consideration is associated with strongly negative evaluations and the relative increase in the prevalence of this content is large. Additionally, given that readers already consumed that newspapers, the qualities of the sender should rather increase the effect size, while the high salience of the issue should decrease it. Given these considerations, I expect an effect of around 10% of the scale, or 0.6 on the seven-point scale[^1], which represents a conservative estimate.
+
+[^1]: As the scale runs from one to seven, it spans six points wide.
+
+As suggested by @Laken2017, I also estimate equivalence bounds indicating the smallest effect size of interest (SESOI, indicated by dotted orange line in the graph), as well as a conservative estimate of the experimentally expected effect. I define the SESOI at a 2.5% change, or 0.15 on the seven-point scale, which represents a fraction of the conservative experimental estimate and sets a fairly low bar given the strong treatment. This SESOI can be used to define equivalence bounds. Any effect estimated to lie within these bounds with statistical significance (i.e. a 90%-confidence interval in-between the positive and negative effect of this size) is too small to constitute a meaningful effect, as the hypothesis that the effect is *not* equivalent to zero can be rejected [see also @Peyton2020].
+
 # Results
 
-## Framing Effects on Migration Attitudes
+```{r singlemodel}
 
-Figure \@ref(fig:multidv) visualizes the standardized effect of the change in framing on relevant dependent variables. As suggested by @Laken2017 [see also @Peyton2020], I added equivalence bounds of 0.2 standard deviations, representing a minimal effect size
 
-```{r multidv, fig.cap="Standardised Effect of Change in Framing on Alternative Dependent Variables"}
+gles_p_long <- 
+  fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
+  as_tibble()
 
-EffectPlot(multi = T, scaled = "raw", boundary_share = 0.2) # 0.2 SD suggested by Peyton 2020, 599
+postdate <- as.Date("2017-02-01")
+title <- "Mean migration attitude post-Reichelt takeover"
+
+gles_p_long["dv"] <- gles_p_long["1130_clean"]
+    
+single_model <- 
+  fixest::feglm(dv ~ post*treat | lfdn + wave_ctrl, 
+                data = 
+                  # add control for different post-waves
+                  gles_p_long %>% 
+                  filter(!is.na(dv)) %>% 
+                  mutate(
+                    wave_ctrl = 
+                      ifelse(
+                        wave %in% unique(.$wave[c(1,2)]),
+                        "reference",
+                        wave
+                      ) 
+                  ) %>% 
+                  select(dv, post, treat, lfdn, wave_ctrl))
+
+ATT <- single_model$coefficients[["postTRUE:treatTRUE"]]
+t_ATT <- single_model$coeftable["postTRUE:treatTRUE", "t value"]
+p_ATT <- single_model$coeftable["postTRUE:treatTRUE", "Pr(>|t|)"]
 
 ```
 
+Figure \@ref(fig:singledv) visualizes the effect of the change in framing on immigration attitudes. Green, dashed vertical lines indicate the expected effect from the experimental literature. The orange dotted lines indicate the equivalence boundaries. If the 90% interval is contained within these boundaries, the hypothesis that the estimate is larger than the SESOI can be rejected. The point estimate indicates a `r round(ATT, 3)`-point change among Bild readers following treatment (\$t = \$ `r round(t_ATT, 2)`, \$p = \$ `r round(p_ATT, 2)`), which is around `r round(ATT*100/0.6)`% of the expected effect of 0.6. The 95% confidence intervals also contains values far smaller than the SESOI of 0.15 but clearly include the vertical red line indicating no change. Clearly, the model suggests a null effect.
 
-## Alternative Dependent Variables
+```{r singleplot, fig.cap="Standardised Effect of Change in Framing on Alternative Dependent Variables", fig.height=2}
 
-```{r multidv, fig.cap="Standardised Effect of Change in Framing on Alternative Dependent Variables"}
+# add 0.9 confidence bar
 
-EffectPlot(multi = T, scaled = "raw", boundary_share = 0.2) # 0.2 SD suggested by Peyton 2020, 599
+EffectPlot(multi = F, scaled = "raw", theoretical_effect_size = 0.6, boundary_share = 0.25)
 
 ```
 
-## Stability of Estimates
+```{r multidv, fig.cap="Standardised Effect of Change in Framing on Alternative Dependent Variables"}
+
+# add 0.9 confidence bar
+
+EffectPlot(multi = T, scaled = T, theoretical_effect_size = 0.2) # 0.2 SD suggested by Peyton 2020, 599
+
+```
+
+Figure \@ref(fig:multidv) shows standardized effects of the change in newspaper framing on immigration attitudes and three related dependent variables, namely integration attitudes, the likelihood to report migration as the most important problem facing the country, as well as thermometer scores for the radical-right AfD. Dotted lines indicate a 20% standard deviation change, which has been defined as the standardized equivalence boundary in existing research [@Peyton2020, 599]. All estimated effects are smaller in size than 0.05 standard deviations and associated 95%-confidence intervals contain zero. This means we can reject the hypothesis of meaningful effect size, but cannot reject that the estimate is statistically different from zero. All estimates suggest a clear null effect.
+
+To address potential long-term effects of this change in migration framing, figure \@ref(fig:migwaves) assesses the effect in each post-wave compared to the pre-treatment wave.
 
 ```{r migwaves, fig.cap="Effect of Change in Framing on Immigration Attitudes across Waves"}
 
-EffectByWavePlot(boundary_share = 1) 
+# add 0.9 confidence bar
+
+EffectByWavePlot(theoretical_effect_size = 0.6, boundary_share = 0.25)
 # would add 2 (or 3) lines here: 
 #   minimal relevant effect (5%/0.3 on 7-point scale); 
 #   conservative experimental effect (10%/0.6)
