@@ -614,6 +614,7 @@ gles_p_long$post <- gles_p_long$date_clean>= as.Date("2017-02-01")
 # define post-treatment date - placebo
 gles_p_long$post_placebo <- gles_p_long$date_clean>= as.Date("2018-01-01")
 
+
 ## save
 gles_p_long %>% 
   fwrite(., here('data/raw/gles/Panel/long_cleaned.csv'))

@@ -270,6 +270,23 @@ EffectPlot <- function(multi = F,
       stop("scaled = 'raw' not supported for multi = T.")
     }else if(scaled){
       # standardised dv
+      gles_p_long["dv"] <- scale(gles_p_long["2880h_clean"])
+      
+    }else if (!scaled){
+      
+      # else percentage of scale
+      gles_p_long$dv <- scales::rescale(gles_p_long$`2880h_clean`, to = c(0,1))
+      
+    }
+    
+    crime_att_model <- 
+      fixest::feglm(dv ~ post*treat | lfdn, 
+                    data = gles_p_long)
+    
+    if(scaled == "raw"){
+      stop("scaled = 'raw' not supported for multi = T.")
+    }else if(scaled){
+      # standardised dv
       gles_p_long["dv"] <- scale(gles_p_long["1210_clean"])
       
     }else if (!scaled){
@@ -318,7 +335,8 @@ EffectPlot <- function(multi = F,
                     data = gles_p_long)
     
     modelsummary::modelplot(
-      list("AfD thermometer" = afd_model,
+      list("Crime Attitude" = crime_att_model, 
+           "AfD thermometer" = afd_model,
            "MIP: Migration" = mip_model,
            "Integration Attitude" = int_att_model,
            "Migration Attitude" = mig_att_model),

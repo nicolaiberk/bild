@@ -37,13 +37,14 @@ for (filename in list.files(here("code/functions"))){
 
 ```
 
+
 WORD COUNT: 6,596
 
 *I am thankful for extensive feedback on earlier stages of this draft from Christian Arnold, Daniel Bischof, Philipp Broniecki, Jóhanna Ýr Bjarnadóttir, Elias Dinas, Florian Foos, Felix Hagemann, Julian Heid, Christina Gahn, Heike Klüver, Martin Vinæs Larsen, Matthew Levendusky, Will Lowe, Thomas M. Meyer, Rune Slothuus, Judith Spirig, Antonio Valentim as well as participants in the EPSIP Colloquium at HU Berlin, CIVICA EGN Workshop at the EUI, CompText Conference 2022, and the Political Behaviour Section at Aarhus University. I also thank the two RAs, Robin Groß and Nathalie Aerts, for annotating the news articles. All remaining confusions are my own.*
 
 # Introduction: Does Framing Matter?
 
-The persuasiveness of the news media has been a fixation of research on political communication and public opinion for at least the past 100 years. One of the largest fields within this literature is concerned with framing effects. A huge body of experimental evidence suggests that citizens substantially alter their issue attitudes when presented with different frames [@Busby2019; @Chong2007b; @Leeper2020; @Nelson1996; @Nelson1997Rally; @sniderman2004structure; @Slothuus2008a]. However, there is little research investigating whether these findings translate into a messy reality [@Barabas2010], where frames are communicated by specific actors, and citizens self-select into media outlets, potentially shielding them from some frames and exposing them to others.
+The persuasiveness of the news media has been a fixation of research on political communication and public opinion for at least the past 100 years. One of the largest fields within this literature is concerned with framing effects. A huge body of experimental evidence suggests that citizens substantially alter their issue attitudes when presented with different frames [@Busby2019; @Chong2007b; @Leeper2020; @Nelson1996; @Nelson1997Rally; @sniderman2004structure; @Slothuus2008a]. However, there is little research investigating whether these findings translate into a messy reality [@Barabas2010], where frames are communicated by specific actors, and citizens self-select into media outlets, potentially shielding them from some frames and exposing them to others. 
 
 In fact, many researchers argue that the effects of media content on attitudes are minimal. Observational research on media effects is abundant [@Broockman2022; @Durante2012; @Foos2022; @Grossman2022; @Guess2021; @Levendusky2022; @Martin2017; @Spirig2020], but has rarely paid attention to the precise content affecting issue attitudes [see @Djourelova2020 for an exception]. To the authors knowledge, no existing observational study assesses the causal effect of changing news framing on issue attitudes.
 
@@ -53,19 +54,26 @@ The results show that emphasis framing does not affect citizens' political attit
 
 The paper will proceed as follows: in the next section I will briefly discuss the existing literature on framing and media effects, before describing the theoretical framework and research design, including case, measurement, and estimation strategy. The results section will then showcase findings from difference-in-differences and fixed-effect models assessing the impact of increased emphasis of crime in news coverage about migration, both on the association of attitudes about crime with attitudes about migration, as well as migration attitudes themselves. Lastly, I discuss the wider implications of the findings for the study of framing effects and the role of the news media in the opinion formation process.
 
+
 # Framing Effects vs. Media Effects
 
 <!-- look at rune's comments regarding this chapter - keep focusing on framing effects literature -->
 
 Research on framing has shown for decades that citizens' attitudes are highly reactive to minor changes in question wording and emphasis of specific considerations. However, it remains unclear how well these experimental findings translate into the real world, where citizens self-select into media content, receive cues from political actors, and are usually more concerned with their private lifes than politics. Scholarly effort has therefor been devoted to test the conditions under which framing effects materialize, designing experiments which emulate different aspects of real-world environments. For example,it has been shown that exposure to conflicting frames can serve to strengthen the effect of frames one was earlier exposed to, dependent on individual preconditions [@Bechtel2015; @Chong2013; @Druckman2012]. Others have assessed what influence the sender of a frame has and shown that the effects of framing are more pronounced when the sponsor of the frame is from one's own party [@Druckman2001; @Slothuus2010b; @Slothuus2010]. Lastly, concerns about the duration of framing effects have been addressed by some experimental research showing that those effects can last at least several weeks [@Lecheler2011]. (missing here: Lau et al)
 
-While these findings enable a better understanding about individuals' susceptibility to framing effects in real-world environments, the literature almost exclusively provides us with experimental evidence. Experiments can only incorporate few characteristics at a time and are limited to emulate a realistic environment for the study of news framing. As Donald Kinder puts it: "[E]xperimental results can always be questioned on their generalizability, and framing effects are no exception. [...] A more balanced reading of frame effects requires methodological diversification, experiments and studies oriented to the world outside" [-@Kinder2007, 157]. In order to test the external validity of framing effect studies, it is necessary to study observational data.
+While these findings enable a better understanding about individuals’ susceptibility to framing effects in real-world environments, the literature almost exclusively provides us with experimental evidence. Experiments can only incorporate few characteristics at a time and are limited to emulate a realistic environment for the study of news framing. As Donald Kinder puts it: "[E]xperimental results can always be questioned on their generalizability, and framing effects are no exception. [...] A more balanced reading of frame effects requires methodological diversification, experiments and studies oriented to the world outside" [-@Kinder2007, 157]. In order to test the external validity of framing effect studies, it is necessary to study observational data. 
 
-This call for an assessment of framing effects beyond experimental studies has been echoed by various scholars over time [@Busby2019; @Leeper2020], yet rarely been answered. Existing research is often riddled with endogeneity concerns, co-treatment or concerned with media effects broadly, instead of assessing framing effects specifically. For example, @Jerit2008 investigates the effects of framing on public opinion compared to addressing the opponents issue. She finds that reframing is less effective than engagement with the opposite parties' frames, a finding that suggests that framing is not very effective. However, this study does not try to identify causal effects, but restricts itself to the assessment of correlational evidence. Others show with similar correlational designs that only specific frames seem to drive issue importance [@Mclaren2018], but do not assess effects on attitudes.
+This call for an assessment of framing effects beyond experimental studies has been echoed by various scholars over time [@Busby2019; @Leeper2020], yet rarely been answered. Existing research is often riddled with endogeneity concerns, co-treatment or concerned with media effects broadly, instead of assessing framing effects specifically. For example, @Jerit2008 investigates the effects of framing on public opinion compared to addressing the opponents issue. She finds that reframing is less effective than engagement with the opposite parties' frames, a finding that suggests that framing is not very effective. However, this study does not try to identify causal effects, but restricts itself to the assessment of correlational evidence. Others show with similar correlational designs that only specific frames seem to drive issue importance [@Mclaren2018], but do not assess effects on attitudes. 
 
-Other work has put more emphasis on causal identification of media effects using quasi-experimental designs, but paid less attention to the precise definition of the independent variable. This literature has usually exploited changes in news media markets such as boycotts of certain outlets [@Foos2022], entries of new outlets [@DellaVigna2007; @Grossman2022], changing TV channel positions [@Martin2017], or partisan takeovers of news outlets [@Durante2012; @Levendusky2022; @Spirig2020] to estimate the effects of changing news exposure on political behavior. Interestingly, the results diﬀer across studies. While some studies find substantial effects of exposure to slanted media on political attitudes and voting behavior even in the long run [@Foos2020; @Grossman2022], others find that consumers switch outlets when the slant of currently consumed news changes [@Durante2012; @Spirig2020].
+Other work has put more emphasis on causal identification of media effects using quasi-experimental designs, but paid less attention to the precise definition of the independent variable. This literature has
+usually exploited changes in news media markets such as boycotts of certain
+outlets [@Foos2022], entries of new outlets [@DellaVigna2007; @Grossman2022], changing TV channel positions [@Martin2017], or partisan takeovers of news outlets [@Durante2012; @Levendusky2022; @Spirig2020] to estimate the effects of changing news exposure on political behavior. Interestingly, the results diﬀer across studies. While some studies find substantial effects of exposure to slanted media on political attitudes and voting behavior even in the long run [@Foos2020; @Grossman2022], others find that consumers switch outlets when the slant of currently consumed news changes [@Durante2012; @Spirig2020].
 
-Another approach is to assess consumer reactions to news content through ﬁeld experiments. In this setup, consumers are randomly assigned to speciﬁc news outlets and the development of their political attitudes is assessed. @Guess2021, for example, randomly assigned individuals to receive content from a left-leaning or a right-leaning news outlet in their online news feeds. Similar studies have assessed the ffects of cross-partisan content on TV [@Broockman2022] and social media [@Bail2018]. This literature provided contradicting results as well: while some found liberalizing effects of liberal content [@Broockman2022], others found no effects [@Guess2021], or even partisan backlash (i.e. individuals becoming even more conservative in response to liberal content; @Bail2018).
+Another approach is to assess consumer reactions to news content through ﬁeld
+experiments. In this setup, consumers are randomly assigned to speciﬁc news
+outlets and the development of their political attitudes is assessed. @Guess2021, for example, randomly assigned individuals to receive content from a left-leaning or a right-leaning news outlet in their online news feeds. Similar studies have assessed the ffects of cross-partisan content on TV [@Broockman2022] and social media [@Bail2018]. This literature provided
+contradicting results as well: while some found liberalizing effects of liberal
+content [@Broockman2022], others found no effects [@Guess2021], or even partisan backlash (i.e. individuals becoming even more conservative in response to liberal content; @Bail2018).
 
 I argue this lack of consensus regarding the effects of media content is at least partly related to a lack of precision in the definition of the independent variable. The vast majority of studies in this literature observes or manipulates the consumed *outlet* , rather than the *content*. This is problematic for three main reasons. First, by assuming a stable 'slant' of specific news outlets, it remains unclear which content consumers actually react to (or not). While it is certainly true that news outlets have a certain political leaning, there is variation in how political and how persuasive specific news content is. Second, citizens are often aware of outlets' political leaning. @Baum2008a showed that consumers place the same news content more left- or right-leaning, dependent on wether it was presented as Fox news or CNN content. This implies that citizens should be able to discount political bias of outlets (muting potential effects of biased content) or might show motivated responses to content they perceive as motivated by political motives (e.g. backlash to opposing news sources). Third, by focusing on the effects of the consumption of different outlets, the literature studies a process unlikely to be observed in the real world - after all, changes in the makeup of media markets are extremely rare and switches from one partisan outlet to an opposing partisan outlet even more so. The main influence of news editors on public opinion should be exercised by editing the everyday content of news, rather than changing the consumer base of their outlets.
 
@@ -73,13 +81,15 @@ To my knowledge, there are only two observational studies assessing the causal e
 
 Summarized, we lack an understanding of how framing affects political opinions in the real world. While experimental evidence suggests rather strong effects, it is unclear how these findings travel outside the lab. Observational evidence on media effects is abundant but has not studied precisely what the impact of framing is. The present study therefor exploits a naturally occurring change in the news framing of a particular issue *within* a specific outlet to isolate the effects of news framing on political opinions.
 
+
 # Emphasis Framing and the Value-Expectancy Model
 
-"Framing is the process by which a communication source, such as a news organisation, defines and constructs a political issue or public controversy" [@Nelson1997Rally]. A "frame" is then the operating unit of this process, defining the issue at hand in a specific way. Different forms of frames have been conceptualised. When I talk about 'frames' here, I refer to *emphasis frames*. These frames emphasise certain topics in relation to an issue, guiding the recipient to think about the issue with those considerations in mind that are promoted by the frame [@Leeper2020, 152]. For example, issues of increasing welfare contributions might be discussed with reference to inequality and providing chances to the poor, or by mentioning that higher welfare benefits might result in higher taxes. Individuals' support of a statement will differ dependent on the frame presented [@sniderman2004structure].
+”Framing is the process by which a communication source, such as a news organisation, defines and constructs a political issue or public controversy” [@Nelson1997Rally]. A ”frame” is then the operating unit of this process, defining the issue at hand in a specific way. Different forms of frames have been conceptualised. When I talk about ’frames’ here, I refer to *emphasis frames*. These frames emphasise certain topics in relation to an issue, guiding the recipient to think about the issue with those considerations in mind that are promoted by the frame [@Leeper2020, 152]. For example, issues of increasing welfare contributions might be discussed with reference to inequality and providing chances to the poor, or by mentioning that higher welfare benefits might result in higher taxes. Individuals’ support of a statement will differ dependent on the frame presented [@sniderman2004structure].
 
 Work using the emphasis framing concept of framing - as opposed to other definitions like equivalence frames [@Kahneman1979prospect], episodic frames [@Iyengar2005], or generic frames [@DeVreese2005] - mostly builds on the expectancy-value model developed by @Ajzen2000. This model suggests that an attitude on a given issue is a function of two things: considerations relating to that object and their respective weights. The evaluation of the issue is subdivided into a number of considerations, which will carry clear evaluations. For example, to form an opinion about whether immigration to one's country should be restricted, a person might consider the humanitarian conditions in the countries of origin (negative consideration regarding restrictive migration policy), as well as the risk of increased crime (positive consideration; note that the model does not differentiate whether a consideration is grounded in objective reality). Individuals weigh each of these considerations to form an overall opinion on the subject.
 
 Figure \ref{fig:cogStor} visualizes this logic. A given issue is associated with an attitude $y$. The issue is related to a number of different considerations, each of which carries an associated evaluation $x_i$, e.g. that crime is bad. Each of these considerations is more or less associated with the issue. Based on the strength of this association $w_i$, a given consideration's evaluation is more or less reflected in the issue evaluation $y$, which is equal to the weighted sum of considerations.
+
 
 ```{=tex}
 \begin{figure}
@@ -89,9 +99,10 @@ Figure \ref{fig:cogStor} visualizes this logic. A given issue is associated with
     \label{fig:cogStor}
 \end{figure}
 ```
-According to this model, framing changes opinions by changing the association of a single consideration with the issue at hand. As a result, a specific consideration factors more prominently in an individuals' attitude formation process: "media frames influence opinions by stressing specific values, facts, or other considerations, endowing them with greater apparent relevance to the issue than they might appear to have under an alternative frame" [@Nelson1997Rally, 569].
 
-Applying this to the issue of migration policy and the consideration of criminal migrants, one can imagine a news consumer confronted with an increased volume of news about crimes committed by migrants. The value-expectancy model predicts that the consumer forms a cognitive definition of migration that is increasingly associated with the issue of crime, meaning this consideration features more prominently when forming an opinion about the appropriate level of immigration policy. As a result, their opinion about migration policies should become more restrictive.
+According to this model, framing changes opinions by changing the association of a single consideration with the issue at hand. As a result, a specific consideration factors more prominently in an individuals' attitude formation process: "media frames influence opinions by stressing specific values, facts, or other considerations, endowing them with greater apparent relevance to the issue than they might appear to have under an alternative frame" [@Nelson1997Rally, 569]. 
+
+Applying this to the issue of migration policy and the consideration of criminal migrants, one can imagine a news consumer confronted with an increased volume of news about crimes committed by migrants. The value-expectancy model predicts that the consumer forms a cognitive definition of migration that is increasingly associated with the issue of crime, meaning this consideration features more prominently when forming an opinion about the appropriate level of immigration policy. As a result, their opinion about migration policies should become more restrictive. 
 
 ***Association hypothesis*****: When an individual is exposed to a specific consideration about an issue, their association of the issue with this consideration should be strengthened.**
 
@@ -101,21 +112,25 @@ Applying this to the issue of migration policy and the consideration of criminal
 
 ## A Rare Shift in Migration Framing
 
+
 In order to test whether changing news content - rather than a shift in the consumed news outlet - affected political attitudes, I exploit an editorial change in the largest German tabloid newspaper, *Bild*. As I will show, this editorial change resulted in a substantial shift in the papers' migration framing and is hence ideal to assess the effect of within-newspaper content shifts. Additionally, the fielding of a large-scale panel survey in the same period allow to assess the impact of news content on migration attitudes and how predispositions condition this effect. I will briefly discuss the context of the case in this section.
 
 In the summer of 2015, Germany became sanctuary for around 800,000 refugees who had fled war, violence, and famine in Syria and elsewhere. The German public debated how to deal with the newly arriving and for the first time since the post-war years, a radical right party was likely to win representation in the national parliament. Surprisingly, given its traditional populist style and right-wing takes on migration, the major tabloid newspaper *Bild* promoted an open stance towards the newly arriving in this period. This was often connected to chief editor Kai Diekmann, who hosted a refugee family in his home [@BR2015Diekmann].
 
-In December 2016, Axel Springer, the company owning Bild, announces that Diekmann will leave the company. Less than a week after, it becomes public that prosecutors investigate Diekmann for sexual harassment. While the company claimed that this was not the reason for Diekmann's departure, the process might have been sped up as a result of the investigations\footnote{According to a former editor of the newspaper I talked to, rumors in the company at the time also suggested Diekmann's departure might have been sped up as a result of the investigation.} [@Spiegel2017Diekmann]. The migration coverage in *Bild* severely changed when Diekmann left the newspaper in February 2017 and Julian Reichelt took over the position as editor-in-chief. The paper increasingly started painting a picture of refugees as criminals on the tabloid's front page [@Niggemeyer2018Bild; @DLF2018Reichelt]. Headlines like "I killed 40 people and want asylum" increasingly dominated the migration coverage of the newspaper. In a speech months before he took over the position as chief editor, Reichelt outlined his motivation for such a shift in migration coverage: "I can assure you: nothing has hurt [*Bild*] economically as much as our clear, humane, empathetic stance in the refugee crisis" \footnote{Reichelt in a speech at Deutschlandfunk's conference "Formate des Politischen 2016": \url{https://vimeo.com/190347766}}. He also argued that the German media shows too little tolerance towards anti-immigration attitudes and therefor excludes those holding such views from the political discourse.
+In December 2016, Axel Springer, the company owning Bild, announces that Diekmann will leave the company. Less than a week after, it becomes public that prosecutors investigate Diekmann for sexual harassment. While the company claimed that this was not the reason for Diekmann's departure, the process might have been sped up as a result of the investigations\footnote{According to a former editor of the newspaper I talked to, rumors in the company at the time also suggested Diekmann's departure might have been sped up as a result of the investigation.} [@Spiegel2017Diekmann].  The migration coverage in *Bild* severely changed when Diekmann left the newspaper in February 2017 and Julian Reichelt took over the position as editor-in-chief. The paper increasingly started painting a picture of refugees as criminals on the tabloid's front page [@Niggemeyer2018Bild; @DLF2018Reichelt]. Headlines like "I killed 40 people and want asylum" increasingly dominated the migration coverage of the newspaper. In a speech months before he took over the position as chief editor, Reichelt outlined his motivation for such a shift in migration coverage: "I can assure you: nothing has hurt [*Bild*] economically as much as our clear, humane, empathetic stance in the refugee crisis" \footnote{Reichelt in a speech at Deutschlandfunk's conference "Formate des Politischen 2016": \url{https://vimeo.com/190347766}}. He also argued that the German media shows too little tolerance towards anti-immigration attitudes and therefor excludes those holding such views from the political discourse.
 
 This presents a unique case to study the effects of media content on public opinion. As outlined above, past observational studies have usually explored the effect of consuming a new/different news outlet, without assessing the precise shift in content. In this case, the shift in content took place *within* the outlet and can be clearly identified. The change of editor itself was not salient, which means any opinion changes among readers are most likely the result of the content [@Spirig2020]. Additionally, the timing of the editorial change is potentially exogenous, given the pressure from allegations against Diekmann. In summary, *this case is as close as possible to a field experiment in which a specific consideration of migration coverage is amplified in the coverage of one newspaper, but not others*.
 
 I estimate the effect of this communicative shift in the tabloid's migration coverage with a difference-in-differences design to answer the question how much influence the news media has to shape public opinion. Compared to the experimental setting, this can tell us with high external validity how news content affects political attitudes in contemporary news environments, in the medium term, in the real world.
 
+
+
 ## Measuring Crime Frames in Migration Coverage
+
 
 To measure media attention to immigration, I collected 2.5 million newspaper articles from the websites of the most important German broadsheets \textit{Frankfurter Allgemeine Zeitung (FAZ), Spiegel Online (SPON), Süddeutsche Zeitung (SZ), Die Tageszeitung (TAZ), Die Welt} and the major German tabloid \textit{Bild} for the period 2013-2019. Following the value-expectancy model, I identify crime frames in migration coverage in a two-step process: first, I use supervised machine learning to identify content about migration. Second, I identify content about crime *within* migration coverage by applying a similar supervised classifier. This approach closely resembles the value-expectancy model, as I first identify coverage about the *issue*, before identifying the considerations emphasized in the discussion of this issue.
 
-Table 1 in the appendix shows the number of print copies sold and online page impressions for each newspaper per day. It becomes clear that German newspapers have a rather important position in the German news market. The tabloid \textit{Bild} has by far the largest reach, with over 1.7 Million sold newspaper daily and around 550 million web visits per month. For reference: the German Wikipedia site had less than twice as many visits (975 million) in the same time frame \footnote{Wikipedia Siteviews Analyisis: https://pageviews.wmcloud.org/siteviews/}. *Bild* is closely followed by the weekly published \textit{Spiegel}. The daily broadsheets sell less, and interestingly the online presence seems to be dominated by the right, given the weak presence of centre-left \textit{SZ} and left-wing \textit{taz}.
+Table 1 in the appendix shows the number of print copies sold and online page impressions for each newspaper per day. It becomes clear that German newspapers have a rather important position in the German news market. The tabloid \textit{Bild} has by far the largest reach, with over 1.7 Million sold newspaper daily and around 550 million web visits per month. For reference: the German Wikipedia site had less than twice as many visits (975 million) in the same time frame  \footnote{Wikipedia Siteviews Analyisis: https://pageviews.wmcloud.org/siteviews/}. *Bild* is closely followed by the weekly published \textit{Spiegel}. The daily broadsheets sell less, and interestingly the online presence seems to be dominated by the right, given the weak presence of centre-left \textit{SZ} and left-wing \textit{taz}.
 
 To identify whether an article is about migration, a research assistant annotated 1800 articles. As migration content is rare, and training data needs to be somewhat balanced, articles cannot be selected randomly. Instead, I first construct a dictionary of terms related to migration. I use dictionary extension based on German GloVe word-embeddings\footnote{Downloadable from \url{https://deepset.ai/german-word-embeddings}.} to construct a comprehensive dictionary, and apply it to the articles. Based on the relative share of migration words in an article, I draw a stratified sample of 300 articles (100 from articles with no migration terms, 100 from the quarter with most migration terms and 100 from the remainder in between) for each newspaper for a total of 1,800 papers. Then, a coder hand-coded these articles, assessing whether their main topic is related to migration.
 
@@ -131,6 +146,7 @@ Figure \@ref(fig:salience) shows the share of migration articles in each newspap
 
 To identify migration coverage containing the crime consideration and thereby associating migration with crime, I first fine tune a BERT classifier for German language in a similar fashion as above, this time with coverage about crime as the outcome of interest. Using a training sample of 1400 articles and a test sample of 400 articles, the classifier reaches a very good performance with an F1 score of 85.7%. I then apply this classifier to classify the approximately 90,000 articles about migration identified by the first classifier. About 7% of all migration coverage consists of articles about some form of crime\footnote{See appendix 1.2 for more information about the classifier, training process and data.}. The share of migration content devoted to news about crime within a given time frame allows me to assess how prominent the consideration of crime as a result of migration was at a specific point in time.
 
+
 ```{r treatment, fig.cap="Estimated change in attention to crime content in migration coverage, Bild vs. other newspapers. Black ticks in left panel indicate survey waves."}
 
 
@@ -141,13 +157,13 @@ TreatmentTrendPlot() + TreatmentDiDPlot()
 
 ```
 
-The left panel of figure \@ref(fig:treatment) shows the share of migration coverage devoted to crime news (solid, red line), once for Bild and once for all other newspapers (dashed, black line). As we can see, *Bild*'s attention to crime news in its migration coverage substantially increased briefly following the takeover of Julian Reichelt, while it focused less on the issue preceding the editorial change. The trends run largely parallel to each other preceding the treatment, with the major exception being the few months following the events at new year's eve in Cologne 2015/16. The right-hand panel shows difference-in-difference estimates of the crime emphasis in migration coverage of one newspaper compared to all others, before and after the editorial change in Bild. One can see that *Bild* was the only newspaper which substantially changed its emphasis of the frame, while other newspapers maintained their levels of attention. Note that estimates using a structural topic model to identify migration framing yield similar results (see appendix 2.1).
-
-```{r exampleArticles, results='markup'}
+```{r exampleArticles}
 
 TenMostCrime()
 
 ```
+
+The left panel of figure \@ref(fig:treatment) shows the share of migration coverage devoted to crime news (solid, red line), once for Bild and once for all other newspapers (dashed, black line). As we can see, *Bild*'s attention to crime news in its migration coverage substantially increased briefly following the takeover of Julian Reichelt, while it focused less on the issue preceding the editorial change. The trends run largely parallel to each other preceding the treatment, with the major exception being the few months following the events at new year's eve in Cologne 2015/16. The right-hand panel shows difference-in-difference estimates of the crime emphasis in migration coverage of one newspaper compared to all others, before and after the editorial change in Bild. One can see that *Bild* was the only newspaper which substantially changed its emphasis of the frame, while other newspapers maintained their levels of attention. Note that estimates using a structural topic model to identify migration framing yield similar results (see appendix 2.1).
 
 ## Measuring Immigration Attitudes and News Exposure
 
@@ -157,6 +173,7 @@ The panel also contains a question on newspaper consumption, which was asked in 
 
 ## Estimation
 
+
 I will present evidence from two different estimation strategies to capture the effect of crime framing in migration coverage on immigration attitudes. The first will exploit the case outlined above and a *difference-in-differences* (DiD) estimator to show the effect of the editorial change - and the related content shift - on migration attitudes:
 
 $$
@@ -165,28 +182,21 @@ $$
 
 The dependent variable $y_{it}$ indicates a respondent's migration attitude in a given survey wave, measured on the Likert scale described above. The conditioning variable $BildReader_i$ is a simple binary variable indicating whether respondents read *Bild* in the past week and is measured in the pre-treatment wave. $Post_t$ indicates whether an interview took place preceding or following the editorial change. The estimator of interest is $\beta_3$, which indicates the change in migration attitudes of *Bild* readers following the editorial change, controlling for pre-treatment differences ($BildReader_i$), as well as general pre-post shifts in migration attitudes ($Post_t$).
 
+
+<!-- equivalence boundaries (following Lakens & Peyton) -->
+
 # Results
 
 ## Framing Effects on Migration Attitudes
 
-Figure \@ref(fig:multidv) visualizes the standardized effect of the change in framing on relevant dependent variables. As suggested by @Laken2017 [see also @Peyton2020], I added equivalence bounds of 0.2 standard deviations, representing a minimal effect size
+
 
 ```{r multidv, fig.cap="Standardised Effect of Change in Framing on Alternative Dependent Variables"}
 
-EffectPlot(multi = T, scaled = "raw", boundary_share = 0.2) # 0.2 SD suggested by Peyton 2020, 599
+EffectPlot(multi = T, scaled = T, boundary_share = 0.2) # 0.2 SD suggested by Peyton 2020, 599
 
 ```
 
-
-## Alternative Dependent Variables
-
-```{r multidv, fig.cap="Standardised Effect of Change in Framing on Alternative Dependent Variables"}
-
-EffectPlot(multi = T, scaled = "raw", boundary_share = 0.2) # 0.2 SD suggested by Peyton 2020, 599
-
-```
-
-## Stability of Estimates
 
 ```{r migwaves, fig.cap="Effect of Change in Framing on Immigration Attitudes across Waves"}
 
@@ -199,6 +209,7 @@ EffectByWavePlot(boundary_share = 1)
 
 ```
 
+
 ## Tracing the Mechanism: the Association of Crime and Migration Attitudes
 
 As outlined above, framing theory suggests that increased exposure to a specific consideration about an issue leads to stronger association of an issue with this consideration. In the present case, this should mean that the correlation of attitudes on immigration with attitudes about crime should increase. The GLES Panel data contains a variable asking respondents whether "the state's capabilities to fight crime should be extended, even if that would entail more surveillance", asked in three waves overlapping with the migration attitude question. Figure \@ref(fig:corplot) shows the correlation of crime- and migration attitudes in treatment and control group, pre- and post-treatment. I added a counterfactual, applying the change in the control group to the treatment group, for easier interpretation. As we can see, the treatment group actually saw a *smaller* increase in the correlation of crime and migration attitudes than the control group, *despite weaker pre-treatment association*. Following [@Nelson1996], table \@ref(tab:cortable) regresses immigration attitudes on attitudes towards crime and investigates whether this association is generally different between the two groups\footnote{These differences are however in the opposite direction as the (substantial) differences in the descriptive correlations outlined in the plot. I am currently not sure how to interpret this.}, changes post-treatment, and whether it changes more in the treatment group using interaction terms. I find minor differences between the groups, but no significant difference when interacted with the DiD-term - respondents do not seem to associate crime more strongly with migration following the change in migration coverage in *Bild*.
@@ -209,11 +220,13 @@ MigCrimeCorPlot()
 
 ```
 
+
 ```{r cortable}
 
 MigCrimeCorTable()
 
 ```
+
 
 # Conclusion: Framing Effects in the Real World
 
