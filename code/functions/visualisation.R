@@ -48,16 +48,26 @@ TenMostCrime <- function(){
 # Treatment: shift in attention to crime
 
 TreatmentTrendPlot <- function(size = 1, 
-                               cntrl_col = "black",
-                               treat_col = "red",
+                               palette = c("red", "black"),
                                maxdate = as.Date("2020-01-01"),
-                               mindate = as.Date("2016-01-01"),
-                               aggregation = "quarter") {
+                               mindate = as.Date("2015-01-01"),
+                               aggregation = "quarter",
+                               dpa_corrected = T) {
   
   ## load BERT data
   bert_ests_raw <- 
-    fread(here('data/processed/bert_crime_clean.csv'))
+    fread(here('data/processed/bert_crime_clean.csv')) 
+  
+  if(dpa_corrected){
     
+    # filter Bild news based on DPA to avoid spurious association
+    bert_ests_raw <- 
+      bert_ests_raw %>% 
+      filter(paper != "Bild" | !dpa)
+    
+    
+  }
+  
     bert_ests <- 
       bert_ests_raw %>% 
       mutate(month = lubridate::floor_date(date_clean, aggregation)) %>% 
@@ -90,44 +100,59 @@ TreatmentTrendPlot <- function(size = 1,
       ylab("Share of Migration Articles Containing Crime Frame") +
       theme_minimal() +
       theme(legend.position = "none") +
-      scale_color_manual(values = c(treat_col, cntrl_col))
+      scale_color_manual(values = palette)
     
     return(trendplot)
   
 }
 
 TreatmentDiDPlot <- function(size = 1, 
-                             cntrl_col = "black",
-                             treat_col = "red",
+                             palette = c("red", "black"),
                              maxdate = as.Date("2020-01-01"),
-                             mindate = as.Date("2016-01-01")){
+                             mindate = as.Date("2015-01-01"),
+                             dpa_corrected = T){
   
   
   ## load BERT data
   bert_ests_raw <- 
     fread(here('data/processed/bert_crime_clean.csv')) %>% 
-    filter(paper != "Spiegel") %>%  # as Spiegel not part of the analysis
-    filter(date_clean < maxdate & date_clean >= mindate)
-  
-  # DiD with placebo papers, 2016-17
-  merged_bert_daily <- 
-    bert_ests_raw %>% 
+    filter(paper != "Spiegel", # as Spiegel not part of the analysis
+           date_clean < maxdate,
+           date_clean >= mindate) %>% 
     group_by(paper, date_clean) %>% 
-    summarise(dv = mean(crime_label)) %>% 
-    mutate(post = ifelse(date_clean >= as.Date("2017-02-01"), T, F))
+    summarise(dv = mean(crime_label),
+              dpa = mean(dpa)) %>%  
+    mutate(post = ifelse(date_clean >= as.Date("2017-02-01"), T, F),
+           quarter_id = floor_date(date_clean, "quarter"))
+    
   
-  
+  ## DiD with placebo papers
   
   treatment_ests <- 
     data.frame()
   
-  for (p in unique(merged_bert_daily$paper)){
+  for (p in unique(bert_ests_raw$paper)){
     
-    merged_bert_daily$treatment <-  merged_bert_daily$paper == p
+    bert_ests_raw$treatment <-  bert_ests_raw$paper == p
     
-    did_model <- lm(dv ~ post*treatment, 
-                    data = 
-                      merged_bert_daily)
+    if(dpa_corrected){
+      
+      did_model <- 
+        fixest::feglm(
+          dv ~ post*treatment + dpa | quarter_id, 
+          data = bert_ests_raw)
+      
+    }else{
+      
+      did_model <- 
+        fixest::feglm(
+          dv ~ post*treatment | quarter_id, 
+          data = bert_ests_raw)
+      
+    }
+    
+    
+    
     
     est <- did_model$coefficients["postTRUE:treatmentTRUE"][[1]]
     lower <- confint(did_model)["postTRUE:treatmentTRUE", 1]
@@ -154,18 +179,28 @@ TreatmentDiDPlot <- function(size = 1,
              unlist()
     )
   
+  effect_size <- 
+    treatment_ests %>% 
+    filter(paper == "Bild") %>% 
+    select(est) %>% 
+    unlist()
+  
   treatment_ests %>% 
     ggplot(aes(x = est, xmin = lower, xmax = upper, 
                y = paper, 
                col = paper != "Bild", 
                shape = paper != "Bild")) +
     geom_pointrange(size = size) +
+    geom_text(aes(x = effect_size, y = "Bild", 
+                  label = as.character(round(effect_size, 3)),
+                  hjust = 1.5, size = 20),
+                  col = palette[1]) +
     geom_vline(xintercept = 0,
                col = "red", lty = 2) +
     theme_minimal() +
     xlab("Estimated DiD") + ylab("") +
     theme(legend.position = "None") +
-    scale_color_manual(values = c(treat_col, cntrl_col)) +
+    scale_color_manual(values = palette) +
     coord_flip() %>% 
     return()
   
@@ -177,7 +212,7 @@ TreatmentDiDPlot <- function(size = 1,
 
 ## Descriptive visualisation - cntrl vs treatment (by group)
 
-DiDPlot <- function(placebo = F, 
+DescPlot <- function(placebo = F, 
                     exclude_pretreated = F, 
                     legend_position = "right"){
   
@@ -232,7 +267,7 @@ DiDPlot <- function(placebo = F,
 
 
 
-EffectPlot <- function(multi = F, 
+DiDPlot <- function(multi = F, 
                        dv_var = "1130_clean",
                        dv_name = "Migration Attitude",
                        scaled = T,
@@ -435,7 +470,8 @@ EffectPlot <- function(multi = F,
 
 }
 
-EffectByWavePlot <- function(dv = "1130_clean", 
+
+DiDByWavePlot <- function(dv = "1130_clean", 
                              size = 1,
                              scaled = F,
                              boundary_share = 1,
@@ -509,6 +545,148 @@ EffectByWavePlot <- function(dv = "1130_clean",
     xlab("Date") + ylab("Effect") +
     theme_minimal() %>% 
     return()
+}
+
+# Instrumental Variable Regression ####
+# following Cunningham's Mixtape, p. 354
+
+iv_model <- function(dv_name, iv = T, dpa_corrected = T){
+  
+  if (!exists("dv_name")){
+    stop("Must define dependent variable (e.g. `dv_name = '1130_clean'`)")
+  }
+  
+  merged_data[["dv"]] <- merged_data[[dv_name]]
+  
+  if(iv){
+    
+    if (dpa_corrected){
+      
+      first_stage <- feglm(crime_label_share ~ scale(mig_share) + post*treat | Wave + ID, 
+                           data = merged_data)
+      
+      merged_data$Y2_hat <- predict(first_stage, 
+                                    merged_data[, c("mig_share", "post", "treat", "Wave", "ID")])
+      
+      
+      second_stage <- feglm(scale(dv) ~ scale(Y2_hat) + scale(mig_share) | Wave + ID,
+                            data = merged_data)
+      
+    }else{
+      
+      first_stage <- feglm(crime_label_share ~ scale(mig_share) + scale(dpa_corrected) + post*treat | Wave + ID, 
+                           data = merged_data)
+      
+      merged_data$Y2_hat <- predict(first_stage, 
+                                    merged_data[, c("mig_share", "post", "treat", "Wave", "ID")])
+      
+      
+      second_stage <- feglm(scale(dv) ~ scale(Y2_hat) + scale(dpa_corrected) + scale(mig_share) | Wave + ID,
+                            data = merged_data)
+      
+    }
+    
+  
+    return(second_stage)
+    
+  }else{
+    
+    twfe_model <- 
+      feglm(scale(dv) ~ scale(crime_label_share) + scale(mig_share) + scale(dpa_corrected) | Wave + ID,
+            data = merged_data)
+    
+    return(twfe_model)
+    
+  }
+  
+}
+
+IVPlot <- function(dv_name = "1130_clean", 
+                   dv_label = "Crime",
+                   multi = F, iv = T,
+                   theoretical_effect_size = 0.2,
+                   size = 1,
+                   dpa_corrected = T){
+  
+  # dpa_label <- 
+  #   ifelse(
+  #     dpa_corrected,
+  #     "_nodpaBild",
+  #     ""
+  #   )
+  
+  # load data
+  merged_data <- data.table::fread(file = here(paste0("data/processed/merged_bert.csv")))
+  
+  merged_data <- 
+    merged_data %>%  
+    filter(lag == 7)
+  
+  merged_data <- 
+    merged_data %>% 
+    mutate(mig_share = n_mig/n_tot,
+           ID  = factor(lfdn),
+           Wave = factor(wave))
+  
+  if (!multi){
+  
+    single_model <- iv_model(dv_name = dv_name, iv = iv, dpa_corrected = dpa_corrected)
+    
+    if(iv){
+      
+      modelsummary::modelplot(single_model,
+                  coef_map = 
+                      list("scale(Y2_hat)" = paste0("Exposure to/n", dv_label))
+                  ) +
+        geom_vline(xintercept = 0, lty = 1, col = "red", size = size) +
+        geom_vline(xintercept = theoretical_effect_size, lty = 3, col = "black", size = size) +
+        geom_vline(xintercept = -1*theoretical_effect_size, lty = 3, col = "black", size = size) %>% 
+        return()
+      
+    }else{
+      
+      modelsummary::modelplot(single_model,
+                              coef_map = list("scale(crime_label_share)" = paste0("Exposure to/n", dv_label))
+                              ) +
+        geom_vline(xintercept = 0, lty = 1, col = "red", size = size) +
+        geom_vline(xintercept = theoretical_effect_size, lty = 3, col = "black", size = size) +
+        geom_vline(xintercept = -1*theoretical_effect_size, lty = 3, col = "black", size = size) %>% 
+        return()
+      
+    }
+    
+    
+  }else{
+    
+    mig_model <- iv_model("1130_clean", iv = iv, dpa_corrected = dpa_corrected)
+    int_model <- iv_model("1210_clean", iv = iv, dpa_corrected = dpa_corrected)
+    afd_model <- iv_model("430i_clean", iv = iv, dpa_corrected = dpa_corrected)
+    mip_model <- iv_model("mip_mig",    iv = iv, dpa_corrected = dpa_corrected)
+    
+    coef_map <- 
+      if(iv){
+        list("scale(Y2_hat)" = "")
+      }else{
+        list("scale(crime_label_share)" = "")
+      }
+    
+    modelsummary::modelplot(
+      list("AfD thermometer" = afd_model,
+           "MIP: Migration" = mip_model,
+           "Integration Attitude" = int_model,
+           "Migration Attitude" = mig_model),
+      coef_map = coef_map,
+      facet = T, 
+    ) +
+      geom_vline(xintercept = 0, lty = 1, col = "red", size = size) +
+      geom_vline(xintercept = theoretical_effect_size, lty = 3, col = "black", size = size) +
+      geom_vline(xintercept = -1*theoretical_effect_size, lty = 3, col = "black", size = size) %>% 
+      return()
+    
+    
+  }
+  
+  
 }
 
 

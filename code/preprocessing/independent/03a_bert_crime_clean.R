@@ -37,7 +37,10 @@ articles <-
       ifelse(
         crime_label == 1,
         crime_prob,
-        1 - crime_prob)
+        1 - crime_prob),
+    
+    # add dpa indicator
+    dpa = str_detect(text, "(dpa)")
   )
 
 
@@ -68,7 +71,8 @@ articles <-
                      paper == "bild" ~ "Bild")) %>% 
   filter(paper != "Spiegel") %>%  # as Spiegel not part of the analysis
   filter(date_clean < as.Date("2020-01-01")) # data only collected until end of 2019, some dates are off
-
+  
+  
 envlist <- c(envlist, "bert_ests")
 
 # check missings produced (fine, scraping wasn't fully perfect but small n of missings)

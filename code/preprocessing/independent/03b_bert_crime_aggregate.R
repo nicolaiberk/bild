@@ -4,17 +4,6 @@ library(dplyr)
 library(here)
 library(data.table)
 
-# aggregate BERT estimates to daily measure
-prevalence <- fread(here("data/processed/bert_crime_clean.csv"))
-
-
-prevalence <- 
-  prevalence %>% 
-  select(date_clean, paper, crime_label, crime_prob) %>% 
-  group_by(date_clean, paper) %>% 
-  mutate(n_mig = 1) %>% 
-  summarise_all(sum)
-
 # get number of news articles total from original data
 load(here("data/salience_cleaned.csv"))
 
@@ -33,10 +22,23 @@ salience <-
   group_by(paper, date_clean) %>% 
   summarise(n_tot = n()) #; rm(salience_raw)
 
-prevalence <- 
-  prevalence %>% 
+# aggregate BERT estimates to daily measure
+fread(here("data/processed/bert_crime_clean.csv")) %>% 
+  select(date_clean, paper, crime_label, crime_prob, dpa) %>% 
+  group_by(date_clean, paper) %>% 
+  mutate(n_mig = 1) %>% 
+  summarise_all(sum) %>% 
   left_join(salience, by = c("paper", "date_clean")) %>% 
-  mutate(mig_share = n_mig/n_tot)
+  mutate(mig_share = n_mig/n_tot) %>% 
+  fwrite(here("data/processed/bert_crime_daily.csv"))
 
-
-fwrite(prevalence, here("data/processed/bert_crime_daily.csv"))
+# aggregate BERT estimates to daily measure - exclude Bild-dpa
+fread(here("data/processed/bert_crime_clean.csv")) %>% 
+  filter(paper != "Bild" | !dpa) %>% 
+  select(date_clean, paper, crime_label, crime_prob) %>% 
+  group_by(date_clean, paper) %>% 
+  mutate(n_mig = 1) %>% 
+  summarise_all(sum) %>% 
+  left_join(salience, by = c("paper", "date_clean")) %>% 
+  mutate(mig_share = n_mig/n_tot) %>% 
+  fwrite(here("data/processed/bert_crime_daily_nodpaBild.csv"))
