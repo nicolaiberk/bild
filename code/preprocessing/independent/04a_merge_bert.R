@@ -82,7 +82,7 @@ for(dpa_corrected in c(T, F)){
         `1661e_clean`+
         `1661f_clean`
     )
-  
+
   # subset for testing
   # merged_data <-
   #   merged_data %>%
@@ -166,6 +166,6 @@ for(dpa_corrected in c(T, F)){
            mig_att_lag = lag(`1130_clean`))
   
   merged_data %>%  
-    fwrite(., file = here(paste0("data/processed/merged_bert_", dpa_label, ".csv")))
+    fwrite(., file = here(paste0("data/processed/merged_bert", dpa_label, ".csv")))
   
 }
