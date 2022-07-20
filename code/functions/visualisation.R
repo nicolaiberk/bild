@@ -550,39 +550,39 @@ DiDByWavePlot <- function(dv = "1130_clean",
 # Instrumental Variable Regression ####
 # following Cunningham's Mixtape, p. 354
 
-iv_model <- function(dv_name, iv = T, dpa_corrected = T){
+iv_model <- function(dataset, dv_name, iv = T, dpa_corrected = T){
   
   if (!exists("dv_name")){
     stop("Must define dependent variable (e.g. `dv_name = '1130_clean'`)")
   }
   
-  merged_data[["dv"]] <- merged_data[[dv_name]]
+  dataset[["dv"]] <- dataset[[dv_name]]
   
   if(iv){
     
-    if (dpa_corrected){
+    if (!dpa_corrected){
       
       first_stage <- feglm(crime_label_share ~ scale(mig_share) + post*treat | Wave + ID, 
-                           data = merged_data)
+                           data = dataset)
       
-      merged_data$Y2_hat <- predict(first_stage, 
-                                    merged_data[, c("mig_share", "post", "treat", "Wave", "ID")])
+      dataset$Y2_hat <- predict(first_stage, 
+                                    dataset[, c("mig_share", "post", "treat", "Wave", "ID", "dpa_share")])
       
       
       second_stage <- feglm(scale(dv) ~ scale(Y2_hat) + scale(mig_share) | Wave + ID,
-                            data = merged_data)
+                            data = dataset)
       
     }else{
       
-      first_stage <- feglm(crime_label_share ~ scale(mig_share) + scale(dpa_corrected) + post*treat | Wave + ID, 
-                           data = merged_data)
+      first_stage <- feglm(crime_label_share ~ scale(mig_share) + scale(dpa_share) + post*treat | Wave + ID, 
+                           data = dataset)
       
-      merged_data$Y2_hat <- predict(first_stage, 
-                                    merged_data[, c("mig_share", "post", "treat", "Wave", "ID")])
+      dataset$Y2_hat <- predict(first_stage, 
+                                    dataset[, c("mig_share", "post", "treat", "Wave", "ID", "dpa_share")])
       
       
-      second_stage <- feglm(scale(dv) ~ scale(Y2_hat) + scale(dpa_corrected) + scale(mig_share) | Wave + ID,
-                            data = merged_data)
+      second_stage <- feglm(scale(dv) ~ scale(Y2_hat) + scale(mig_share) | Wave + ID,
+                            data = dataset)
       
     }
     
@@ -592,8 +592,8 @@ iv_model <- function(dv_name, iv = T, dpa_corrected = T){
   }else{
     
     twfe_model <- 
-      feglm(scale(dv) ~ scale(crime_label_share) + scale(mig_share) + scale(dpa_corrected) | Wave + ID,
-            data = merged_data)
+      feglm(scale(dv) ~ scale(crime_label_share) + scale(mig_share) + scale(dpa_share) | Wave + ID,
+            data = dataset)
     
     return(twfe_model)
     
@@ -608,29 +608,17 @@ IVPlot <- function(dv_name = "1130_clean",
                    size = 1,
                    dpa_corrected = T){
   
-  # dpa_label <- 
-  #   ifelse(
-  #     dpa_corrected,
-  #     "_nodpaBild",
-  #     ""
-  #   )
-  
   # load data
-  merged_data <- data.table::fread(file = here(paste0("data/processed/merged_bert.csv")))
-  
   merged_data <- 
-    merged_data %>%  
-    filter(lag == 7)
-  
-  merged_data <- 
-    merged_data %>% 
-    mutate(mig_share = n_mig/n_tot,
+    data.table::fread(file = here(paste0("data/processed/merged_bert.csv"))) %>% 
+    mutate(dpa_share = dpa/n_tot,
+           mig_share = n_mig/n_tot,
            ID  = factor(lfdn),
            Wave = factor(wave))
   
   if (!multi){
   
-    single_model <- iv_model(dv_name = dv_name, iv = iv, dpa_corrected = dpa_corrected)
+    single_model <- iv_model(dataset = merged_data, dv_name = dv_name, iv = iv, dpa_corrected = dpa_corrected)
     
     if(iv){
       
@@ -646,7 +634,7 @@ IVPlot <- function(dv_name = "1130_clean",
     }else{
       
       modelsummary::modelplot(single_model,
-                              coef_map = list("scale(crime_label_share)" = paste0("Exposure to/n", dv_label))
+                              coef_map = list("scale(crime_label_share)" = paste0(dv_label, " exposure"))
                               ) +
         geom_vline(xintercept = 0, lty = 1, col = "red", size = size) +
         geom_vline(xintercept = theoretical_effect_size, lty = 3, col = "black", size = size) +
@@ -658,10 +646,10 @@ IVPlot <- function(dv_name = "1130_clean",
     
   }else{
     
-    mig_model <- iv_model("1130_clean", iv = iv, dpa_corrected = dpa_corrected)
-    int_model <- iv_model("1210_clean", iv = iv, dpa_corrected = dpa_corrected)
-    afd_model <- iv_model("430i_clean", iv = iv, dpa_corrected = dpa_corrected)
-    mip_model <- iv_model("mip_mig",    iv = iv, dpa_corrected = dpa_corrected)
+    mig_model <- iv_model(dataset = merged_data, "1130_clean", iv = iv, dpa_corrected = dpa_corrected)
+    int_model <- iv_model(dataset = merged_data, "1210_clean", iv = iv, dpa_corrected = dpa_corrected)
+    afd_model <- iv_model(dataset = merged_data, "430i_clean", iv = iv, dpa_corrected = dpa_corrected)
+    mip_model <- iv_model(dataset = merged_data, "mip_mig",    iv = iv, dpa_corrected = dpa_corrected)
     
     coef_map <- 
       if(iv){
