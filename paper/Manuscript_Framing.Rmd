@@ -11,13 +11,13 @@ output:
 # subtitle: Manuscript prepared for the 12th Annual Conference of the European Political Science Association in Prague, Czech Republic
 fontsize: 12pt
 geometry: margin=1.5in
-abstract: "A large body of evidence from experimental work suggests that individual attitudes can easily be altered by emphasizing different aspect of an the issue at stake. However, such experimental studies of *emphasis framing* are limited in their emulation of the real world, where consumers are treated by multiple sources, select their news content, and pay more or less attention compared to the experimental setting. I exploit a rare change in news framing in the major German tabloid paper - *Bild* - to study whether experimental estimates of framing effects translate to the real world. In a first step, I apply supervised transformer models to a novel dataset of 2.5M news articles and provide evidence of a substantial shift in *Bild*'s migration framing following an editorial change. Second, I use a difference-in-differences design on a panel datset of over 16,000 individuals in ten waves to assess the precise impact on migration attitudes. The estimated effect is thirty times smaller than similar estimates from experimental studies, statisticially indistinguishable from zero, and significantly smaller than even minimal relevant effect magnitudes. Further analyses show that no change can be observed on other, related dependent variables either, and suggest that the change did not result in outward or inward selection into the newspaper. Taken together, these findings fundamentally challenge the external validity of framing effects research and suggests more limited influence of the news media on public opinion than previously thought."
+abstract: "A large body of experimental work suggests that individual attitudes can easily be altered by emphasizing different aspects of the issue at stake. However, such experimental studies of *emphasis framing* are limited in their emulation of the real world, where consumers are treated by multiple sources, select their news content, and pay more or less attention compared to the experimental setting. I exploit a rare change of news framing in the major German tabloid newspaper *Bild* to study whether experimental estimates of framing effects translate into the real world. In a first step, I apply supervised transformer models to a novel dataset of 2.5M news articles and provide evidence of a substantial shift in the paper's migration framing following an editorial change. Second, I use a difference-in-differences design on a panel datset of over 16,000 individuals in ten waves to assess the precise impact on migration attitudes. The estimated effect is thirty times smaller than similar estimates from experimental studies, statisticially indistinguishable from zero, and significantly smaller than even minimal relevant effect magnitudes. Further analyses show that no change can be observed on other, related dependent variables either and show no evidence for outward or inward selection into the newspaper. Taken together, these findings fundamentally challenge the external validity of framing effects research and suggests more limited influence of the news media on public opinion than previously thought."
 bibliography: C:/Users/nicol/Dropbox/Studium/BibTex/PhD.bib
 ---
 
 ```{r setup, include = F}
 
-knitr::opts_chunk$set(echo = F, message = F, warning = F, cache = F, fig.height=6, fig.width=10, fig.align='center', eval = T)
+knitr::opts_chunk$set(echo = F, message = F, warning = F, cache = T, fig.height=6, fig.width=10, fig.align='center', eval = T)
 
 
 library(tidyverse)
@@ -27,7 +27,7 @@ library(fixest)
 library(lubridate)
 library(patchwork)
 library(here)
-library(censReg)
+
 
 
 # load self-made functions
@@ -39,9 +39,11 @@ for (filename in list.files(here("code/functions"))){
 
 WORD COUNT:
 
-*I am thankful for extensive feedback and other support on this manuscript from Christian Arnold, Daniel Bischof, Philipp Broniecki, Jóhanna Ýr Bjarnadóttir, Elias Dinas, Florian Foos, Felix Hagemann, Violetta Haas, Julian Heid, Christina Gahn, Heike Klüver, Martin Vinæs Larsen, Matthew Levendusky, Will Lowe, Thomas M. Meyer, Rune Slothuus, Judith Spirig, Antonio Valentim as well as participants in the EPSIP Colloquium at HU Berlin, CIVICA EGN Workshop at the EUI, CompText Conference 2022, and the Political Behaviour Section at Aarhus University. I also thank the two RAs, Robin Groß and Nathalie Aerts, for annotating the news articles. All remaining confusions are my own.*
+*I am thankful for extensive feedback and other support on this manuscript from Christian Arnold, Daniel Bischof, Philipp Broniecki, Jóhanna Ýr Bjarnadóttir, Elias Dinas, Florian Foos, Violetta Haas, Felix Hagemann, Julian Heid, Christina Gahn, Heike Klüver, Martin Vinæs Larsen, Matthew Levendusky, Will Lowe, Thomas M. Meyer, Rune Slothuus, Judith Spirig, Antonio Valentim as well as participants in the EPSIP Colloquium at HU Berlin, CIVICA EGN Workshop at the EUI, CompText Conference 2022, and the Political Behaviour Section at Aarhus University. I also thank the two RAs, Robin Groß and Nathalie Aerts, for annotating the news articles. All remaining confusions are my own.*
 
 # Introduction: Does Framing Matter?
+
+<!--# Limits of observational framing studies, field experiments unethical & expensive, natural experiments rare, summary of study  -->
 
 The persuasiveness of the news media has been a fixation of research on political communication and public opinion for at least the past 100 years. One of the largest fields within this literature is concerned with framing effects. A huge body of experimental evidence suggests that citizens substantially alter their issue attitudes when presented with different frames [@Busby2019; @Chong2007b; @Leeper2020; @Nelson1996; @Nelson1997Rally; @sniderman2004structure; @Slothuus2008a]. However, there is little research investigating whether these findings translate into a messy reality [@Barabas2010], where frames are communicated by specific actors, and citizens self-select into media outlets, potentially shielding them from some frames and exposing them to others.
 
@@ -53,9 +55,69 @@ The results show that emphasis framing does not affect citizens' political attit
 
 The paper will proceed as follows: in the next section I will briefly discuss the existing literature on framing and media effects, before describing the theoretical framework and research design, including case, measurement, and estimation strategy. The results section will then showcase findings from difference-in-differences and fixed-effect models assessing the impact of increased emphasis of crime in news coverage about migration, both on the association of attitudes about crime with attitudes about migration, as well as migration attitudes themselves. Lastly, I discuss the wider implications of the findings for the study of framing effects and the role of the news media in the opinion formation process.
 
+<!--# Need to explain emphasis framing in the introduction or move chapter from below up here, as well as open up distinction of frames in though and frames in communcation -->
+
 # Limits of Framing Experiments
 
-<!-- look at rune's comments regarding this chapter - keep focusing on framing effects literature -->
+<!--# add example of typical emphasis framing experiment -->
+
+Experiments offer strong internal validity at the cost of weaker external validity, compared to observational research. Framing effect studies offers strong evidence that the association of issues with different considerations in political communication can change reported attitudes about these issues, however it is unclear whether changing news content in the real world affects consumers' attitudes similarly. Figure \@ref(fig:causalPath) shows the main causal steps between frames in news content and reported individual attitudes. First (step 1), a frame in communication in news content needs to be presented to a respondent. While framing studies usually simply present a news article or other forms of political content to respondents, news content in the real world competes with other news and entertainment content to reach its audience. Additionally, changes in news framing itself might affect how likely readers are to consume news content: readers might be less likely to consume frames challenging their existing attitudes and reject news outlets containing such frames (and vice versa seek out attitudinally congruent information). This idea of 'selective exposure/avoidance' [@Bennett2008], or a a 'confirmation bias' [@Taber2006] or is one of the main arguments against the use of correlational evidence to study the effect of news content.
+
+Once the consumer receives the content, e.g. buys a newspaper, visits its website, or is exposed otherwise, it is not clear whether the content is actually engaged with (step 2). E.g., a consumer might well buy a newspaper but skip an article after reading the headline because the topic is not of interest or the frame is at odds with their existing attitude [@Lau2021a]. Exposure is different from consumption mainly in that consumers actively decide to willfully engage with content rather than passively being exposed to it. As most framing studies do not offer choice of content to respondents, this steps remains an assumption in experimental studies. The assumptions of exposure and consumption in classic framing studies represent a high hurdle for the translation of experimental effects into the real world.
+
+Step 3 connects the newspaper content [i.e. the frame in communication; @Kinder1990] with the cognition of the exposed. While the preceding steps concerned the content reaching the respondent, this step is concerned with whether the consumer of the frame actually understands the frame being communicated correctly. Step 4 makes the leap from understanding the frame to increasingly associating the issue with the raised consideration - the major mechanism by which emphasis framing is assumed to change attitudes. Step 5 then translates these changing associations into (private) attitudes, while step 6 translates them into reported attitudes. Steps 3-6 are part of any framing experiment. However, this does not mean that they might not differ in the real world. Consumption might result in better or worse comprehension in the real world (step 3) because respondents might pay more or less attention to real news content compared to experimental treatments [@Barabas2010]. Even after understanding the frame, there might be differences in how easily this translate into changing cognitive associations, given that those exposed might take real-world content more seriously. The core step of emphasis framing (5) is the change in attitudes following an increased association of an issue with the consideration raised by a presented frame. This step is likely unchanged given the mechanic translation of weighted considerations into attitudes assumed in emphasis framing theory [@Ajzen2000; @Nelson1997Rally]. Lastly, attitudes have to translate into reported attitudes. While this is heavily context dependent [see e.g. @DinasSocialNorms] and differs based on the survey mode [SOURCE], it is unlikely to differ heavily in this study where attitudes are measured in a survey.
+
+To summarize, the main challenges in the translation of experimental framing effect studies into the real world stem from 1) exposure and 2) consumption, whereas the always limited realism of treatments in experiments might limit 3) comprehension of frames in communication, as well as 4) their translation into a strengthened association of issue and consideration.
+
+```{r causalPath, fig.align='center', fig.cap="Causal pathway of framing effect.", out.height="45%"}
+
+graph <- "digraph boxes_and_circles {
+          
+            rankdir = 'LR'
+            bgcolor = 'white'
+          
+            # a 'graph' statement
+            graph [overlap = false]
+          
+            # several 'node' statements
+            node [shape = plaintext,
+                  fontname = Verdana,
+                  fontcolor = black,
+                  fontsize = 15]
+            A [label = '         News Content         ']
+            B [label = 'Exposure']
+            C [label = 'Consumption']
+            D [label = '  Cognitive Comprehension  ']
+            E [label = 'Cognitive Association']
+            F [label = 'Attitude']
+            G [label = 'Reported Attitude']
+          
+          
+          
+            # several 'edge' statements
+            edge [fontname = Verdana,
+                  fontsize = 15,
+                  minlen = 0.3]
+            A->B[label='  1', color = red, fontcolor = red, arrowhead = dot]
+            B->C[label='  2', color = red, fontcolor = red, arrowhead = dot]
+            C->D[label='  3', color = red, fontcolor = red, arrowhead = dot]
+            D->E[label='  4', color = red, fontcolor = red, arrowhead = dot]
+            E->F[label='  5']
+            F->G[label='  6']
+          }
+          "
+
+DiagrammeR::grViz(graph) %>% 
+  DiagrammeRsvg::export_svg() %>% 
+  charToRaw() %>% 
+  rsvg::rsvg_pdf(here("paper/vis/CausalPath.pdf"))
+
+knitr::include_graphics(here("paper/vis/CausalPath.pdf"))
+
+
+```
+
+<!--# look at rune's comments regarding this chapter - keep focusing on framing effects literature, rework part below -->
 
 Research on framing has shown for decades that citizens' attitudes are highly reactive to minor changes in question wording and emphasis of specific considerations. However, it remains unclear how well these experimental findings translate into the real world, where citizens self-select into media content, receive cues from political actors, and are usually more concerned with their private lifes than politics. Scholarly effort has therefor been devoted to test the conditions under which framing effects materialize, designing experiments which emulate different aspects of real-world environments. For example,it has been shown that exposure to conflicting frames can serve to strengthen the effect of frames one was earlier exposed to, dependent on individual preconditions [@Bechtel2015; @Chong2013; @Druckman2012]. Others have assessed what influence the sender of a frame has and shown that the effects of framing are more pronounced when the sponsor of the frame is from one's own party [@Druckman2001; @Slothuus2010b; @Slothuus2010]. Lastly, concerns about the duration of framing effects have been addressed by some experimental research showing that those effects can last at least several weeks [@Lecheler2011]. (missing here: Lau et al)
 
@@ -271,4 +333,3 @@ This study estimated the causal effect of news framing on migration attitudes, e
 
 <!-- might add: election campaign might expose people to more debate, plus general shift towards more restrictive attitudes ("Zeitgeist") -->
 
-# Resources
