@@ -1,5 +1,5 @@
 ---
-title: "Framing Effects in the Wild: How the News Media Shapes Public Opinion by Defining Political Issues"
+title: "Framing Effects in the Wild"
 author: "Nicolai Berk"
 date: "`r Sys.Date()`"
 output:
@@ -8,10 +8,10 @@ output:
     fig_caption: yes
     includes:
       in_header: preamble.tex
-subtitle: Manuscript prepared for the 12th Annual Conference of the European Political Science Association in Prague, Czech Republic
+# subtitle: Manuscript prepared for the 12th Annual Conference of the European Political Science Association in Prague, Czech Republic
 fontsize: 12pt
 geometry: margin=1.5in
-abstract: "A vast body of research is devoted to the persuasive effects of news framing. However, the study of the effects of framing has almost exclusively taken an experimental approach, with limited external validity. I provide the first observational estimate of framing effects by exploiting a unique case from Germany, where an editorial change in Germany's largest tabloid - *Bild* - led to a substantial shift in the paper's migration framing. Combining panel data from over 15,000 individuals with content analysis of 2.5 million newspaper articles using transformer models and a difference-in-differences design, I show that a substantial increase in the emphasis of crime in migration coverage did not affect immigration attitudes, nor did it increase the association of migration attitudes with attitudes about crime. These findings fundamentally challenge the generalizability of framing effects research and question worries about the news media|s power to shape public opinion."
+abstract: "A large body of evidence from experimental work suggests that individual attitudes can easily be altered by emphasizing different aspect of an the issue at stake. However, such experimental studies of *emphasis framing* are limited in their emulation of the real world, where consumers are treated by multiple sources, select their news content, and pay more or less attention compared to the experimental setting. I exploit a rare change in news framing in the major German tabloid paper - *Bild* - to study whether experimental estimates of framing effects translate to the real world. In a first step, I apply supervised transformer models to a novel dataset of 2.5M news articles and provide evidence of a substantial shift in *Bild*'s migration framing following an editorial change. Second, I use a difference-in-differences design on a panel datset of over 16,000 individuals in ten waves to assess the precise impact on migration attitudes. The estimated effect is thirty times smaller than similar estimates from experimental studies, statisticially indistinguishable from zero, and significantly smaller than even minimal relevant effect magnitudes. Further analyses show that no change can be observed on other, related dependent variables either, and suggest that the change did not result in outward or inward selection into the newspaper. Taken together, these findings fundamentally challenge the external validity of framing effects research and suggests more limited influence of the news media on public opinion than previously thought."
 bibliography: C:/Users/nicol/Dropbox/Studium/BibTex/PhD.bib
 ---
 
@@ -37,9 +37,9 @@ for (filename in list.files(here("code/functions"))){
 
 ```
 
-WORD COUNT: 6,596
+WORD COUNT:
 
-*I am thankful for extensive feedback on earlier stages of this draft from Christian Arnold, Daniel Bischof, Philipp Broniecki, Jóhanna Ýr Bjarnadóttir, Elias Dinas, Florian Foos, Felix Hagemann, Julian Heid, Christina Gahn, Heike Klüver, Martin Vinæs Larsen, Matthew Levendusky, Will Lowe, Thomas M. Meyer, Rune Slothuus, Judith Spirig, Antonio Valentim as well as participants in the EPSIP Colloquium at HU Berlin, CIVICA EGN Workshop at the EUI, CompText Conference 2022, and the Political Behaviour Section at Aarhus University. I also thank the two RAs, Robin Groß and Nathalie Aerts, for annotating the news articles. All remaining confusions are my own.*
+*I am thankful for extensive feedback and other support on this manuscript from Christian Arnold, Daniel Bischof, Philipp Broniecki, Jóhanna Ýr Bjarnadóttir, Elias Dinas, Florian Foos, Felix Hagemann, Violetta Haas, Julian Heid, Christina Gahn, Heike Klüver, Martin Vinæs Larsen, Matthew Levendusky, Will Lowe, Thomas M. Meyer, Rune Slothuus, Judith Spirig, Antonio Valentim as well as participants in the EPSIP Colloquium at HU Berlin, CIVICA EGN Workshop at the EUI, CompText Conference 2022, and the Political Behaviour Section at Aarhus University. I also thank the two RAs, Robin Groß and Nathalie Aerts, for annotating the news articles. All remaining confusions are my own.*
 
 # Introduction: Does Framing Matter?
 
@@ -53,7 +53,7 @@ The results show that emphasis framing does not affect citizens' political attit
 
 The paper will proceed as follows: in the next section I will briefly discuss the existing literature on framing and media effects, before describing the theoretical framework and research design, including case, measurement, and estimation strategy. The results section will then showcase findings from difference-in-differences and fixed-effect models assessing the impact of increased emphasis of crime in news coverage about migration, both on the association of attitudes about crime with attitudes about migration, as well as migration attitudes themselves. Lastly, I discuss the wider implications of the findings for the study of framing effects and the role of the news media in the opinion formation process.
 
-# Framing Effects vs. Media Effects
+# Limits of Framing Experiments
 
 <!-- look at rune's comments regarding this chapter - keep focusing on framing effects literature -->
 
@@ -135,7 +135,8 @@ To identify migration coverage containing the crime consideration and thereby as
 
 
 
-TreatmentTrendPlot() + TreatmentDiDPlot()
+TreatmentTrendPlot() + 
+  TreatmentDiDPlot()
 
 
 
@@ -165,6 +166,8 @@ $$
 
 The dependent variable $y_{it}$ indicates a respondent's migration attitude in a given survey wave, measured on the Likert scale described above. The conditioning variable $BildReader_i$ is a simple binary variable indicating whether respondents read *Bild* in the past week and is measured in the pre-treatment wave. $Post_t$ indicates whether an interview took place preceding or following the editorial change. The estimator of interest is $\beta_3$, which indicates the change in migration attitudes of *Bild* readers following the editorial change, controlling for pre-treatment differences ($BildReader_i$), as well as general pre-post shifts in migration attitudes ($Post_t$).
 
+## Difference of Treated and Untreated Units [or matching]
+
 ## Expected Effect Size
 
 Despite the abundance of framing effects studies, no common standard of the magnitude of framing effects exists. Even the correct measurement of the magnitude is a contested question, as different control groups can be compared [see @Chong2007a, 109f for a discussion]. Additionally, framing effects differ based on the polarization and salience of the issue [@Lecheler2009a], repeated exposure [@Chong2007competitiveFraming], the sender [@Slothuus2010], political knowledge [@Chong2007b], as well as the reference of certain groups [@Nelson1996]. Generally, reported effect size around 30% of the scale are not uncommon [@Slothuus2010], sometimes even over 40% [@Chong2007a, 104], but most results seem to lie in between 10% and 25% of the scale when comparing pro and con arguments [@Lecheler2009a; @Nelson1997Psychology; @Nelson1997Rally; @Slothuus2008; @Slothuus2010], as most studies lack a neutral control group. As experimental treatments are likely designed in order to elicit strong responses, and given biases towards null effects in the production of scientific knowledge [SOURCE], reported effects likely display a selection bias towards strong treatments. The treatment can be considered rather strong here, as the crime consideration is associated with strongly negative evaluations and the relative increase in the prevalence of this content is large. Additionally, given that readers already consumed that newspapers, the qualities of the sender should rather increase the effect size, while the high salience of the issue should decrease it. Given these considerations, I expect an effect of around 10% of the scale, or 0.6 on the seven-point scale[^1], which represents a conservative estimate.
@@ -174,6 +177,8 @@ Despite the abundance of framing effects studies, no common standard of the magn
 As suggested by @Laken2017, I also estimate equivalence bounds indicating the smallest effect size of interest (SESOI, indicated by dotted orange line in the graph), as well as a conservative estimate of the experimentally expected effect. I define the SESOI at a 2.5% change, or 0.15 on the seven-point scale, which represents a fraction of the conservative experimental estimate and sets a fairly low bar given the strong treatment. This SESOI can be used to define equivalence bounds. Any effect estimated to lie within these bounds with statistical significance (i.e. a 90%-confidence interval in-between the positive and negative effect of this size) is too small to constitute a meaningful effect, as the hypothesis that the effect is *not* equivalent to zero can be rejected [see also @Peyton2020].
 
 # Results
+
+## Effect on Migration Attitude
 
 ```{r singlemodel}
 
@@ -190,7 +195,6 @@ gles_p_long["dv"] <- gles_p_long["1130_clean"]
 single_model <- 
   fixest::feglm(dv ~ post*treat | lfdn + wave_ctrl, 
                 data = 
-                  # add control for different post-waves
                   gles_p_long %>% 
                   filter(!is.na(dv)) %>% 
                   mutate(
@@ -209,21 +213,12 @@ p_ATT <- single_model$coeftable["postTRUE:treatTRUE", "Pr(>|t|)"]
 
 ```
 
-Figure \@ref(fig:singledv) visualizes the effect of the change in framing on immigration attitudes. Green, dashed vertical lines indicate the expected effect from the experimental literature. The orange dotted lines indicate the equivalence boundaries. If the 90% interval is contained within these boundaries, the hypothesis that the estimate is larger than the SESOI can be rejected. The point estimate indicates a `r round(ATT, 3)`-point change among Bild readers following treatment (\$t = \$ `r round(t_ATT, 2)`, \$p = \$ `r round(p_ATT, 2)`), which is around `r round(ATT*100/0.6)`% of the expected effect of 0.6. The 95% confidence intervals also contains values far smaller than the SESOI of 0.15 but clearly include the vertical red line indicating no change. Clearly, the model suggests a null effect.
+Figure \@ref(fig:singledv) visualizes the effect of the change in framing on immigration attitudes. Dashed vertical lines indicate the expected effect from the experimental literature. The dotted lines indicate the equivalence boundaries. If the 90% interval is contained within these boundaries, the hypothesis that the estimate is larger than the SESOI can be rejected. The point estimate indicates a `r round(ATT, 3)`-point change among Bild readers following treatment (\$t = \$ `r round(t_ATT, 2)`, \$p = \$ `r round(p_ATT, 2)`), which is around `r round(ATT*100/0.6)`% of the expected effect of 0.6. The 95% confidence intervals also contains values far smaller than the SESOI of 0.15 but clearly include the vertical red line indicating no change. Clearly, the model suggests a null effect.
 
-```{r singleplot, fig.cap="Standardised Effect of Change in Framing on Alternative Dependent Variables", fig.height=2}
+```{r singleplot, fig.cap="Effect of change in framing on migration attitudes; difference-in-differences estimate.", fig.height=2}
 
-# add 0.9 confidence bar
+DiDPlot(multi = F, scaled = "raw", theoretical_effect_size = 0.6, boundary_share = 0.25)
 
-EffectPlot(multi = F, scaled = "raw", theoretical_effect_size = 0.6, boundary_share = 0.25)
-
-```
-
-```{r multidv, fig.cap="Standardised Effect of Change in Framing on Alternative Dependent Variables"}
-
-# add 0.9 confidence bar
-
-EffectPlot(multi = T, scaled = T, theoretical_effect_size = 0.2) # 0.2 SD suggested by Peyton 2020, 599
 
 ```
 
@@ -235,12 +230,18 @@ To address potential long-term effects of this change in migration framing, figu
 
 # add 0.9 confidence bar
 
-EffectByWavePlot(theoretical_effect_size = 0.6, boundary_share = 0.25)
-# would add 2 (or 3) lines here: 
-#   minimal relevant effect (5%/0.3 on 7-point scale); 
-#   conservative experimental effect (10%/0.6)
-#   large (not maximum) experimental effect (30%/2.4)
+DiDByWavePlot(theoretical_effect_size = 0.6, boundary_share = 0.25)
 
+
+```
+
+## Effect on other dependent variables
+
+```{r multidv, fig.cap="Standardised Effect of Change in Framing on Alternative Dependent Variables"}
+
+# add 0.9 confidence bar
+
+DiDPlot(multi = T, scaled = T, theoretical_effect_size = 0.2) # 0.2 SD suggested by Peyton 2020, 599
 
 ```
 
@@ -259,6 +260,8 @@ MigCrimeCorPlot()
 MigCrimeCorTable()
 
 ```
+
+## Outward Selection
 
 # Conclusion: Framing Effects in the Real World
 
