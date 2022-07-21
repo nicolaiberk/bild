@@ -51,8 +51,8 @@ TreatmentTrendPlot <- function(size = 1,
                                palette = c("red", "black"),
                                maxdate = as.Date("2020-01-01"),
                                mindate = as.Date("2015-01-01"),
-                               aggregation = "quarter",
-                               dpa_corrected = T) {
+                               aggregation = "month",
+                               dpa_corrected = F) {
   
   ## load BERT data
   bert_ests_raw <- 
@@ -110,7 +110,7 @@ TreatmentDiDPlot <- function(size = 1,
                              palette = c("red", "black"),
                              maxdate = as.Date("2020-01-01"),
                              mindate = as.Date("2015-01-01"),
-                             dpa_corrected = T){
+                             dpa_corrected = F){
   
   
   ## load BERT data
