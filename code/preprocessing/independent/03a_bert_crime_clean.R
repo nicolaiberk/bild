@@ -69,7 +69,7 @@ articles <-
                      paper == "faz"  ~ "FAZ",
                      paper == "sz"   ~ "SZ",
                      paper == "bild" ~ "Bild")) %>% 
-  filter(paper != "Spiegel") %>%  # as Spiegel not part of the analysis
+  # filter(paper != "Spiegel") %>%  # as Spiegel not part of the analysis
   filter(date_clean < as.Date("2020-01-01")) # data only collected until end of 2019, some dates are off
   
   
