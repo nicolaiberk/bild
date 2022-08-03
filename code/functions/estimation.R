@@ -371,3 +371,45 @@ TobitDiD <- function(dv_name,
   
   
 }
+
+SelectionModel <- function() {
+  
+  ## load data
+  gles_p_long <- 
+    fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
+    as_tibble()
+  
+  ## define parameters
+  postdate <- as.Date("2017-02-01")
+  
+  ## select relevant sample
+  gles_p_long <- 
+    gles_p_long %>% 
+    filter(
+      bild_init, ## restrict to Bild readers
+      init_mig_groups != "", ## exclude missings in first wave
+      !is.na(date_clean),
+      wave %in% c(1, 3, 4, 6:8)) %>%
+    mutate(init_mig_groups = 
+             factor(init_mig_groups, 
+                    levels = c("Liberal", 
+                               "Neutral",
+                               "Conservative")),
+           dv = `1661a_bin`,
+           post = date_clean >= postdate
+    )
+    
+  
+  
+  ## model
+  lm(
+    dv ~ init_mig_groups,
+    data = 
+      gles_p_long %>% 
+      filter(wave != "1")
+  ) %>% 
+    return()
+  
+  
+}
+
