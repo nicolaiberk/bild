@@ -27,6 +27,8 @@ for (filename in list.files(here("code/functions"))){
 
 ## Market Coverage of Different Newspapers
 
+Table 1 shows the number of print copies sold and online page impressions for each newspaper per day. It becomes clear that German newspapers have a rather important position in the German news market. The tabloid \textit{Bild} has by far the largest reach, with over 1.7 Million sold newspaper daily and around 550 million web visits per month. For reference: the German Wikipedia site had less than twice as many visits (975 million) in the same time frame \footnote{Wikipedia Siteviews Analyisis: https://pageviews.wmcloud.org/siteviews/}. Bild is closely followed by the weekly published \textit{Spiegel}. The daily broadsheets sell less, and interestingly the online presence seems to be dominated by the right, given the weak presence of centre-left \textit{SZ} and left-wing \textit{taz}.
+
 ```{=tex}
 \begin{table}[!htbp] \centering
     \begin{tabular}{@{\extracolsep{5pt}} lcc}
@@ -54,21 +56,60 @@ for (filename in list.files(here("code/functions"))){
 
 ### Crime
 
-# Structural Topic Model
+### Correcting for change in DPA-sourced content
+
+Among the changes after Reichelt's takeover as chief editor of *Bild* was a severe drop in the overall number of articles published online. Figure \@ref(fig:dpaShare) shows the monthly number of articles *Bild* published in their online archive across time. Recall that Reichelt took over in February 2017, and briefly after - in June 2017 - the overall number of articles published decreases by over 60%. The graph also suggests an explanation for this sudden shift: the share of articles sourced from DPA, a major German press agency alike the Associated Press, sharply decreases at the same time as the major decrease in the number of articles takes place (see top blue bars). While the decision to discontinue buying content from DPA must have been made by Reichelt himself (and is thus an outcome of the treatment), it might nevertheless affect the measurement of migration framing in *Bild*. DPA is a press agency supplying many German news outlets, which means it must have a rather unbiased or at least centrist coverage, potentially decreasing the estimate of crime frames within Bild's migration content. This would not be a problem, as long as this content is equally likely to make it to the front page. However, *Bild* likely gives more weight to its own content compared to pre-written content from DPA. It is therefore necessary to assess whether the change in framing persists when excluding DPA content.
+
+```{r dpaShare, fig.cap="Monthly number of articles by source."}
+
+data.table::fread(here("data/raw/newspapers/_bild_articles.csv"), 
+                  encoding = "UTF-8") %>% 
+  mutate(
+    dpa = str_detect(text, "(dpa)")
+  ) %>% 
+  mutate(month = lubridate::floor_date(date, "month")) %>% 
+  mutate(
+    dpa = ifelse(dpa, "DPA", "Original")
+  ) %>%
+  ggplot(aes(x = month, fill = dpa)) +
+  geom_bar() +
+  theme_minimal() +
+  ggtitle("Monthly number of articles, Bild online", "By origin, 2013-2019") + 
+  xlab("") + ylab("N") +
+  scale_fill_manual(name = "Source",
+                    values = MetBrewer::met.brewer("Archambault", 2))
+
+
+```
+
+The left panel of figure \@ref(fig:treatmentDPAcorr) displays the quarterly share of migration articles discussing crime for *Bild* compared to all other newspapers. The depression visible in the original plot in 2016-2017 is not visible anymore, as is the sharp increase in June 2017. Instead, the share of crime content in Bild's migration coverage increases directly after the takeover by Reichelt. The gap between Bild and all other newspapers increases, and this increased difference persists. This change becomes even more visible in the right-hand panel, which shows a difference-in-differences estimate of the change of the share of crime news in a newspapers migration content, this time controlling for whether the content is DPA-sourced or not. The general picture is quite similar to the original estimate in the paper, as migration coverage only increases in Bild, while all other outlets remain rather stable on this metric. The only difference is that in this estimate, the share of migration coverage devoted to crime 'only' increases by 5 percentage points, which still constitutes a very substantial increase.
+
+```{r treatmentDPAcorr, fig.cap="Change in share of crime content in newspaper coverage, excluding DPA-sourced news content. Left panel: quarterly share across time, Bild compared to other newspapers' average. Right panel: difference-in-differences estimates of change in newspaper coverage compared to other newspapers, controlling for source of content."}
+
+TreatmentTrendPlot(dpa_corrected = T) + 
+  TreatmentDiDPlot(dpa_corrected = T)
+
+```
+
+## Structural Topic Model
 
 To identify different considerations about migration in news coverage, I estimate a structural topic model with 60 topics for the nearly 90,000 migration articles in the full period (2013-2019)\footnote{The topics' prevalence along with the most important words can be assessed in the appendix.}. The number of topics was chosen to strike a balance between the computational and human resources necessary to estimate and annotate the topics and finding appropriate topics for the large corpus of nearly 90,000 migration articles\footnote{Currently, I work to identify crime content using supervised models (similar to the identification of migration content) to provide a specific estimate of the attention to the consideration of interest. I will also analyse the data with embedding regression, assessing how the meaning of migration related terms like 'migrant', 'asylum' or 'syrian' changed in Bild compared to other newspapers}. Topic prevalence is estimated as a function of the release date of the article, as well as the newspaper it has been published in. The 60 topics' most predictive words and ten most representative articles were assessed to identify and label the content of each topic, and all topics related to crime (two in total) are selected and their prevalence added together for a daily measure of attention to crime in each newspaper.
 
-## Treatment
+### Treatment
 
-## Modeling Exposure with STM in TWFE Model
+# Readership models
 
+## Inward selection
 
+```{r inselection fig.cap = "Coefficients of OLS regression of readership on migration attitude across waves. Vertical lines indicate 95% confidence intervals, dashed (red) vertical line indicates editorial change."}
+
+InSelection()
+
+```
 
 # Difference-in-Differences Estimates
 
-Treated Group: Bild Readers in first (and only pre-treatment) wave.
-Control Group: Never-Readers of Bild.
-Post Date: $>=$ 01.02.2017
+Treated Group: Bild Readers in first (and only pre-treatment) wave. Control Group: Never-Readers of Bild. Post Date: $>=$ 01.02.2017
 
 ## Descriptives
 
@@ -103,6 +144,18 @@ rm(gles_p_long, desc)
 
 Note that the variable "Birthyear" is left-censored in the data. All respondents born before 1955 were assigned 1955 as birth year.
 
+## DiD assumptions
+
+### Parallel Trends
+
+Figure \@ref(fig:parallelTrends) shows the development of migration attitudes among a panel of Bild readers\footnote{Readership was measured in a single wave in late 2015.} and non-readers across time, recorded in the German Longitudinal Election Study's Longterm Panel [@SOURCE]. This is a far smaller sample with a limited time frame and hence less useful for the precise estimation of the effects of changing migration framing. The plot shows that both groups move along a similar long-term trend, slowly becoming more conservative, while moving into similar directions along the way. The only difference between the two groups is that Bild readers seem to be more conservative in late 2015 (note that only the last three interviews were conducted in January 2016). However this deviation lies well within the 95% confidence interval and those not reading Bild move in a similar direction, albeit less strongly. The parallel trends assumption seems to be generally met.
+
+```{r parallelTrends, fig.cap = "Migration Attitude among Bild-readers compared to non-readers across Time"}
+
+ParallelTrendsPlot()
+
+```
+
 
 ## Variable: Immigration Attitudes
 
@@ -112,12 +165,12 @@ Note that the variable "Birthyear" is left-censored in the data. All respondents
 
 Jetzt geht es um Zuzugsmöglichkeiten für Ausländer. Sollten die Zuzugsmöglichkeiten für Ausländer erleichtert oder eingeschränkt werden?
 
-(1) 1 Zuzug von Ausländern erleichtern 
-(2) 2  
-(3) 3  
-(4) 4  
-(5) 5  
-(6) 6  
+(1) 1 Zuzug von Ausländern erleichtern
+(2) 2\
+(3) 3\
+(4) 4\
+(5) 5\
+(6) 6\
 (7) 7 Zuzug von Ausländern einschränken
 
 *Transformed to [-3, 3].*
@@ -142,6 +195,7 @@ fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>%
   theme_minimal()
 
 ```
+
 #### Treatment groups across time, by prior attitude
 
 ```{r did_imm_att_plot_groups}
@@ -163,22 +217,21 @@ fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>%
 
 #### Effect by prior opinion
 
-
 ```{r linearEffect}
 
 InterLinear() + 
   InterLinear(placebo = T)
 
 ```
+
 #### Regression to the mean among Bild readers
 
-- Placebo-treatment post Bundestagswahl (3-6 months after treatment)
-- Exclusing Bild readers actually treated
+-   Placebo-treatment post Bundestagswahl (3-6 months after treatment)
+-   Exclusing Bild readers actually treated
 
 ```{r}
 DiDPlot(placebo = T, exclude_pretreated = T, legend_position = "None") + InterLinear(placebo = T, exclude_pretreated = T)
 ```
-
 
 #### Effect of Reichelt takeover
 
@@ -206,8 +259,7 @@ rm(gles_p_long)
 
 ```
 
-
-#### Number of observations 
+#### Number of observations
 
 ```{r treat_initmig_obs, fig.cap="Number of observations in treatment and control group by pre-existing attitude."}
 
@@ -222,7 +274,6 @@ rm(gles_p_long)
 
 ```
 
-
 #### Conservative Outlets only
 
 ```{r did_imm_att_cons}
@@ -230,7 +281,6 @@ rm(gles_p_long)
 DiDModels("1130_clean", restrict_sample = "conservative_outlets")
 
 ```
-
 
 ```{r did_imm_att_cons_vis}
 
@@ -251,7 +301,6 @@ fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>%
 
 ```
 
-
 ### Outcome: Immigration Attitude Nonresponse (1130 = -99)
 
 ```{r did_imm_dodge}
@@ -264,15 +313,15 @@ DiDModels("1130_dodge")
 
 #### Question Text
 
-Es gibt unterschiedliche Auffassungen darüber, wie sehr sich Ausländer in Deutschland anpassen sollten. Manche denken, dass sich Ausländer vollständig an die deutsche Kultur anpassen sollten. Andere denken, Ausländer sollten auch hier möglichst nach der eigenen Kultur leben können. 
+Es gibt unterschiedliche Auffassungen darüber, wie sehr sich Ausländer in Deutschland anpassen sollten. Manche denken, dass sich Ausländer vollständig an die deutsche Kultur anpassen sollten. Andere denken, Ausländer sollten auch hier möglichst nach der eigenen Kultur leben können.
 
-(1) Ausländer sollten sich vollständig an die deutsche Kultur anpassen 
-(2)  
-(3)  
-(4)  
-(5)  
-(6)  
-(7) Ausländer sollten möglichst nach eigener Kultur leben können 
+(1) Ausländer sollten sich vollständig an die deutsche Kultur anpassen
+(2) 
+(3) 
+(4) 
+(5) 
+(6) 
+(7) Ausländer sollten möglichst nach eigener Kultur leben können
 
 *Recoded to [-3, 3].*
 
@@ -284,7 +333,6 @@ DiDModels("1210_clean")
 
 ```
 
-
 ### Outcome: Integration Attitude Nonresponse (1210 = -99)
 
 ## General Nonresponse/Attrition (1130 = -95)
@@ -295,13 +343,11 @@ DiDModels("participation")
 
 ```
 
-
-
 ## Variable: Voting Behaviour
 
 ### Outcome: Voting AfD (190b)
 
-Bei der Bundestagswahl können Sie ja zwei Stimmen vergeben. Die Erststimme für einen Kandidaten aus Ihrem Wahlkreis und die Zweitstimme für eine Partei. Was werden Sie auf Ihrem Stimmzettel ankreuzen? 
+Bei der Bundestagswahl können Sie ja zwei Stimmen vergeben. Die Erststimme für einen Kandidaten aus Ihrem Wahlkreis und die Zweitstimme für eine Partei. Was werden Sie auf Ihrem Stimmzettel ankreuzen?
 
 ```{r afd_vote}
 
@@ -309,9 +355,7 @@ DiDModels("afd_vote")
 
 ```
 
-
-
-### Outcome: Voting Nonresponse (190b = -99 | -98)
+### Outcome: Voting Nonresponse (190b = -99 \| -98)
 
 ```{r vote_mis}
 
@@ -340,6 +384,7 @@ DiDModels("430i_clean")
 DiDModels("mip_mig_crime")
 
 ```
+
 No effect, but also very low N.
 
 ### Outcome: MIP Migration (840s)
@@ -366,12 +411,12 @@ DiDModels("2880h_clean")
 
 #### Question
 
-Die staatlichen Befugnisse in der Kriminalitätsbekämpfung sollten ausgeweitet werden, auch wenn das zu einer stärkeren Überwachung der Bürger führt. 
+Die staatlichen Befugnisse in der Kriminalitätsbekämpfung sollten ausgeweitet werden, auch wenn das zu einer stärkeren Überwachung der Bürger führt.
 
-(1) stimme überhaupt nicht zu 
-(2) stimme eher nicht zu 
-(3) teils/teils 
-(4) stimme eher zu 
+(1) stimme überhaupt nicht zu
+(2) stimme eher nicht zu
+(3) teils/teils
+(4) stimme eher zu
 (5) stimme voll und ganz zu
 
 #### Bootstrap of correlations
@@ -469,7 +514,6 @@ rm(gles_p_long, inter, inter_fe, inter_cond, inter_fe_cond)
 
 ```
 
-
 ## Variable: Accuracy Motivation
 
 **This variable is only measured post-treatment**
@@ -503,7 +547,6 @@ DiDModels("1130_clean",
 
 ```
 
-
 # TWFE: BERT Estimates
 
 ## Distribution of Independent Variable
@@ -517,21 +560,19 @@ fread(here("data/processed/merged_bert.csv")) %>%
 
 ```
 
-
 ## Variable: Immigration Attitudes
 
 ### Outcome: Reduce Immigration (1130)
 
 Jetzt geht es um Zuzugsmöglichkeiten für Ausländer. Sollten die Zuzugsmöglichkeiten für Ausländer erleichtert oder eingeschränkt werden?
 
-(1) 1 Zuzug von Ausländern erleichtern 
-(2) 2  
-(3) 3  
-(4) 4  
-(5) 5  
-(6) 6  
+(1) 1 Zuzug von Ausländern erleichtern
+(2) 2\
+(3) 3\
+(4) 4\
+(5) 5\
+(6) 6\
 (7) 7 Zuzug von Ausländern einschränken
-
 
 ```{r ind_imm_att}
 
@@ -539,9 +580,7 @@ TWFEModels("1130_clean")
 
 ```
 
-
 ### Outcome: Immigration Attitude Nonresponse (1130 = -99)
-
 
 ```{r ind_imm_dodge}
 
@@ -549,18 +588,17 @@ TWFEModels("1130_dodge")
 
 ```
 
-
 ### Outcome: Integration Attitude (1210)
 
-Es gibt unterschiedliche Auffassungen darüber, wie sehr sich Ausländer in Deutschland anpassen sollten. Manche denken, dass sich Ausländer vollständig an die deutsche Kultur anpassen sollten. Andere denken, Ausländer sollten auch hier möglichst nach der eigenen Kultur leben können. 
+Es gibt unterschiedliche Auffassungen darüber, wie sehr sich Ausländer in Deutschland anpassen sollten. Manche denken, dass sich Ausländer vollständig an die deutsche Kultur anpassen sollten. Andere denken, Ausländer sollten auch hier möglichst nach der eigenen Kultur leben können.
 
-(1) Ausländer sollten sich vollständig an die deutsche Kultur anpassen 
-(2)  
-(3)  
-(4)  
-(5)  
-(6)  
-(7) Ausländer sollten möglichst nach eigener Kultur leben können 
+(1) Ausländer sollten sich vollständig an die deutsche Kultur anpassen
+(2) 
+(3) 
+(4) 
+(5) 
+(6) 
+(7) Ausländer sollten möglichst nach eigener Kultur leben können
 
 ```{r ind_int_att}
 
@@ -575,7 +613,6 @@ TWFEModels("1210_clean")
 TWFEModels("1210_dodge")
 
 ```
-
 
 ## Conditioning on Prior Exposure
 
@@ -595,9 +632,9 @@ Exposure has no conditioning effect - maybe conditional effect IS ceiling effect
 
 ### Outcome: Voting AfD (190b)
 
-Bei der Bundestagswahl können Sie ja zwei Stimmen vergeben. Die Erststimme für einen Kandidaten aus Ihrem Wahlkreis und die Zweitstimme für eine Partei. Was werden Sie auf Ihrem Stimmzettel ankreuzen? 
+Bei der Bundestagswahl können Sie ja zwei Stimmen vergeben. Die Erststimme für einen Kandidaten aus Ihrem Wahlkreis und die Zweitstimme für eine Partei. Was werden Sie auf Ihrem Stimmzettel ankreuzen?
 
-### Outcome: Voting Nonresponse (190b = -99 | -98)
+### Outcome: Voting Nonresponse (190b = -99 \| -98)
 
 ```{r ind_afd_dodge}
 
@@ -606,7 +643,6 @@ TWFEModels("vote_miss")
 ```
 
 ### Outcome: Scalometer AfD (430i)
-
 
 ```{r ind_afd_vote}
 
@@ -618,7 +654,6 @@ TWFEModels("430i_clean")
 
 ### Outcome: MIP Migrant Crime (840s)
 
-
 ```{r ind_mip_mig_crime}
 
 TWFEModels("mip_mig_crime")
@@ -627,13 +662,11 @@ TWFEModels("mip_mig_crime")
 
 ### Outcome: MIP Migration (840s)
 
-
 ```{r ind_mip_mig}
 
 TWFEModels("mip_mig")
 
 ```
-
 
 ## TWFE Conditional on Paper Consumed (driven by Bild-readers?)
 
@@ -645,7 +678,6 @@ TWFEModels("1130_clean", cond_var = "bild_init", cond_name = "Paper: Bild")
 
 Effect **lower** among Bild readers!
 
-
 <!-- # TWFE: STM Estimates -->
 
 <!-- **STM estimates currently NOT reliable - fix 04a_merge_stm.R** -->
@@ -655,12 +687,14 @@ Effect **lower** among Bild readers!
 <!-- ```{r stm_dist} -->
 
 <!-- fread(here("data/processed/merged_stm.csv")) %>%  -->
+
 <!--   ggplot(aes(crime_label_share)) +  -->
+
 <!--   geom_histogram(bins = 50, col = "white") + -->
+
 <!--   theme_minimal() -->
 
 <!-- ``` -->
-
 
 <!-- ## Variable: Immigration Attitudes -->
 
@@ -669,13 +703,18 @@ Effect **lower** among Bild readers!
 <!-- Jetzt geht es um Zuzugsmöglichkeiten für Ausländer. Sollten die Zuzugsmöglichkeiten für Ausländer erleichtert oder eingeschränkt werden? -->
 
 <!-- (1) 1 Zuzug von Ausländern erleichtern  -->
-<!-- (2) 2   -->
-<!-- (3) 3   -->
-<!-- (4) 4   -->
-<!-- (5) 5   -->
-<!-- (6) 6   -->
-<!-- (7) 7 Zuzug von Ausländern einschränken -->
 
+<!-- (2) 2   -->
+
+<!-- (3) 3   -->
+
+<!-- (4) 4   -->
+
+<!-- (5) 5   -->
+
+<!-- (6) 6   -->
+
+<!-- (7) 7 Zuzug von Ausländern einschränken -->
 
 <!-- ```{r ind_imm_att_stm} -->
 
@@ -683,9 +722,7 @@ Effect **lower** among Bild readers!
 
 <!-- ``` -->
 
-
 <!-- ### Outcome: Immigration Attitude Nonresponse (1130 = -99) -->
-
 
 <!-- ```{r ind_imm_dodge_stm} -->
 
@@ -693,17 +730,22 @@ Effect **lower** among Bild readers!
 
 <!-- ``` -->
 
-
 <!-- ### Outcome: Integration Attitude (1210) -->
 
 <!-- Es gibt unterschiedliche Auffassungen darüber, wie sehr sich Ausländer in Deutschland anpassen sollten. Manche denken, dass sich Ausländer vollständig an die deutsche Kultur anpassen sollten. Andere denken, Ausländer sollten auch hier möglichst nach der eigenen Kultur leben können.  -->
 
 <!-- (1) Ausländer sollten sich vollständig an die deutsche Kultur anpassen  -->
+
 <!-- (2)   -->
+
 <!-- (3)   -->
+
 <!-- (4)   -->
+
 <!-- (5)   -->
+
 <!-- (6)   -->
+
 <!-- (7) Ausländer sollten möglichst nach eigener Kultur leben können  -->
 
 <!-- ```{r ind_int_att_stm} -->
@@ -720,7 +762,6 @@ Effect **lower** among Bild readers!
 
 <!-- ``` -->
 
-
 <!-- ## Conditioning on Prior Exposure -->
 
 <!-- ### DV: Immigration Attitude -->
@@ -728,8 +769,11 @@ Effect **lower** among Bild readers!
 <!-- ```{r ind_cpond_explag_stm} -->
 
 <!-- TWFEModels("1130_clean",  -->
+
 <!--            cond = "crime_label_share_lag",  -->
+
 <!--            cond_name = "\nLagged Exposure", -->
+
 <!--            dataset = "stm") -->
 
 <!-- ``` -->
@@ -752,7 +796,6 @@ Effect **lower** among Bild readers!
 
 <!-- ### Outcome: Scalometer AfD (430i) -->
 
-
 <!-- ```{r ind_afd_scale} -->
 
 <!-- TWFEModels("430i_clean", dataset = "stm") -->
@@ -763,7 +806,6 @@ Effect **lower** among Bild readers!
 
 <!-- ### Outcome: MIP Migrant Crime (840s) -->
 
-
 <!-- ```{r ind_mip_mig_crime_stm} -->
 
 <!-- TWFEModels("mip_mig_crime", dataset = "stm") -->
@@ -772,13 +814,11 @@ Effect **lower** among Bild readers!
 
 <!-- ### Outcome: MIP Migration (840s) -->
 
-
 <!-- ```{r ind_mip_mig_stm} -->
 
 <!-- TWFEModels("mip_mig", dataset = "stm") -->
 
 <!-- ``` -->
-
 
 <!-- # TWFE Conditional on Paper Consumed (driven by Bild-readers?) -->
 
@@ -787,7 +827,3 @@ Effect **lower** among Bild readers!
 <!-- TWFEModels("1130_clean", cond_var = "bild_init", cond_name = "Paper: Bild", dataset = "stm") -->
 
 <!-- ``` -->
-
-
-
-
