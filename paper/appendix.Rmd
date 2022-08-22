@@ -107,6 +107,17 @@ InSelection()
 
 ```
 
+# Change in Migration Attitudes across time
+
+
+```{r}
+
+MigChangePlot()
+
+```
+
+[Add description of variable and explanation]
+
 # Difference-in-Differences Estimates
 
 Treated Group: Bild Readers in first (and only pre-treatment) wave. Control Group: Never-Readers of Bild. Post Date: $>=$ 01.02.2017
@@ -155,6 +166,23 @@ Figure \@ref(fig:parallelTrends) shows the development of migration attitudes am
 ParallelTrendsPlot()
 
 ```
+
+## Effect in Longterm-Panel
+
+### Reichelt
+
+```{r LTPDiD, fig.height=2}
+
+LTPDiD()
+
+```
+
+```{r LTPDiD_table}
+
+LTPDiD(return_table = T)
+
+```
+
 
 
 ## Variable: Immigration Attitudes

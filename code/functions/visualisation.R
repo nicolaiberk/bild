@@ -1086,8 +1086,8 @@ ParallelTrendsPlot <- function(){
                        values = color_palette) +
     scale_fill_manual(values = color_palette) +
     guides(lty = "none", fill = "none") +
-    ggtitle("Migration Attitude by Bild Readership", "GLES Longterm Panel") +
-    ylab("Share") + xlab("") +
+    ggtitle("Immigration Attitude by Bild Readership", "GLES Longterm Panel") +
+    ylab("< More liberal | more restrictive >") + xlab("") +
     hist + 
     guide_area() +
     plot_layout(guides = "collect",
@@ -1099,5 +1099,217 @@ ParallelTrendsPlot <- function(){
   
   
 }
+
+
+
+# Change in Migration Attitudes ####
+
+MigChangePlot <- function(return_table = F) {
+  
+  color_palette = MetBrewer::met.brewer("Archambault", 2)
+  
+  ## load GLES LTP data, wide to long
+  gles_ltp <- 
+    haven::read_dta(here("data/raw/gles/LongTermPanel/ZA5770_v1-0-0.dta")) %>% 
+    pivot_longer(
+      cols = jdatum:nwkrnr3,
+      names_to = c("Erhebung", ".value"),
+      names_pattern = "(.)(.*)"
+    )
+  
+  ## clean migration and readership variable
+  gles_ltp <- 
+    gles_ltp %>% 
+    mutate(
+      `285a_clean` = ifelse(`285a` < 0, NA, `285a` - 1),
+      `174b_clean` = ifelse(`174b` < 0, NA, `174b` - 6),
+      date_clean = 
+        as.Date(
+          case_when(
+            Erhebung == "j" ~ "2013-12-23",
+            Erhebung == "k" ~ "2014-12-11",
+            Erhebung == "l" ~ "2016-01-07",
+            Erhebung == "m" ~ "2016-12-15",
+            Erhebung == "n" ~ "2017-12-08",
+          ),
+          format = "%Y-%m-%d"
+        )
+    )
+  
+  
+  ## estimate attitude change since last wave
+  gles_ltp <- 
+    gles_ltp %>% 
+    select(lfdn, date_clean, Erhebung, `174b_clean`) %>% 
+    pivot_wider(lfdn, names_from = Erhebung, values_from = `174b_clean`, names_prefix = "mig_") %>% 
+    mutate(
+      change_l = abs(mig_l - mig_j),
+      change_n = abs(mig_n - mig_l)
+    ) %>% 
+    pivot_longer(
+      cols = change_l:change_n,
+      names_to = c(".value", "Erhebung"),
+      names_pattern = "(.*)_(.)"
+    ) %>% 
+    right_join(gles_ltp, by = c("lfdn", "Erhebung"))
+  
+  
+  if(!return_table){
+    
+    ## plot
+    gles_ltp %>% 
+      filter(Erhebung %in% c("l", "n")) %>% 
+      mutate(change_label = 
+               ifelse(Erhebung == "l",
+                      "2014-2016",
+                      "2016-2018")
+               ) %>% 
+      ggplot(aes(x = change, fill = change_label)) +
+      geom_histogram(aes(y = after_stat(count/ sum(count))), binwidth = 1, alpha = 0.5) +
+      geom_boxplot(width = 0.05, outlier.alpha = 0, notch = T, ) +
+      facet_wrap(~change_label, ncol = 1) +
+      scale_fill_manual(values = color_palette) +
+      xlab("Change in immigration attitude") +
+      scale_x_continuous(minor_breaks = seq(0, 10, 1),
+                         breaks = seq(0, 10, 2)) +
+      ylab("Relative frequency") +
+      theme_minimal() +
+      theme(legend.position = "None") %>% 
+      return()
+  
+  }else{
+    
+    # table
+    gles_table <- 
+      gles_ltp %>% 
+      filter(Erhebung %in% c("l", "n")) %>% 
+      mutate(change_label = 
+               ifelse(Erhebung == "l",
+                      "2014-2016",
+                      "2016-2018")
+      ) %>% 
+      group_by(change_label) %>% 
+      summarise(
+        
+        change_mean = mean(change, na.rm = T),
+        change_sd = sd(change, na.rm = T),
+        N = n()
+        
+      ) %>% 
+      mutate(
+        change_lower = change_mean + qt(.025, df = N-1) * (change_sd/sqrt(N)),
+        change_upper = change_mean + qt(.975, df = N-1) * (change_sd/sqrt(N))
+      )
+    
+    rownames(gles_table) <- gles_table$change_label
+    
+    return(gles_table)
+    
+  }
+    
+  
+  
+}
+
+# DiD estimates in Longterm Panel ####
+
+LTPDiD <- function(return_table = F,
+                   treatment_timing = "2017-02-01",
+                   boundary_share = 0.25,
+                   theoretical_effect_size = 1,
+                   size = 2) {
+  
+  ## load GLES LTP data, wide to long
+  gles_ltp <- 
+    haven::read_dta(here("data/raw/gles/LongTermPanel/ZA5770_v1-0-0.dta")) %>% 
+    pivot_longer(
+      cols = jdatum:nwkrnr3,
+      names_to = c("Erhebung", ".value"),
+      names_pattern = "(.)(.*)"
+    )
+  
+  ## clean migration and readership variable
+  gles_ltp <- 
+    gles_ltp %>% 
+    mutate(
+      `285a_clean` = ifelse(`285a` < 0, NA, `285a` - 1),
+      `174b_clean` = ifelse(`174b` < 0, NA, `174b` - 6),
+      date_clean = 
+        as.Date(
+          case_when(
+            Erhebung == "j" ~ "2013-12-23",
+            Erhebung == "k" ~ "2014-12-11",
+            Erhebung == "l" ~ "2016-01-07",
+            Erhebung == "m" ~ "2016-12-15",
+            Erhebung == "n" ~ "2017-12-08",
+          ),
+          format = "%Y-%m-%d"
+        )
+    )
+  
+  ## define treatment group and timing
+  gles_ltp <- 
+    gles_ltp %>% 
+    filter(Erhebung == "l") %>% 
+    mutate(bild_reader = `285a_clean` > 0) %>% 
+    select(lfdn, bild_reader) %>% 
+    right_join(gles_ltp, by = "lfdn") %>% 
+    mutate(
+      post = date_clean >= as.Date(treatment_timing),
+      dv = `174b_clean`,
+      Wave = 
+        case_when(
+          Erhebung == "j" ~ "a",
+          Erhebung == "k" ~ "b",
+          Erhebung == "l" ~ "c",
+          Erhebung == "m" ~ "d",
+          Erhebung == "n" ~ "d" # post-vs prewave as relevant comparison (only one postwave)
+        ),
+      ID = lfdn
+    )
+  
+  
+  ## model
+  single_model <- 
+    fixest::feglm(
+    
+      dv ~ post*bild_reader | Wave + ID,
+      data = gles_ltp,
+      cluster = "lfdn"
+      
+    )
+  
+  
+  ## plot
+  if(!return_table){
+    modelsummary::modelplot(
+        list(dv_name = single_model),
+        coef_map = list("postTRUE:bild_readerTRUE" = ""),
+        facet = T
+      ) +
+        geom_vline(xintercept = 0, lty = 1, col = "red", size = size) +
+        geom_vline(xintercept = boundary_share*theoretical_effect_size, 
+                   lty = 3, col = "black", size = size) +
+        geom_vline(xintercept = boundary_share*-1*theoretical_effect_size, 
+                   lty = 3, col = "black", size = size) +
+        geom_vline(xintercept = theoretical_effect_size, 
+                   lty = 2, col = "black", size = size) +
+        geom_vline(xintercept = -1*theoretical_effect_size, 
+                   lty = 2, col = "black", size = size) %>% 
+      return()
+  
+  }else{
+    
+    return(single_model)
+    
+  }
+  
+  
+  
+  
+  ## return table
+  
+}
+
 
 
