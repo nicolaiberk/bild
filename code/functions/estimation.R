@@ -16,136 +16,37 @@ library(fixest)
 library(modelsummary)
 
 # Difference-in-Difference model
-DiDModels <- function(dv_name, 
-                      cond_var = "init_mig", 
-                      cond_name = "\nImmigration Attitude W1",
-                      ctrl_var = F, 
-                      restrict_period = F,
-                      restrict_sample = F,
-                      estimate = "{estimate}{stars}",
-                      ctrl_name,
-                      gof_omit = "^(?!R2.Pseudo|Num|Std|FE)") {
-  
-  gles_p_long <- data.table::fread(here('data/raw/gles/Panel/long_cleaned.csv'))
-  
-  # restrict to relevant time frame
-  if(restrict_period){
-    
-    gles_p_long <-
-      gles_p_long %>%
-      filter(date_clean >= as.Date("2016-01-01"),
-             date_clean <  as.Date("2018-01-01"))
-  
-  }
-  
-  if (restrict_sample == "conservative_outlets"){
-    gles_p_long <-
-      gles_p_long %>%
-      filter(bild_init | faz_init | welt_init)
-  }
-  
-  # define dv and conditioning variable
-  gles_p_long[["dv"]] <- gles_p_long[[dv_name]]
-  gles_p_long[["cond"]] <- gles_p_long[[cond_var]]
-  
-  gles_p_long$ID <- as.factor(gles_p_long$lfdn)
-  
-  # model 1: direct effect
-  ate <- 
-    feglm(dv ~ post * treat, 
-          cluster = c("ID"), 
-          data = 
-            gles_p_long %>% 
-            filter(!is.na(dv), !is.na(treat), !is.na(post)))
-  
-  if (!isFALSE(ctrl_var)){
-    
-    if (ctrl_var == "cond"){
-      ate_ctrl <- 
-        feglm(dv ~ post * treat + cond, 
-              cluster = c("ID"), 
-              data = 
-                gles_p_long %>% 
-                filter(!is.na(dv), !is.na(treat), !is.na(post), !is.na(cond)))
-      
-    } else {
-      
-      gles_p_long[["ctrl"]] <- gles_p_long[[ctrl_var]]
-      
-      ate_ctrl <- 
-        feglm(dv ~ post * treat + ctrl, 
-              cluster = c("ID"), 
-              data = 
-                gles_p_long %>% 
-                filter(!is.na(dv), !is.na(treat), !is.na(post), !is.na(ctrl)))
-      
-    }
-    
-  }
-  
-  ate_fe <- 
-    feglm(dv ~ post * treat | ID, # treat gets dropped due to MC with pre-treatment differences (exactly what it should capture)
-          cluster = c("ID"), 
-          data = 
-            gles_p_long %>% 
-            filter(!is.na(dv), !is.na(treat), !is.na(post)))
-  
-  inter <- 
-    feglm(dv ~ post * treat * cond, 
-          cluster = c("ID"), 
-          data = gles_p_long %>% 
-            filter(!is.na(dv), !is.na(treat), !is.na(post), !is.na(cond)))
-  
-  inter_fe <- 
-    feglm(dv ~ post * treat * cond | ID, 
-          cluster = c("ID"), 
-          data = gles_p_long %>% 
-            filter(!is.na(dv), !is.na(treat), !is.na(post), !is.na(cond)))
-  
-  coef_map <- 
-    c("postTRUE:treatTRUE" = "Post X Treat", 
-      "postTRUE:treatTRUE:cond" = paste0("Post X Treat X ", cond_name))
-    
-  if(exists("ate_ctrl")){
-    
-    if (ctrl_var != "cond"){
-      coef_map <- 
-        c(coef_map,
-          "ctrl" = ctrl_name)
-      
-    } else {
-      
-      coef_map <- 
-        c(coef_map,
-          "cond" = cond_name)
-      
-    }
-    
-    
-  }
-  
-   
-  if(exists("ate_ctrl")){
-    
-    model_list <- list(ate, ate_ctrl, ate_fe, inter, inter_fe)
-  
-  } else {
-    
-    model_list <- list(ate, ate_fe, inter, inter_fe)
-    
-  }    
 
-  return(
-    modelsummary(
-      
-      model_list,
-      stars = T,
-      coef_map = coef_map,
-      gof_omit = gof_omit, 
-      output = "markdown"
-    )
-  )
-
+SingleDVModel <- function(var){
+  
+  gles_p_long <- 
+    fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
+    as_tibble()
+  
+  postdate <- as.Date("2017-02-01")
+  title <- "Mean migration attitude post-Reichelt takeover"
+  
+  gles_p_long["dv"] <- gles_p_long[var]
+  
+  single_model <- 
+    fixest::feglm(dv ~ post*treat | ID + Wave, 
+                  data = 
+                    gles_p_long %>% 
+                    filter(!is.na(dv)) %>% 
+                    mutate(
+                      Wave = 
+                        ifelse(
+                          wave %in% unique(.$wave[c(1,2)]),
+                          "reference",
+                          wave
+                        ),
+                      ID = lfdn
+                    ) %>% 
+                    select(dv, post, treat, ID, Wave),
+                  cluster = c("ID", "Wave"))
+  
+  modelsummary::modelsummary(single_model, output = "markdown")
+  
 }
 
 
