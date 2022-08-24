@@ -193,13 +193,13 @@ LTPDiD(return_table = T)
 
 Jetzt geht es um Zuzugsmöglichkeiten für Ausländer. Sollten die Zuzugsmöglichkeiten für Ausländer erleichtert oder eingeschränkt werden?
 
-(1) 1 Zuzug von Ausländern erleichtern
-(2) 2\
-(3) 3\
-(4) 4\
-(5) 5\
-(6) 6\
-(7) 7 Zuzug von Ausländern einschränken
+(1) Zuzug von Ausländern erleichtern
+(2)
+(3)
+(4)
+(5)
+(6)
+(7) Zuzug von Ausländern einschränken
 
 *Transformed to [-3, 3].*
 
@@ -210,17 +210,30 @@ Jetzt geht es um Zuzugsmöglichkeiten für Ausländer. Sollten die Zuzugsmöglic
 ```{r did_imm_att_plot}
 
 fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
-  filter(init_mig_groups != "", !is.na(`1130_clean`), !is.na(treat)) %>% 
+  filter(!is.na(`1130_clean`), !is.na(treat)) %>% 
   group_by(treat, wave) %>% 
   summarise(
     date_clean = min(date_clean, na.rm = T),
-    `1130_clean` = mean(`1130_clean`, na.rm = T)
+    mig_mean = mean(`1130_clean`, na.rm = T),
+    mig_sd = sd(`1130_clean`, na.rm = T),
+    N = n()
   ) %>% 
-  ggplot(aes(x = date_clean, y = `1130_clean`, lty = !treat, col = !treat)) +
+  mutate(
+    mig_lower = mig_mean + qt(0.025, df = N-1) * (mig_sd/sqrt(N)),
+    mig_upper = mig_mean + qt(0.975, df = N-1) * (mig_sd/sqrt(N))
+  ) %>% 
+  ggplot(aes(x = date_clean, y = mig_mean,
+             ymin = mig_lower, ymax = mig_upper,
+             lty = !treat, col = !treat)) +
   geom_line() +
+  geom_pointrange() +
   geom_vline(xintercept = as.Date("2017-02-01"), lty = 2, col = "red") + 
-  # facet_wrap(~init_mig_groups, ncol = 1) + 
-  theme_minimal()
+  theme_minimal() +
+  labs( x = "", y = "", col = "Readership", lty = "Readership") +
+  scale_color_manual(labels = c("Bild", "Never Bild"),
+                     values = MetBrewer::met.brewer("Archambault", 2)) +
+  scale_linetype_manual(labels = c("Bild", "Never Bild"),
+                     values = c(1,2))
 
 ```
 
