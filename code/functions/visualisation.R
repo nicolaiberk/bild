@@ -1247,11 +1247,11 @@ LTPDiD <- function(return_table = F,
         )
     )
   
-  ## define treatment group and timing
+  ## define treatment group and timing (still need to filter out ever-readers)
   gles_ltp <- 
     gles_ltp %>% 
     filter(Erhebung == "l") %>% 
-    mutate(bild_reader = `285a_clean` > 0) %>% 
+    mutate(bild_reader = `285a_clean` > 0) %>% # misdefined - exclude ever-readers
     select(lfdn, bild_reader) %>% 
     right_join(gles_ltp, by = "lfdn") %>% 
     mutate(
