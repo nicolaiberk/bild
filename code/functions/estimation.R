@@ -79,7 +79,7 @@ MigCrimeCorTable <- function(){
         "crime_att:postTRUE:treatTRUE" = "Crime Attitude X Post X Bild"
       ),
     stars = T,
-    gof_omit = ".*",
+    gof_omit = "R2*|AIC|BIC|Log.Lik.",
     output = "markdown"
     ) %>% 
     return()
