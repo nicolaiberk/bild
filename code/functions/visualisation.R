@@ -785,10 +785,14 @@ MigCrimeCorPlot <- function(size = 1){
     geom_point(size = size*2) +
     geom_line(size = size) +
     theme_minimal() +
-    xlab("") + ylab("Correlation") +
-    # scale_color_discrete(name = "Group", labels = c("Control", "Treatment")) +
-    # scale_shape_discrete(name = "Group", labels = c("Control", "Treatment")) +
-    scale_x_discrete(labels = c("TRUE" = "Post", "FALSE" = "Pre"))%>% 
+    xlab("") + ylab("Pearson's r") +
+    scale_color_discrete(name = "Readership", 
+                         labels = c("FALSE" = "Not Bild", 
+                                    "TRUE" = "Bild")) +
+    scale_shape_discrete(name = "Readership", 
+                         labels = c("FALSE" = "Not Bild", 
+                                    "TRUE" = "Bild")) +
+    scale_x_discrete(labels = c("TRUE" = "Post", "FALSE" = "Pre")) %>% 
     return()
   
 }
