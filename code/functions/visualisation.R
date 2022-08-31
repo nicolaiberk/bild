@@ -49,7 +49,7 @@ TenMostCrime <- function(){
 # Treatment: shift in attention to crime
 
 TreatmentTrendPlot <- function(size = 1, 
-                               palette = c("red", "black"),
+                               palette = MetBrewer::met.brewer("Archambault", 2)[c(2,1)],
                                maxdate = as.Date("2020-01-01"),
                                mindate = as.Date("2015-01-01"),
                                aggregation = "Quarter",
@@ -91,9 +91,9 @@ TreatmentTrendPlot <- function(size = 1,
       bert_ests %>% 
       filter(month < maxdate, month >= mindate) %>% 
       ggplot(aes(x = month, y = crime, col = paper, lty = paper)) +
+      geom_vline(xintercept = as.Date("2017-02-01"), lty = 2, col = "red", size = size) +
       geom_line(size = size) +
       geom_rug(data = survey_dates, aes(x = date), sides = 't', inherit.aes = F) +
-      geom_vline(xintercept = as.Date("2017-02-01"), lty = 2, col = "red", size = size) +
       ggtitle(paste0(aggregation, "ly Share of Migration Content Devoted to Crime Frames"), 
               paste0("Bild vs. other major daily newspapers, 2016-", lubridate::year(maxdate))) + 
       xlab("Date") + 
@@ -107,7 +107,7 @@ TreatmentTrendPlot <- function(size = 1,
 }
 
 TreatmentDiDPlot <- function(size = 1, 
-                             palette = c("red", "black"),
+                             palette = MetBrewer::met.brewer("Archambault", 2)[c(2,1)],
                              maxdate = as.Date("2020-01-01"),
                              mindate = as.Date("2015-01-01"),
                              dpa_corrected = F,
