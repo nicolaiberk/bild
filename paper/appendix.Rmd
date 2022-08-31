@@ -23,7 +23,7 @@ for (filename in list.files(here("code/functions"))){
 }
 ```
 
-# Independent Variable
+# Frames in Communication
 
 ## Market Coverage of Different Newspapers
 
@@ -56,9 +56,12 @@ Table 1 shows the number of print copies sold and online page impressions for ea
 
 ### Crime
 
-### Correcting for change in DPA-sourced content
+## Salience of Migration
 
-Among the changes after Reichelt's takeover as chief editor of *Bild* was a severe drop in the overall number of articles published online. Figure \@ref(fig:dpaShare) shows the monthly number of articles *Bild* published in their online archive across time. Recall that Reichelt took over in February 2017, and briefly after - in June 2017 - the overall number of articles published decreases by over 60%. The graph also suggests an explanation for this sudden shift: the share of articles sourced from DPA, a major German press agency alike the Associated Press, sharply decreases at the same time as the major decrease in the number of articles takes place (see top blue bars). While the decision to discontinue buying content from DPA must have been made by Reichelt himself (and is thus an outcome of the treatment), it might nevertheless affect the measurement of migration framing in *Bild*. DPA is a press agency supplying many German news outlets, which means it must have a rather unbiased or at least centrist coverage, potentially decreasing the estimate of crime frames within Bild's migration content. This would not be a problem, as long as this content is equally likely to make it to the front page. However, *Bild* likely gives more weight to its own content compared to pre-written content from DPA. It is therefore necessary to assess whether the change in framing persists when excluding DPA content.
+
+## Correcting for change in DPA-sourced content
+
+Among the changes after Reichelt's takeover as chief editor of *Bild* was a severe drop in the overall number of articles published online. Figure \@ref(fig:dpaShare) shows the monthly number of articles *Bild* published in their online archive across time. Recall that Reichelt took over in February 2017, and briefly after - in June 2017 - the overall number of articles published decreases by over 60%. The graph also suggests an explanation for this sudden shift: the share of articles sourced from DPA, a major German press agency alike the Associated Press, sharply decreases at the same time as the major decrease in the number of articles takes place (see top blue bars). DPA is a press agency supplying many German news outlets, which means it must have a rather unbiased or at least centrist coverage, potentially decreasing the estimate of crime frames within Bild's migration content. This would not be a problem, as long as this content is equally likely to make it to the front page. However, *Bild* likely gives more weight to its own content compared to pre-written content from DPA. For this reason, the paper presented data excluding DPA content. On the other hand, the decision to discontinue buying content from DPA must have been made by Reichelt himself and is thus an outcome of the treatment. Hence, it is fruitful to assess the change including DPA-sourced content. 
 
 ```{r dpaShare, fig.cap="Monthly number of articles by source."}
 
@@ -82,12 +85,12 @@ data.table::fread(here("data/raw/newspapers/_bild_articles.csv"),
 
 ```
 
-The left panel of figure \@ref(fig:treatmentDPAcorr) displays the quarterly share of migration articles discussing crime for *Bild* compared to all other newspapers. The depression visible in the original plot in 2016-2017 is not visible anymore, as is the sharp increase in June 2017. Instead, the share of crime content in Bild's migration coverage increases directly after the takeover by Reichelt. The gap between Bild and all other newspapers increases, and this increased difference persists. This change becomes even more visible in the right-hand panel, which shows a difference-in-differences estimate of the change of the share of crime news in a newspapers migration content, this time controlling for whether the content is DPA-sourced or not. The general picture is quite similar to the original estimate in the paper, as migration coverage only increases in Bild, while all other outlets remain rather stable on this metric. The only difference is that in this estimate, the share of migration coverage devoted to crime 'only' increases by 5 percentage points, which still constitutes a very substantial increase.
+The left panel of figure \@ref(fig:treatmentDPAcorr) displays the quarterly share of migration articles discussing crime for *Bild* compared to all other newspapers. A depression is visible in 2016-2017 which was not visible in the corrected data. The share of crime content in *Bild*'s migration coverage strongly increases a few months following the treatment, when the share of DPA-sourced content severely drop. The gap between *Bild* and all other newspapers increases, and this increased difference persists. This change becomes even more visible in the right-hand panel, which shows a difference-in-differences estimate of the change of the share of crime news in a newspapers migration content, this time controlling for whether the content is DPA-sourced or not. The general picture is quite similar to the original estimate in the paper, as migration coverage only increases in *Bild*, while all other outlets remain rather stable on this metric. In the estimate including DPA content, the share of migration coverage devoted to crime increases by an even stronger 6 percentage points, which still constitutes a very substantial increase. Both ways of handling the data suggest a strong increase in the emphasis of crime in migration coverage.
 
 ```{r treatmentDPAcorr, fig.cap="Change in share of crime content in newspaper coverage, excluding DPA-sourced news content. Left panel: quarterly share across time, Bild compared to other newspapers' average. Right panel: difference-in-differences estimates of change in newspaper coverage compared to other newspapers, controlling for source of content."}
 
-TreatmentTrendPlot(dpa_corrected = T) + 
-  TreatmentDiDPlot(dpa_corrected = T)
+TreatmentTrendPlot(dpa_corrected = F) + 
+  TreatmentDiDPlot(dpa_corrected = F)
 
 ```
 
