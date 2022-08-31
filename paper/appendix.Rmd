@@ -94,12 +94,6 @@ TreatmentTrendPlot(dpa_corrected = F) +
 
 ```
 
-## Structural Topic Model
-
-To identify different considerations about migration in news coverage, I estimate a structural topic model with 60 topics for the nearly 90,000 migration articles in the full period (2013-2019)\footnote{The topics' prevalence along with the most important words can be assessed in the appendix.}. The number of topics was chosen to strike a balance between the computational and human resources necessary to estimate and annotate the topics and finding appropriate topics for the large corpus of nearly 90,000 migration articles\footnote{Currently, I work to identify crime content using supervised models (similar to the identification of migration content) to provide a specific estimate of the attention to the consideration of interest. I will also analyse the data with embedding regression, assessing how the meaning of migration related terms like 'migrant', 'asylum' or 'syrian' changed in Bild compared to other newspapers}. Topic prevalence is estimated as a function of the release date of the article, as well as the newspaper it has been published in. The 60 topics' most predictive words and ten most representative articles were assessed to identify and label the content of each topic, and all topics related to crime (two in total) are selected and their prevalence added together for a daily measure of attention to crime in each newspaper.
-
-### Treatment
-
 # Readership models
 
 ## Inward selection
@@ -110,16 +104,6 @@ InSelection()
 
 ```
 
-# Change in Migration Attitudes across time
-
-
-```{r}
-
-MigChangePlot()
-
-```
-
-[Add description of variable and explanation]
 
 # Difference-in-Differences Estimates
 
