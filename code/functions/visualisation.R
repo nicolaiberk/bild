@@ -97,7 +97,12 @@ TreatmentTrendPlot <- function(size = 1,
       ggtitle(paste0(aggregation, "ly Share of Migration Content Devoted to Crime Frames"), 
               paste0("Bild vs. other major daily newspapers, 2016-", lubridate::year(maxdate))) + 
       xlab("Date") + 
-      ylab("Share of Migration Articles Containing Crime Frame") +
+      ylab(paste0("Share of Migration Articles", 
+                  ifelse(size > 1,
+                         "",
+                         " Containing Crime Frame")
+                  )
+           ) +
       theme_minimal() +
       theme(legend.position = "none") +
       scale_color_manual(values = palette)
