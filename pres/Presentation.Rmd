@@ -318,8 +318,7 @@ class: inverse, center, middle
 ```{r trendplot, cache = F}
 
 TreatmentTrendPlot(size = 2, 
-                   cntrl_col = "#004A95", 
-                   treat_col = "#cc0000") +
+                   dpa_corrected = T) +
   theme_xaringan()
 
 ```
@@ -448,7 +447,7 @@ class: inverse, center, middle
 
 ```{r singledv, fig.height=3}
 
-EffectPlot(multi = F, scaled = "raw", size = 2) +
+DiDPlot(multi = F, scaled = "raw", size = 2) +
   theme_xaringan()
 
 
@@ -466,7 +465,7 @@ EffectPlot(multi = F, scaled = "raw", size = 2) +
 
 ```{r multidv}
 
-EffectPlot(multi = T, scaled = T, size = 2) +
+DiDPlot(multi = T, scaled = T, size = 2) +
   theme_xaringan()
 
 ```
@@ -477,7 +476,7 @@ EffectPlot(multi = T, scaled = T, size = 2) +
 
 ```{r migwaves}
 
-EffectByWavePlot(size = 2) +
+DiDByWavePlot(size = 2) +
   theme_xaringan()
 
 ```
@@ -494,7 +493,7 @@ EffectByWavePlot(size = 2) +
 
 ```{r crimewaves}
 
-EffectByWavePlot("2880h_clean", size = 2) +
+DiDByWavePlot("2880h_clean", size = 2) +
   theme_xaringan()
 
 ```
@@ -508,7 +507,7 @@ EffectByWavePlot("2880h_clean", size = 2) +
 
 ```{r intwaves}
 
-EffectByWavePlot(dv = "1210_clean", size = 2) +
+DiDByWavePlot(dv = "1210_clean", size = 2) +
   theme_xaringan()
 
 ```
@@ -526,7 +525,7 @@ EffectByWavePlot(dv = "1210_clean", size = 2) +
 
 ```{r afdwaves}
 
-EffectByWavePlot(dv = "430i_clean", size = 2) +
+DiDByWavePlot(dv = "430i_clean", size = 2) +
   theme_xaringan()
 
 ```
@@ -539,7 +538,7 @@ EffectByWavePlot(dv = "430i_clean", size = 2) +
 
 ```{r mipwaves}
 
-EffectByWavePlot(dv = "mip_mig", size = 2) +
+DiDByWavePlot(dv = "mip_mig", size = 2) +
   theme_xaringan()
 
 ```
