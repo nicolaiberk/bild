@@ -134,13 +134,13 @@ if(run_cor_mip_crime){
   modeldata <- 
     gles_p_long %>% 
     filter(!is.na(treat) & !is.na(dv) & !is.na(crime_att)) %>% 
-    select(lfdn, dv, crime_att, treat, post) %>% 
+    select(lfdn, dv, crime_att, treat, wave) %>% 
     nest(-lfdn)
   
   bs <- bootstraps(modeldata, times = B)
   bs_cor_mig_crime <- map(bs$splits, ~as.tibble(.) %>% 
                           unnest %>% 
-                          group_by(treat, post) %>% 
+                          group_by(treat, wave) %>% 
                           summarise(mig_crime_cor = cor(dv, crime_att, use = "complete.obs"))
                                        
                            ) %>% 
