@@ -488,7 +488,8 @@ DiDByWavePlot <- function(dv = "1130_clean",
                              size = 1,
                              scaled = F,
                              boundary_share = 1,
-                             theoretical_effect_size = 0.1) {
+                             theoretical_effect_size = 0.1,
+                             return_ests = F) {
   
   gles_p_long <- 
     fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
@@ -542,23 +543,31 @@ DiDByWavePlot <- function(dv = "1130_clean",
     
   }
   
-  ests %>% 
-    ggplot(aes(x = date, y= point, ymin = upper, ymax = lower)) +
-    geom_hline(yintercept = 0, col = "red", size = size) +
-    geom_hline(yintercept = boundary_share*theoretical_effect_size,
-               lty = 3, col = "black", size = size) +
-    geom_hline(yintercept = boundary_share*-1*theoretical_effect_size, 
-               lty = 3, col = "black", size = size) +
-    geom_hline(yintercept = theoretical_effect_size,
-               lty = 2, col = "black", size = size) +
-    geom_hline(yintercept = -1*theoretical_effect_size,
-               lty = 2, col = "black", size = size) +
-    geom_vline(xintercept = as.Date(postdate), lty = 2, col = "red", size = size) +
-    geom_vline(xintercept = as.Date("2017-06-01"), lty = 3, col = "orange", size = size) +
-    geom_pointrange(size = size) +
-    xlab("Date") + ylab("Effect") +
-    theme_minimal() %>% 
-    return()
+  if(return_ests){
+    
+    return(ests)
+  
+  }else{
+    
+    ests %>% 
+      ggplot(aes(x = date, y= point, ymin = upper, ymax = lower)) +
+      geom_hline(yintercept = 0, col = "red", size = size) +
+      geom_hline(yintercept = boundary_share*theoretical_effect_size,
+                 lty = 3, col = "black", size = size) +
+      geom_hline(yintercept = boundary_share*-1*theoretical_effect_size, 
+                 lty = 3, col = "black", size = size) +
+      geom_hline(yintercept = theoretical_effect_size,
+                 lty = 2, col = "black", size = size) +
+      geom_hline(yintercept = -1*theoretical_effect_size,
+                 lty = 2, col = "black", size = size) +
+      geom_vline(xintercept = as.Date(postdate), lty = 2, col = "red", size = size) +
+      geom_vline(xintercept = as.Date("2017-06-01"), lty = 3, col = "orange", size = size) +
+      geom_pointrange(size = size) +
+      xlab("Date") + ylab("Effect") +
+      theme_minimal() %>% 
+      return()
+    
+  }
 }
 
 # Instrumental Variable Regression ####
@@ -819,19 +828,20 @@ MigCrimeCorPlotBS <- function(size = 1, return_ests = F){
   
   load(here("data/processed/did_bootstraps_cor.RData"))
   
-  cors <- 
-    bs_cor_mig_crime %>% 
-    group_by(treat, wave) %>% 
-    summarise(lower = quantile(mig_crime_cor, 0.025),
-              upper = quantile(mig_crime_cor, 0.975),
-              point = mean(mig_crime_cor)) %>% 
-    mutate(Universe = "Factual")
-  
   if(return_ests){
     
-    return(cors)
+    return(bs_cor_mig_crime)
     
   }else{
+    
+    cors <- 
+      bs_cor_mig_crime %>% 
+      group_by(treat, wave) %>% 
+      summarise(lower = quantile(mig_crime_cor, 0.025),
+                upper = quantile(mig_crime_cor, 0.975),
+                point = mean(mig_crime_cor)) %>% 
+      mutate(Universe = "Factual")
+  
     
     
     cors <- 
@@ -1052,6 +1062,158 @@ InSelection <- function() {
   
 }
 
+# Crowding Out ####
+
+CrowdOutEstimates <- function(vis = T) {
+  
+  gles_long <- 
+    fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
+    select(lfdn, date_clean, wave, 
+           `1661a_clean`:`1661g_clean`, `1600_clean`, `1681f_clean`,
+           `1130_clean`, post, treat) %>% 
+    mutate(dv = `1130_clean`,
+           treat = as.factor(treat),
+           post = as.factor(post))
+  
+  gles_long <- 
+    gles_long %>% 
+    filter(wave == "1") %>% 
+    mutate(
+      other_print = 
+        `1661b_clean` +
+        `1661c_clean` +
+        `1661d_clean` +
+        `1661e_clean` +
+        `1661f_clean` +
+        `1661g_clean`,
+      tv_use = `1681f_clean`,
+      in_use = `1600_clean`
+    ) %>% 
+    mutate(other_print = 
+             case_when(
+               other_print == 0 ~ "0",
+               other_print > 0  & 
+                 other_print <= 3 ~ "1-3",
+               other_print > 3  & 
+                 other_print <= 9 ~ "4-9",
+               other_print > 9  & 
+                 other_print <= 15 ~ "10-15",
+               other_print > 15 ~ ">15"
+             )
+    ) %>% 
+    select(lfdn, in_use, tv_use, other_print) %>% 
+    right_join(gles_long, by = c("lfdn"))
+  
+  ests <- 
+    data.frame(
+      CATE = NULL,
+      CATE_lower = NULL,
+      CATE_upper = NULL,
+      value = NULL,
+      moderator = NULL
+    )
+  
+  for (mod in c("tv_use", "in_use", "other_print")){
+    
+    
+    values <- 
+      gles_long %>%
+      filter(!is.na(get(mod))) %>% 
+      select(mod) %>% 
+      unique() %>% 
+      .[[1]]
+    
+    for (value in values){
+      
+      temp <- 
+        gles_long %>% 
+        filter(get(mod) == value)
+      
+      m <- 
+        fixest::feglm(dv ~ post*treat | ID + Wave, 
+                      data = 
+                        temp %>% 
+                        filter(!is.na(dv)) %>% 
+                        mutate(
+                          Wave = 
+                            ifelse(
+                              wave %in% sort(unique(.$wave))[c(1, 2)],
+                              "reference",
+                              wave
+                            ),
+                          ID = lfdn
+                        ) %>% 
+                        select(dv, post, treat, ID, Wave),
+                      cluster = c("ID", "Wave"))
+      
+      ests <- 
+        rbind(
+          ests,
+          data.frame(
+            CATE = m$coefficients["postTRUE:treatTRUE"],
+            CATE_lower = confint(m)["postTRUE:treatTRUE", "2.5 %"],
+            CATE_upper = confint(m)["postTRUE:treatTRUE", "97.5 %"],
+            value = value,
+            moderator = mod
+          )
+        )
+      
+    }
+    
+  }
+  
+  if(vis){
+    
+    ests <- 
+      ests %>% 
+      mutate(
+        effect_label = 
+          ifelse(
+            value == "0",
+            as.character(round(CATE, 3)),
+            ""
+          ),
+        
+      )
+    
+    varnames <- 
+      list(
+        "in_use" = "Internet use", 
+        "other_print" = "Days other print consumed", 
+        "tv_use" = "TV use")
+    
+    labeller <- function(variable,value){
+      return(varnames[value])
+    }
+    
+    ests %>%
+      ggplot(aes(x = factor(value,
+                            levels = as.character(c(0, 1, "1-3", 2, 3, 4, "4-9", 
+                                                    5, 6, 7, 8, 9, 10, "10-15",
+                                                    ">15"))), 
+                 y = CATE, ymin = CATE_lower, ymax = CATE_upper,
+                 col = value != "0")) +
+      geom_hline(yintercept = 0) +
+      geom_hline(yintercept = c(0.15, -0.15), lty = 3) +
+      geom_hline(yintercept = c(0.6, -0.6), lty = 2) +
+      geom_pointrange() +
+      geom_text(aes(x = "0", 
+                    y = CATE, 
+                    label = effect_label,
+                    hjust = -.3)
+      ) +
+      facet_wrap(~moderator, scales = "free_x",
+                 labeller = labeller) +
+      theme_minimal() +
+      xlab("") +
+      theme(legend.position = "None") %>% 
+      return()
+    
+  }else{
+    return(ests)
+  }
+  
+}
 
 # Parallel Trends ####
 
