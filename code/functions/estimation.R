@@ -61,10 +61,7 @@ MigCrimeCorTable <- function(){
   
   inter <- 
     feglm(dv ~ 
-            crime_att + 
-            post : crime_att + 
-            treat : crime_att +
-            post : treat : crime_att, 
+            crime_att * post * treat, 
           cluster = c("ID"), 
           data = gles_p_long %>% 
             filter(!is.na(dv), !is.na(treat), !is.na(post), !is.na(crime_att)))
