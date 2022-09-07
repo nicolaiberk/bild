@@ -762,30 +762,43 @@ MigCrimeCorPlot <- function(size = 1){
   cors <- 
     fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
     filter(!is.na(`1130_clean`), !is.na(`2880h_clean`), !is.na(treat)) %>% 
-    group_by(treat, post) %>% 
-    summarise(mig_crime_cor = cor(`1130_clean`, `2880h_clean`)) %>% 
+    group_by(treat, wave) %>% 
+    summarise(mig_crime_cor = cor(`1130_clean`, `2880h_clean`),
+              date_clean = min(date_clean)) %>% 
     mutate(Universe = "Factual")
+  
+  dates <- 
+    cors %>%
+    ungroup() %>% 
+    select(wave, date_clean) %>%
+    unique()
   
   cors <- 
     cors %>% 
     rbind(
       data.frame(
-        treat = c(TRUE, TRUE),
-        post = c(FALSE, TRUE),
-        mig_crime_cor = c(cors[cors$treat & !cors$post, "mig_crime_cor"][[1]], 
-                          cors[cors$treat & !cors$post, "mig_crime_cor"][[1]] +  
-                            cors[!cors$treat & cors$post, "mig_crime_cor"][[1]] -
-                                    cors[!cors$treat & !cors$post, "mig_crime_cor"][[1]]),
+        treat = c(TRUE, TRUE, TRUE),
+        wave = c("1", "3", "13"),
+        date_clean = c(dates$date_clean[dates$wave == "1"],
+                       dates$date_clean[dates$wave == "3"],
+                       dates$date_clean[dates$wave == "13"]
+                        ),
+        mig_crime_cor = c(cors[cors$treat & cors$wave == "1", "mig_crime_cor"][[1]], 
+                          cors[cors$treat & cors$wave == "1", "mig_crime_cor"][[1]] +  
+                            cors[!cors$treat & cors$wave == "3", "mig_crime_cor"][[1]] -
+                            cors[!cors$treat & cors$wave == "1", "mig_crime_cor"][[1]], 
+                          cors[cors$treat & cors$wave == "1", "mig_crime_cor"][[1]] +  
+                            cors[!cors$treat & cors$wave == "13", "mig_crime_cor"][[1]] -
+                            cors[!cors$treat & cors$wave == "1", "mig_crime_cor"][[1]]),
         Universe = "Counterfactual"
       ), 
     ) %>% 
     mutate(Universe = factor(Universe, levels = c("Factual", "Counterfactual")))
   
-  
+
   cors %>% 
     mutate(treat_universe = paste(treat, Universe, sep = "_")) %>% 
-    ggplot(aes(x = post, y = mig_crime_cor, 
-               col = treat, lty = Universe, shape = treat, 
+    ggplot(aes(x = date_clean, y = mig_crime_cor, lty = Universe, shape = treat, 
                group = treat_universe)) +
     geom_point(size = size*2) +
     geom_line(size = size) +
@@ -796,55 +809,80 @@ MigCrimeCorPlot <- function(size = 1){
                                     "TRUE" = "Bild")) +
     scale_shape_discrete(name = "Readership", 
                          labels = c("FALSE" = "Not Bild", 
-                                    "TRUE" = "Bild")) +
-    scale_x_discrete(labels = c("TRUE" = "Post", "FALSE" = "Pre")) %>% 
+                                    "TRUE" = "Bild")) %>% 
     return()
   
 }
 
 
-MigCrimeCorPlotBS <- function(size = 1){
+MigCrimeCorPlotBS <- function(size = 1, return_ests = F){
   
   load(here("data/processed/did_bootstraps_cor.RData"))
   
   cors <- 
     bs_cor_mig_crime %>% 
-    group_by(treat, post) %>% 
+    group_by(treat, wave) %>% 
     summarise(lower = quantile(mig_crime_cor, 0.025),
               upper = quantile(mig_crime_cor, 0.975),
               point = mean(mig_crime_cor)) %>% 
     mutate(Universe = "Factual")
   
-  cors <- 
+  if(return_ests){
+    
+    return(cors)
+    
+  }else{
+    
+    
+    cors <- 
+      cors %>% 
+      rbind(
+        data.frame(
+          treat = c(TRUE, TRUE, TRUE),
+          wave = c("1", "3", "13"),
+          point = c(cors[cors$treat & cors$wave == "1", "point"][[1]], 
+                    cors[cors$treat & cors$wave == "1", "point"][[1]] +  
+                      cors[!cors$treat & cors$wave == "3", "point"][[1]] -
+                      cors[!cors$treat & cors$wave == "1", "point"][[1]], 
+                    cors[cors$treat & cors$wave == "1", "point"][[1]] +  
+                      cors[!cors$treat & cors$wave == "13", "point"][[1]] -
+                      cors[!cors$treat & cors$wave == "1", "point"][[1]]
+                    ),
+          Universe = "Counterfactual"
+        ),
+      ) %>% 
+      mutate(Universe = factor(Universe, levels = c("Factual", "Counterfactual")))
+    
+    ## merge with survey dates
+    cors <- 
+      fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
+      filter(!is.na(date_clean)) %>% 
+      select(date_clean, wave) %>% 
+      group_by(wave) %>% 
+      summarise(date_clean = min(date_clean, na.rm = T)) %>% 
+      right_join(cors, by = "wave")
+    
     cors %>% 
-    rbind(
-      data.frame(
-        treat = c(TRUE, TRUE),
-        post = c(FALSE, TRUE),
-        point = c(cors[cors$treat & !cors$post, "point"][[1]], 
-                          cors[cors$treat & !cors$post, "point"][[1]] +  
-                            cors[!cors$treat & cors$post, "point"][[1]] -
-                            cors[!cors$treat & !cors$post, "point"][[1]]),
-        Universe = "Counterfactual"
-      ),
-    ) %>% 
-    mutate(Universe = factor(Universe, levels = c("Factual", "Counterfactual")))
-  
-  
-  cors %>% 
-    mutate(treat_universe = paste(treat, Universe, sep = "_")) %>% 
-    ggplot(aes(x = post, 
-               y = point, ymin = lower, ymax = upper, 
-               col = treat, lty = Universe, shape = treat, group = treat_universe)) +
-    geom_pointrange(size = size) +
-    geom_line(size = size) +
-    theme_minimal() +
-    xlab("") + ylab("Correlation") +
-    scale_color_discrete(name = "Group", labels = c("Control", "Treatment")) +
-    scale_shape_discrete(name = "Group", labels = c("Control", "Treatment")) +
-    scale_x_discrete(labels = c("TRUE" = "Post", "FALSE" = "Pre")) %>% 
-    return()
-  
+      mutate(treat_universe = paste(treat, Universe, sep = "_")) %>% 
+      ggplot(aes(x = date_clean, 
+                 y = point, ymin = lower, ymax = upper, 
+                 col = treat, lty = Universe, shape = treat, 
+                 group = treat_universe)) +
+      geom_errorbar(size = size, width = 30) +
+      geom_point(size = size) +
+      geom_line(size = size) +
+      theme_minimal() +
+      xlab("") + ylab("Pearson's r") +
+      scale_color_manual(name = "Readership", 
+                           labels = c("FALSE" = "Not Bild", 
+                                      "TRUE" = "Bild"),
+                           values = c("gray", "black")) +
+      scale_shape_discrete(name = "Readership", 
+                           labels = c("FALSE" = "Not Bild", 
+                                      "TRUE" = "Bild")) %>% 
+      return()
+    
+  }
 }
 
 
