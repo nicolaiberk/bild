@@ -1313,9 +1313,9 @@ ParallelTrendsPlot <- function(){
 
 # Change in Migration Attitudes ####
 
-MigChangePlot <- function(return_table = F) {
-  
-  color_palette = MetBrewer::met.brewer("Archambault", 2)
+MigChangePlot <- function(return_table = F, 
+                          line_plot = T,
+                          color_palette = MetBrewer::met.brewer("Archambault", 2)) {
   
   ## load GLES LTP data, wide to long
   gles_ltp <- 
@@ -1352,50 +1352,101 @@ MigChangePlot <- function(return_table = F) {
     select(lfdn, date_clean, Erhebung, `174b_clean`) %>% 
     pivot_wider(lfdn, names_from = Erhebung, values_from = `174b_clean`, names_prefix = "mig_") %>% 
     mutate(
-      change_l = abs(mig_l - mig_j),
-      change_n = abs(mig_n - mig_l)
+      change_m_1 = abs(mig_m - mig_l),
+      change_n_1 = abs(mig_n - mig_m),
+      change_l_2 = abs(mig_l - mig_j),
+      change_n_2 = abs(mig_n - mig_l)
     ) %>% 
     pivot_longer(
-      cols = change_l:change_n,
-      names_to = c(".value", "Erhebung"),
-      names_pattern = "(.*)_(.)"
+      cols = change_m_1:change_n_2,
+      names_to = c(".value", "Erhebung", "Distance"),
+      names_pattern = "(.*)_(.)_(.)"
     ) %>% 
     right_join(gles_ltp, by = c("lfdn", "Erhebung"))
   
   
   if(!return_table){
     
-    ## plot
-    gles_ltp %>% 
-      filter(Erhebung %in% c("l", "n")) %>% 
-      mutate(change_label = 
-               ifelse(Erhebung == "l",
-                      "2014-2016",
-                      "2016-2018")
-               ) %>% 
-      ggplot(aes(x = change, fill = change_label)) +
-      geom_histogram(aes(y = after_stat(count/ sum(count))), binwidth = 1, alpha = 0.5) +
-      geom_boxplot(width = 0.05, outlier.alpha = 0, notch = T, ) +
-      facet_wrap(~change_label, ncol = 1) +
-      scale_fill_manual(values = color_palette) +
-      xlab("Change in immigration attitude") +
-      scale_x_continuous(minor_breaks = seq(0, 10, 1),
-                         breaks = seq(0, 10, 2)) +
-      ylab("Relative frequency") +
-      theme_minimal() +
-      theme(legend.position = "None") %>% 
-      return()
+    if (line_plot){
+      
+      gles_ltp %>% 
+        filter(!Erhebung %in% c("j", "k")) %>% 
+        mutate(change_label = 
+                 case_when(
+                   Erhebung == "l" & Distance == 2 ~ "2014-2016",
+                   Erhebung == "n" & Distance == 2 ~ "2016-2018",
+                   Erhebung == "m" & Distance == 1 ~ "2016-2017",
+                   Erhebung == "n" & Distance == 1 ~ "2017-2018")
+        ) %>% 
+        group_by(change_label, Distance) %>% 
+        summarise(
+          
+          change_mean = mean(change, na.rm = T),
+          change_sd = sd(change, na.rm = T),
+          N = n()
+          
+        ) %>% 
+        mutate(
+          change_lower = change_mean + qt(.025, df = N-1) * (change_sd/sqrt(N)),
+          change_upper = change_mean + qt(.975, df = N-1) * (change_sd/sqrt(N))
+        ) %>% 
+        ggplot(aes(x = change_label, 
+                   y = change_mean, ymin = change_lower, ymax = change_upper,
+                   group = Distance)) +
+        geom_line() + 
+        geom_pointrange() +
+        scale_fill_manual(values = color_palette) +
+        ylab("Change in immigration attitude") +
+        xlab("") +
+        facet_wrap(~Distance, scales = "free_x") +
+        theme_minimal() + 
+        # removes facet labels
+        theme(
+          strip.background = element_blank(),
+          strip.text.x = element_blank()
+        ) %>% 
+        return()
+    
+    }else{
+      
+      ## plot
+      gles_ltp %>% 
+        filter(!Erhebung %in% c("j", "k")) %>% 
+        mutate(change_label = 
+                 case_when(
+                   Erhebung == "l" & Distance == 2 ~ "2014-2016",
+                   Erhebung == "n" & Distance == 2 ~ "2016-2018",
+                   Erhebung == "m" & Distance == 1 ~ "2016-2017",
+                   Erhebung == "n" & Distance == 1 ~ "2017-2018")
+        ) %>% 
+        ggplot(aes(x = change, fill = Erhebung == "n")) +
+        geom_histogram(aes(y = after_stat(count/ sum(count))), binwidth = 1, alpha = 0.5) +
+        geom_boxplot(width = 0.05, outlier.alpha = 0, notch = T, ) +
+        scale_fill_manual(values = color_palette) +
+        xlab("Change in immigration attitude") +
+        scale_x_continuous(minor_breaks = seq(0, 10, 1),
+                           breaks = seq(0, 10, 2)) +
+        ylab("Relative frequency") +
+        theme_minimal() +
+        theme(legend.position = "None") +
+        facet_grid(Erhebung=="n"~Distance) %>% 
+        return()
+    
+    }
+    
   
   }else{
     
     # table
     gles_table <- 
       gles_ltp %>% 
-      filter(Erhebung %in% c("l", "n")) %>% 
+      filter(!Erhebung %in% c("j", "k")) %>% 
       mutate(change_label = 
-               ifelse(Erhebung == "l",
-                      "2014-2016",
-                      "2016-2018")
+               case_when(
+                 Erhebung == "l" & Distance == 2 ~ "2014-2016",
+                 Erhebung == "n" & Distance == 2 ~ "2016-2018",
+                 Erhebung == "m" & Distance == 1 ~ "2016-2017",
+                 Erhebung == "n" & Distance == 1 ~ "2017-2018")
       ) %>% 
       group_by(change_label) %>% 
       summarise(
