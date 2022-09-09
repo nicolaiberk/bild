@@ -45,7 +45,9 @@ SingleDVModel <- function(var){
                     select(dv, post, treat, ID, Wave),
                   cluster = c("ID", "Wave"))
   
-  modelsummary::modelsummary(single_model, output = "markdown")
+  modelsummary::modelsummary(single_model, 
+                             output = "markdown",
+                             stars = T)
   
 }
 
