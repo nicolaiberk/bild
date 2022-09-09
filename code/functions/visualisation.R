@@ -279,8 +279,8 @@ DiDPlot <- function(multi = F,
                        dv_name = "Migration Attitude",
                        scaled = T,
                        size = 1,
-                       boundary_share = 1,
-                       theoretical_effect_size = 0.1,
+                       boundary_share = 0.25,
+                       theoretical_effect_size = 0.6,
                        clustering = "lfdn") {
   
   gles_p_long <- 
@@ -297,6 +297,7 @@ DiDPlot <- function(multi = F,
     }else if(scaled){
       # standardised dv
       gles_p_long["dv"] <- scale(gles_p_long["1130_clean"])
+      theoretical_effect_size <- theoretical_effect_size/sd(gles_p_long[["1130_clean"]], na.rm = T)
       
     }else if (!scaled){
       
@@ -422,10 +423,10 @@ DiDPlot <- function(multi = F,
       facet = T, 
       ) +
       geom_vline(xintercept = 0, lty = 1, col = "red", size = size) +
-      # geom_vline(xintercept = theoretical_effect_size*boundary_share, lty = 3, col = "orange", size = size) +
-      # geom_vline(xintercept = -1*theoretical_effect_size*boundary_share, lty = 3, col = "orange", size = size) +
-      geom_vline(xintercept = theoretical_effect_size, lty = 3, col = "black", size = size) +
-      geom_vline(xintercept = -1*theoretical_effect_size, lty = 3, col = "black", size = size)
+      geom_vline(xintercept = theoretical_effect_size*boundary_share, lty = 3, col = "black", size = size) +
+      geom_vline(xintercept = -1*theoretical_effect_size*boundary_share, lty = 3, col = "black", size = size) +
+      geom_vline(xintercept = theoretical_effect_size, lty = 2, col = "black", size = size) +
+      geom_vline(xintercept = -1*theoretical_effect_size, lty = 2, col = "black", size = size)
 
   }else{
     
@@ -487,8 +488,8 @@ DiDPlot <- function(multi = F,
 DiDByWavePlot <- function(dv = "1130_clean", 
                              size = 1,
                              scaled = F,
-                             boundary_share = 1,
-                             theoretical_effect_size = 0.1,
+                             boundary_share = 0.25,
+                             theoretical_effect_size = 0.6,
                              return_ests = F) {
   
   gles_p_long <- 
@@ -549,9 +550,21 @@ DiDByWavePlot <- function(dv = "1130_clean",
   
   }else{
     
+    ests <- 
+      rbind(
+        ests,
+        data.frame(
+          wave = 1,
+          date = max(gles_p_long$date_clean[gles_p_long$wave == 1], na.rm = T),
+          point = 0,
+          lower = 0,
+          upper = 0
+        )
+      )
+    
     ests %>% 
-      ggplot(aes(x = date, y= point, ymin = upper, ymax = lower)) +
-      geom_hline(yintercept = 0, col = "red", size = size) +
+      ggplot(aes(x = date, y = point, ymin = lower, ymax = upper)) +
+      geom_hline(yintercept = 0, col = "black", size = size) +
       geom_hline(yintercept = boundary_share*theoretical_effect_size,
                  lty = 3, col = "black", size = size) +
       geom_hline(yintercept = boundary_share*-1*theoretical_effect_size, 
@@ -560,8 +573,7 @@ DiDByWavePlot <- function(dv = "1130_clean",
                  lty = 2, col = "black", size = size) +
       geom_hline(yintercept = -1*theoretical_effect_size,
                  lty = 2, col = "black", size = size) +
-      geom_vline(xintercept = as.Date(postdate), lty = 2, col = "red", size = size) +
-      geom_vline(xintercept = as.Date("2017-06-01"), lty = 3, col = "orange", size = size) +
+      geom_vline(xintercept = as.Date(postdate), lty = 2, col = "black", size = size) +
       geom_pointrange(size = size) +
       xlab("Date") + ylab("Effect") +
       theme_minimal() %>% 
@@ -1398,7 +1410,7 @@ MigChangePlot <- function(return_table = F,
         scale_fill_manual(values = color_palette) +
         ylab("Change in immigration attitude") +
         xlab("") +
-        facet_wrap(~Distance, scales = "free_x") +
+        facet_wrap(~Distance == 1, scales = "free_x") +
         theme_minimal() + 
         # removes facet labels
         theme(
