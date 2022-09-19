@@ -56,6 +56,23 @@ Table 1 shows the number of print copies sold and online page impressions for ea
 
 ### Crime
 
+
+```{=tex}
+\begin{table}
+\centering
+\begin{tabular}{|p{12cm}|}
+\hline
+Final new years eve report of Cologne police: male groups identified \\ \hline
+Police searching for Northern-african offender: asylum-raid in Dortmund! \\ \hline
+Search in refugee home - mega-raid addressing asylum fraud \\ \hline
+Two groups attacking each other - again bloody conflict in refugee shelter \\ \hline
+Cabin fever! Violence! Mass brawls! This is behind the increase in refugee clashes \\ \hline
+\end{tabular}
+\caption{Headlines of five migration articles most likely to concern crime, according to BERT crime classifier. Translation by author.}
+\label{tab:exampleArticles}
+\end{table}
+```
+
 ## Salience of Migration
 
 
@@ -107,145 +124,10 @@ InSelection()
 
 ```{r crowdout}
 
-gles_long <- 
-  fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
-  select(lfdn, date_clean, wave, 
-         `1661a_clean`:`1661g_clean`, `1600_clean`, `1681f_clean`,
-         `1130_clean`, post, treat)
-
-gles_long <- 
-  gles_long %>% 
-  mutate(
-    other_print = 
-      `1661b_clean` +
-      `1661c_clean` +
-      `1661d_clean` +
-      `1661e_clean` +
-      `1661f_clean` +
-      `1661g_clean`,
-    dv = `1130_clean`,
-    tv_use = `1681f_clean`,
-    in_use = `1600_clean`,
-    treat = as.factor(treat),
-    post = as.factor(post)
-  ) %>% 
-  mutate(other_print = 
-           case_when(
-             other_print == 0 ~ "0",
-             other_print > 0  & 
-               other_print <= 3 ~ "1-3",
-             other_print > 3  & 
-               other_print <= 9 ~ "4-9",
-             other_print > 9  & 
-               other_print <= 15 ~ "10-15",
-             other_print > 15 ~ ">15"
-           )
-        ) %>% 
-  filter(!wave %in% c("a1", "a2"))
-
-ests <- 
-  data.frame(
-    CATE = NULL,
-    CATE_lower = NULL,
-    CATE_upper = NULL,
-    value = NULL,
-    moderator = NULL
-  )
-
-for (mod in c("tv_use", "in_use", "other_print")){
-  
-
-  values <- 
-    gles_long %>%
-    filter(!is.na(get(mod))) %>% 
-    select(mod) %>% 
-    unique() %>% 
-    .[[1]]
-  
-  for (value in values){
-    
-    temp <- 
-      gles_long %>% 
-      filter(get(mod) == value)
-    
-    m <- 
-      fixest::feglm(dv ~ post*treat | ID + Wave, 
-                  data = 
-                    temp %>% 
-                    filter(!is.na(dv)) %>% 
-                    mutate(
-                      Wave = 
-                        ifelse(
-                          wave %in% sort(unique(.$wave))[c(1, 2)],
-                          "reference",
-                          wave
-                        ),
-                      ID = lfdn
-                    ) %>% 
-                    select(dv, post, treat, ID, Wave),
-                  cluster = c("ID", "Wave"))
-    
-    ests <- 
-      rbind(
-        ests,
-        data.frame(
-          CATE = m$coefficients["postTRUE:treatTRUE"],
-          CATE_lower = confint(m)["postTRUE:treatTRUE", "2.5 %"],
-          CATE_upper = confint(m)["postTRUE:treatTRUE", "97.5 %"],
-          value = value,
-          moderator = mod
-        )
-      )
-    
-  }
-      
-}
-
-ests <- 
-  ests %>% 
-  mutate(
-    effect_label = 
-      ifelse(
-        value == "0",
-        as.character(round(CATE, 3)),
-        ""
-      ),
-    
-  )
-
-varnames <- 
-  list(
-    "in_use" = "Internet use", 
-    "other_print" = "Days other print consumed", 
-    "tv_use" = "TV use")
-
-labeller <- function(variable,value){
-  return(varnames[value])
-}
-
-ests %>%
-  ggplot(aes(x = factor(value,
-                        levels = as.character(c(0, 1, "1-3", 2, 3, 4, "4-9", 
-                                              5, 6, 7, 8, 9, 10, "10-15",
-                                              ">15"))), 
-             y = CATE, ymin = CATE_lower, ymax = CATE_upper,
-             col = value != "0")) +
-  geom_hline(yintercept = 0) +
-  geom_hline(yintercept = c(0.15, -0.15), lty = 3) +
-  geom_hline(yintercept = c(0.6, -0.6), lty = 2) +
-  geom_pointrange() +
-  geom_text(aes(x = "0", 
-                y = CATE, 
-                label = effect_label,
-                hjust = -.3)
-            ) +
-  facet_wrap(~moderator, scales = "free_x",
-             labeller = labeller) +
-  theme_minimal() +
-  xlab("") +
-  theme(legend.position = "None")
+CrowdOutEstimates(vis = T)
 
 ```
+
 
 
 # Difference-in-Differences Estimates
@@ -299,8 +181,6 @@ ParallelTrendsPlot()
 
 ## Effect in Longterm-Panel
 
-### Reichelt
-
 ```{r LTPDiD, fig.height=2}
 
 LTPDiD()
@@ -309,7 +189,7 @@ LTPDiD()
 
 ```{r LTPDiD_table}
 
-LTPDiD(return_table = T)
+modelsummary::modelsummary(LTPDiD(return_table = T), output = "markdown", stars = T)
 
 ```
 
@@ -491,57 +371,9 @@ cors %>%
 
 #### Interaction of DiD with Crime Attitude (following Nelson & Kinder 1996)
 
-(Association of Crime with migration attitude should be sigificantly higher in post-treatment-group)
-
 ```{r did_cond_crime}
 
-gles_p_long <- fread(here('data/raw/gles/Panel/long_cleaned.csv'))
-
-# define dv and conditioning variable
-gles_p_long[["dv"]] <- gles_p_long[["1130_clean"]]
-gles_p_long[["crime_att"]] <- gles_p_long[["2880h_clean"]]
-gles_p_long$Individual <- gles_p_long$lfdn
-
-inter <- 
-  feglm(dv ~ post * treat * crime_att, 
-        cluster = c("Individual"), 
-        data = gles_p_long %>% 
-          filter(!is.na(dv), !is.na(treat), !is.na(post), !is.na(crime_att)))
-
-inter_cond <- 
-  feglm(dv ~ post * treat * init_mig * crime_att , 
-        cluster = c("Individual"), 
-        data = gles_p_long %>% 
-          filter(!is.na(dv), !is.na(treat), !is.na(post), 
-                 !is.na(crime_att), !is.na(init_mig)))
-
-inter_fe_cond <- 
-  feglm(dv ~ post * treat * init_mig * crime_att | Individual, 
-        cluster = c("Individual"), 
-        data = gles_p_long %>% 
-          filter(!is.na(dv), !is.na(treat), !is.na(post), 
-                 !is.na(crime_att), !is.na(init_mig)))
-
-inter_fe <- 
-  feglm(dv ~ post * treat * crime_att | Individual, 
-        cluster = c("Individual"), 
-        data = gles_p_long %>% 
-          filter(!is.na(dv), !is.na(treat), !is.na(post), !is.na(crime_att)))
-
-modelsummary(
-  list(
-    inter, inter_fe, inter_cond, inter_fe_cond
-  ),
-  stars = T,
-  # coef_map =
-  #   c("postTRUE:treatTRUE" = "ATE",
-  #     "postTRUE:treatTRUE:crime_att" = "ATE X Crime Attitude",
-  #     "postTRUE:treatTRUE:init_mig:crime_att" = "ATE X Crime Attitude X \nInitial Migration Attitude"),
-  gof_omit = "^(?!R2.Pseudo|Num|Std|FE)", 
-  output = "markdown"
-)
-
-rm(gles_p_long, inter, inter_fe, inter_cond, inter_fe_cond)
+MigCrimeCorTable()
 
 
 ```
