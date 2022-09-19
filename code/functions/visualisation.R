@@ -219,52 +219,41 @@ TreatmentDiDPlot <- function(size = 1,
 
 ## Descriptive visualisation - cntrl vs treatment (by group)
 
-DescPlot <- function(placebo = F, 
-                    exclude_pretreated = F, 
-                    legend_position = "right"){
+DescPlot <- function(legend_position = "right",
+                     colorful = F){
   
   gles_p_long <- fread(here('data/raw/gles/Panel/long_cleaned.csv'))
   
   postdate <- as.Date("2017-02-01")
   title <- "Mean migration attitude post-Reichelt takeover"
-  subtitle <- "by readership and initial migration attitude"
-  
-  if (placebo & !exclude_pretreated){
-    
-    gles_p_long$treat <- gles_p_long$treat_placebo
-    gles_p_long$post  <- gles_p_long$post_placebo
-    gles_p_long$init_mig_groups <- gles_p_long$init_mig_groups_placebo
-    title <- "Mean migration attitudes post Placebo"
-    subtitle <- "by readership and initial migration attitude"
-    postdate <- as.Date("2018-01-01")
-    
-  }else if (placebo & exclude_pretreated){
-    
-    gles_p_long$treat <- gles_p_long$treat_placebo_np
-    gles_p_long$post  <- gles_p_long$post_placebo
-    gles_p_long$init_mig_groups <- gles_p_long$init_mig_groups_placebo
-    title <- "Placebo estimate post BTW"
-    subtitle <- "excluding Bild readers W1, by readership and initial migration attitude"
-    postdate <- as.Date("2018-01-01")
-    
-  }
+  subtitle <- "by readership"
   
   gles_p_long %>% 
-    filter(!is.na(treat), init_mig_groups != "", !is.na(`1130_clean`)) %>%
-    group_by(treat, post, init_mig_groups, wave) %>% 
+    filter(!is.na(treat), !is.na(`1130_clean`)) %>%
+    group_by(treat, post, wave) %>% 
     summarise(
       dv_mean = mean(`1130_clean`),
       date_min = min(date_clean)
     ) %>% 
     ggplot(aes(x = date_min, y = dv_mean, 
-               col = treat, shape = treat, 
-               lty = init_mig_groups)) +
+               col = !treat, shape = !treat, lty = !treat)) +
     geom_line() + geom_point() +
-    geom_vline(xintercept = postdate, lty = 2, col = "red") +
+    geom_vline(xintercept = postdate, lty = 2, col = ifelse(colorful, "red", "black")) +
     xlab("") + ylab("Immigration Attitude") +
-    scale_color_discrete(name = "Group", labels = c("Not Bild-reader", "Bild reader")) +
-    scale_shape_discrete(name = "Group", labels = c("Not Bild-reader", "Bild reader")) +
-    scale_linetype_discrete(name = "Pre-treatment\nImmigration Att.") +
+    scale_color_manual(name = "Group",
+                       labels = c("Not Bild-reader", "Bild reader") %>% 
+                         rev(),
+                       values = if(colorful){
+                         MetBrewer::met.brewer("Archambault", 2)
+                       }else{
+                         c("black", "darkgray")
+                       }) +
+    scale_linetype_discrete(name = "Group",
+                              labels = c("Not Bild-reader", "Bild reader") %>% 
+                         rev()) +
+    scale_shape_discrete(name = "Group", 
+                       labels = c("Not Bild-reader", "Bild reader") %>% 
+                         rev()) +
     theme_minimal() +
     theme(legend.position = legend_position) +
     ggtitle(title, subtitle) %>% 
