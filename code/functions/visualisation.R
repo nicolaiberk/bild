@@ -571,69 +571,6 @@ DiDByWavePlot <- function(dv = "1130_clean",
   }
 }
 
-
-
-## Dependent on prior position ####
-
-InterLinear <- function(placebo = F, exclude_pretreated = F) {
-  
-  gles_p_long <- fread(here('data/raw/gles/Panel/long_cleaned.csv'))
-  title <- "Pre-post differences of treated and untreated"
-  
-  if (placebo & !exclude_pretreated){
-    
-    gles_p_long$treat <- gles_p_long$treat_placebo
-    gles_p_long$post  <- gles_p_long$post_placebo
-    gles_p_long$init_mig <- gles_p_long$init_mig_placebo
-    title <- "Placebo estimate post BTW"
-    
-  }else if (placebo & exclude_pretreated){
-    
-    gles_p_long$treat <- gles_p_long$treat_placebo_np
-    gles_p_long$post  <- gles_p_long$post_placebo
-    gles_p_long$init_mig <- gles_p_long$init_mig_placebo
-    title <- c("Placebo estimate post BTW, excluding pretreated")
-    
-  }
-  
-  diffs <- 
-    gles_p_long %>% 
-    filter(!is.na(treat), !is.na(init_mig)) %>%
-    group_by(treat, post, init_mig) %>% 
-    summarise(
-      dv_point = mean(`1130_clean`, na.rm = T)
-    ) %>% 
-    filter(post) %>% 
-    pivot_wider(
-      names_from = treat,
-      values_from = dv_point
-    ) %>% 
-    mutate(difference = `TRUE`-`FALSE`) 
-  
-  diffs %>% 
-    ggplot(aes(x = init_mig, y = difference)) +
-    geom_col() + 
-    theme_minimal() + xlab("") + ylab("") +
-    ylim(-.2, 1) +
-    ggtitle(title, " by initial migration attitude")
-  
-}
-
-## DiD Distribution ####
-
-DiDDist <- function() {
-  fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>%
-    filter(!is.na(treat), !is.na(post)) %>% 
-    mutate(post = factor(ifelse(post, "POST", "PRE"), 
-                         levels = c("PRE", "POST"))) %>% 
-    ggplot(aes(x=`1130_clean`,
-               fill=treat))+
-    geom_histogram() +
-    ylab("Immigration Attitude") +
-    theme_minimal() + 
-    facet_grid(treat~post, scales = "free")
-}
-
 ## Pre-post correlation of migration and crime ####
 
 ### plot
