@@ -44,7 +44,7 @@ WORD COUNT: `r wordcountaddin::word_count(here("paper/Manuscript_Framing.Rmd"))`
 
 \medskip
 
-*I am thankful for extensive feedback and other support on this manuscript from Christian Arnold, Daniel Bischof, Philipp Broniecki, Jóhanna Ýr Bjarnadóttir, Elias Dinas, Florian Foos, Violetta Haas, Felix Hagemann, Julian Heid, Christina Gahn, Heike Klüver, Martin Vinæs Larsen, Matthew Levendusky, Will Lowe, Thomas M. Meyer, Rune Slothuus, Judith Spirig, Antonio Valentim as well as participants of CompText 2022, EPSA 2022, ICA 2022, EPSIP Colloquium at HU Berlin, CIVICA EGN Workshop at the EUI,  and the Political Behaviour Section at Aarhus University. I also thank the two research assistants, Robin Groß and Nathalie Aerts, for annotating the news articles. All remaining confusions are my own.*
+*I am thankful for extensive feedback and other support on this manuscript from Christian Arnold, Daniel Bischof, Philipp Broniecki, Jóhanna Ýr Bjarnadóttir, Elias Dinas, Florian Foos, Violetta Haas, Felix Hagemann, Anselm Hager, Julian Heid, Christina Gahn, Heike Klüver, Martin Vinæs Larsen, Matthew Levendusky, Will Lowe, Thomas M. Meyer, Rune Slothuus, Judith Spirig, Antonio Valentim, as well as participants of CompText 2022, EPSA 2022, ICA 2022, EPSIP Colloquium at HU Berlin, CIVICA EGN Workshop at the EUI,  and the Political Behaviour Section at Aarhus University. I also thank the two research assistants, Robin Groß and Nathalie Aerts, for annotating the news articles. All remaining confusions are my own.*
 
 # Introduction: Does Framing Matter?
 
