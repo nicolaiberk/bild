@@ -84,54 +84,6 @@ MigCrimeCorTable <- function(){
     return()
 }
 
-TobitDiD <- function(dv_name, 
-                     cond_var = "init_mig", 
-                     cond_name = "\nImmigration Attitude W1") {
-  
-  gles_p_long <- data.table::fread(here('data/raw/gles/Panel/long_cleaned.csv'))
-  
-  # define dv and conditioning variable
-  gles_p_long[["dv"]] <- gles_p_long[[dv_name]]
-  gles_p_long[["cond"]] <- gles_p_long[[cond_var]]
-  
-  
-  
-  # model 1: direct effect
-  ate <- 
-    censReg::censReg(
-      dv ~ post * treat, 
-          left = -3, right = 3, 
-          data = 
-            gles_p_long %>% 
-            filter(!is.na(dv), !is.na(treat), !is.na(post)))
-  
-  inter <- 
-    censReg::censReg(
-      dv ~ post * treat * cond, 
-      left = -3, right = 3,
-          data = gles_p_long %>% 
-            filter(!is.na(dv), !is.na(treat), !is.na(post), !is.na(cond)))
-  
-  
-  coef_map <- 
-    c("postTRUE:treatTRUE" = "ATE", 
-      "postTRUE:treatTRUE:cond" = paste0("ATE X ", cond_name))
-  
-  model_list <- list(ate, inter)
-    
-  
-  return(
-    modelsummary(
-      model_list,
-      stars = T,
-      coef_map = coef_map,
-      gof_omit = "^(?!R2.Pseudo|Num|Std|FE)", 
-      output = "markdown"
-    )
-  )
-  
-  
-}
 
 SelectionModel <- function() {
   
