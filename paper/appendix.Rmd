@@ -8,8 +8,8 @@ output:
 toc: TRUE
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = F, message = F, warning = F, cache = T, fig.height=6, fig.width=10, fig.align='center')
+```{r setup, include=FALSE, cache=FALSE}
+knitr::opts_chunk$set(echo = F, message = F, warning = F, cache = T, fig.height=6, fig.width=10, fig.align='center', fig.pos = "!ht", out.extra = "")
 
 library(tidyverse)
 library(dplyr)
@@ -23,7 +23,186 @@ for (filename in list.files(here("code/functions"))){
 }
 ```
 
-# Frames in Communication
+# Variables & Decriptives
+
+## Dependent Variables
+
+### Overview
+
+Table, treated vs. untreated
+
+### Immigration Attitudes (1130 in GLES)
+
+#### Question Text
+
+*Translated:*
+
+Now it's about immigration opportunities for foreigners. Should immigration opportunities for foreigners be made easier or restricted?
+
+(1) Make it easier for foreigners to move here
+(2)
+(3)
+(4)
+(5)
+(6)
+(7) Restrict immigration of foreigners
+
+*Recoded to [-3, 3].*
+
+---
+
+*Original/DE:*
+
+Jetzt geht es um Zuzugsmöglichkeiten für Ausländer. Sollten die Zuzugsmöglichkeiten für Ausländer erleichtert oder eingeschränkt werden?
+
+(1) Zuzug von Ausländern erleichtern
+(2)
+(3)
+(4)
+(5)
+(6)
+(7) Zuzug von Ausländern einschränken
+
+#### Distribution
+
+```{r}
+
+GroupedDistPlot()
+
+```
+
+
+
+### Integration Attitudes (1210 in GLES)
+
+*Translated:*
+
+There are different opinions about how much foreigners in Germany should adapt. Some think that foreigners should fully assimilate to German culture. Others think that foreigners should be able to live according to their own culture if possible.
+
+(1) Foreigners should fully assimilate to German culture
+(2)
+(3)
+(4)
+(5)
+(6)
+(7) Foreigners should, if possible, be able to live according to their own culture
+
+*Recoded to [-3, 3].*
+
+---
+
+*Original/DE:*
+
+Es gibt unterschiedliche Auffassungen darüber, wie sehr sich Ausländer in Deutschland anpassen sollten. Manche denken, dass sich Ausländer vollständig an die deutsche Kultur anpassen sollten. Andere denken, Ausländer sollten auch hier möglichst nach der eigenen Kultur leben können.
+
+(1) Ausländer sollten sich vollständig an die deutsche Kultur anpassen
+(2) 
+(3) 
+(4) 
+(5) 
+(6) 
+(7) Ausländer sollten möglichst nach eigener Kultur leben können
+
+
+### MIP: Immigration (840 in GLES)
+
+*Translated:*
+
+In your opinion, what is the most important political problem in Germany at the moment?
+Please name only one *single* problem.
+
+*0/1 indicator assessing mention of any migration related code (3411-3413 or 3750-3759; find coding scheme on GLES website).*
+
+---
+
+*Original/DE:*
+
+Was ist Ihrer Meinung nach gegenwärtig das wichtigste politische Problem in Deutschland? 
+Hinweistext: Nennen Sie bitte nur ein *einziges* Problem.  
+
+### AfD Scalometer
+
+*Translated:*
+
+What do you think of the individual political parties in general? AfD (Alternative for Germany)
+
+(1) -5 don't think much of the party at all
+(2) -4
+(3) -3
+(4) -2
+(5) -1
+(6) 0
+(7) +1
+(8) +2
+(9) +3
+(10) +4
+(11) +5 think very highly of the party
+ 
+(-71) I don't know [labeled as "not known" in the data set]
+
+*Recoded to [-5, 5].*
+
+---
+
+*Original/DE:*
+
+Was halten Sie so ganz allgemein von den einzelnen politischen Parteien? AfD (Alternative für Deutschland)
+
+(1) -5 halte überhaupt nichts von der Partei 
+(2) -4 
+(3) -3 
+(4) -2 
+(5) -1 
+(6) 0 
+(7) +1 
+(8) +2 
+(9) +3 
+(10) +4 
+(11) +5 halte sehr viel von der Partei 
+ 
+(-71) kenne ich nicht [im Datensatz gelabelt als „nicht bekannt“]
+
+### Attitude towards fighting crime (2880h)
+
+#### Question Text
+
+*Translated:*
+
+State powers to fight crime should be expanded, even if this means more surveillance of citizens.
+
+(1) totally disagree
+(2) rather disagree
+(3) partly/partly
+(4) tend to agree
+(5) I totally agree
+
+*Recoded to [-2, 2].*
+
+---
+
+*Original/DE:*
+
+Die staatlichen Befugnisse in der Kriminalitätsbekämpfung sollten ausgeweitet werden, auch wenn das zu einer stärkeren Überwachung der Bürger führt.
+
+(1) stimme überhaupt nicht zu
+(2) stimme eher nicht zu
+(3) teils/teils
+(4) stimme eher zu
+(5) stimme voll und ganz zu
+
+
+## Bild Readership
+
+## Media Exposure Variables
+
+### Other Newspapers
+
+### TV News
+
+### Internet News Consumption
+
+
+# Treatment
 
 ## Market Coverage of Different Newspapers
 
@@ -52,10 +231,13 @@ Table 1 shows the number of print copies sold and online page impressions for ea
 
 ## BERT Classifiers
 
-### Migration
+### Dictionaries
 
-### Crime
+### Handcoding
 
+### Preprocessing
+
+### Training
 
 ```{=tex}
 \begin{table}
@@ -73,10 +255,8 @@ Cabin fever! Violence! Mass brawls! This is behind the increase in refugee clash
 \end{table}
 ```
 
-## Salience of Migration
 
-
-## Correcting for change in DPA-sourced content
+### Correcting for change in DPA-sourced content
 
 Among the changes after Reichelt's takeover as chief editor of *Bild* was a severe drop in the overall number of articles published online. Figure \@ref(fig:dpaShare) shows the monthly number of articles *Bild* published in their online archive across time. Recall that Reichelt took over in February 2017, and briefly after - in June 2017 - the overall number of articles published decreases by over 60%. The graph also suggests an explanation for this sudden shift: the share of articles sourced from DPA, a major German press agency alike the Associated Press, sharply decreases at the same time as the major decrease in the number of articles takes place (see top blue bars). DPA is a press agency supplying many German news outlets, which means it must have a rather unbiased or at least centrist coverage, potentially decreasing the estimate of crime frames within Bild's migration content. This would not be a problem, as long as this content is equally likely to make it to the front page. However, *Bild* likely gives more weight to its own content compared to pre-written content from DPA. For this reason, the paper presented data excluding DPA content. On the other hand, the decision to discontinue buying content from DPA must have been made by Reichelt himself and is thus an outcome of the treatment. Hence, it is fruitful to assess the change including DPA-sourced content. 
 
@@ -104,6 +284,9 @@ data.table::fread(here("data/raw/newspapers/_bild_articles.csv"),
 
 The left panel of figure \@ref(fig:treatmentDPAcorr) displays the quarterly share of migration articles discussing crime for *Bild* compared to all other newspapers. A depression is visible in 2016-2017 which was not visible in the corrected data. The share of crime content in *Bild*'s migration coverage strongly increases a few months following the treatment, when the share of DPA-sourced content severely drop. The gap between *Bild* and all other newspapers increases, and this increased difference persists. This change becomes even more visible in the right-hand panel, which shows a difference-in-differences estimate of the change of the share of crime news in a newspapers migration content, this time controlling for whether the content is DPA-sourced or not. The general picture is quite similar to the original estimate in the paper, as migration coverage only increases in *Bild*, while all other outlets remain rather stable on this metric. In the estimate including DPA content, the share of migration coverage devoted to crime increases by an even stronger 6 percentage points, which still constitutes a very substantial increase. Both ways of handling the data suggest a strong increase in the emphasis of crime in migration coverage.
 
+
+### Raw Crime Estimates
+
 ```{r treatmentDPAcorr, fig.cap="Change in share of crime content in newspaper coverage, excluding DPA-sourced news content. Left panel: quarterly share across time, Bild compared to other newspapers' average. Right panel: difference-in-differences estimates of change in newspaper coverage compared to other newspapers, controlling for source of content."}
 
 TreatmentTrendPlot(dpa_corrected = F) + 
@@ -111,32 +294,19 @@ TreatmentTrendPlot(dpa_corrected = F) +
 
 ```
 
-# Readership models
 
-## Inward selection
-
-```{r inselection, fig.cap="Coefficients of OLS regression of readership on migration attitude across waves. Vertical lines indicate 95% confidence intervals, dashed (red) vertical line indicates editorial change."}
-
-InSelection()
-
-```
-## Crowding out
-
-```{r crowdout}
-
-CrowdOutEstimates(vis = T)
-
-```
+### Migration Attention over Time
 
 
 
-# Difference-in-Differences Estimates
+## Salience of Migration
+
+
+# Results
+
+## Treatment Groups
 
 Treated Group: Bild Readers in first (and only pre-treatment) wave. Control Group: Never-Readers of Bild. Post Date: $>=$ 01.02.2017
-
-## Descriptives
-
-Show Demographics for Treatment and Control Groups.
 
 ```{r, bild_descriptives}
 
@@ -167,9 +337,7 @@ rm(gles_p_long, desc)
 
 Note that the variable "Birthyear" is left-censored in the data. All respondents born before 1955 were assigned 1955 as birth year.
 
-## DiD assumptions
-
-### Parallel Trends
+## Parallel Trends
 
 Figure \@ref(fig:parallelTrends) shows the development of migration attitudes among a panel of Bild readers\footnote{Readership was measured in a single wave in late 2015.} and non-readers across time, recorded in the German Longitudinal Election Study's Longterm Panel [@SOURCE]. This is a far smaller sample with a limited time frame and hence less useful for the precise estimation of the effects of changing migration framing. The plot shows that both groups move along a similar long-term trend, slowly becoming more conservative, while moving into similar directions along the way. The only difference between the two groups is that Bild readers seem to be more conservative in late 2015 (note that only the last three interviews were conducted in January 2016). However this deviation lies well within the 95% confidence interval and those not reading Bild move in a similar direction, albeit less strongly. The parallel trends assumption seems to be generally met.
 
@@ -178,6 +346,22 @@ Figure \@ref(fig:parallelTrends) shows the development of migration attitudes am
 ParallelTrendsPlot()
 
 ```
+
+
+## Robustness of Main Effect
+
+```{r did_imm_att, results='asis'}
+
+SingleDVModel('1130_clean')
+
+```
+
+
+## Multiple DV Table
+
+## Longterm-Panel Model
+
+
 
 ## Effect in Longterm-Panel
 
@@ -194,182 +378,8 @@ modelsummary::modelsummary(LTPDiD(return_table = T), output = "markdown", stars 
 ```
 
 
+## Association Model
 
-## Variable: Immigration Attitudes
-
-### Outcome: Reduce Immigration (1130)
-
-#### Question Text
-
-Jetzt geht es um Zuzugsmöglichkeiten für Ausländer. Sollten die Zuzugsmöglichkeiten für Ausländer erleichtert oder eingeschränkt werden?
-
-(1) Zuzug von Ausländern erleichtern
-(2)
-(3)
-(4)
-(5)
-(6)
-(7) Zuzug von Ausländern einschränken
-
-*Recoded to [-3, 3].*
-
-#### Treatment groups across time
-
-(add counterfactual if time)
-
-```{r did_imm_att_plot}
-
-fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
-  filter(!is.na(`1130_clean`), !is.na(treat)) %>% 
-  group_by(treat, wave) %>% 
-  summarise(
-    date_clean = min(date_clean, na.rm = T),
-    mig_mean = mean(`1130_clean`, na.rm = T),
-    mig_sd = sd(`1130_clean`, na.rm = T),
-    N = n()
-  ) %>% 
-  mutate(
-    mig_lower = mig_mean + qt(0.025, df = N-1) * (mig_sd/sqrt(N)),
-    mig_upper = mig_mean + qt(0.975, df = N-1) * (mig_sd/sqrt(N))
-  ) %>% 
-  ggplot(aes(x = date_clean, y = mig_mean,
-             ymin = mig_lower, ymax = mig_upper,
-             lty = !treat, col = !treat)) +
-  geom_line() +
-  geom_pointrange() +
-  geom_vline(xintercept = as.Date("2017-02-01"), lty = 2, col = "red") + 
-  theme_minimal() +
-  labs( x = "", y = "", col = "Readership", lty = "Readership") +
-  scale_color_manual(labels = c("Bild", "Never Bild"),
-                     values = MetBrewer::met.brewer("Archambault", 2)) +
-  scale_linetype_manual(labels = c("Bild", "Never Bild"),
-                     values = c(1,2))
-
-```
-
-#### Effect of Reichelt takeover
-
-```{r did_imm_att}
-
-SingleDVModel('1130_clean')
-
-```
-
-### Outcome: Integration Attitude (1210)
-
-#### Question Text
-
-Es gibt unterschiedliche Auffassungen darüber, wie sehr sich Ausländer in Deutschland anpassen sollten. Manche denken, dass sich Ausländer vollständig an die deutsche Kultur anpassen sollten. Andere denken, Ausländer sollten auch hier möglichst nach der eigenen Kultur leben können.
-
-(1) Ausländer sollten sich vollständig an die deutsche Kultur anpassen
-(2) 
-(3) 
-(4) 
-(5) 
-(6) 
-(7) Ausländer sollten möglichst nach eigener Kultur leben können
-
-*Recoded to [-3, 3].*
-
-#### Effect of Reichelt takover
-
-```{r did_int_att}
-
-SingleDVModel("1210_clean")
-
-```
-
-## Variable: Voting Behaviour
-
-### Outcome: Scalometer AfD (430i)
-
-#### QUESTION TEXT MISSING
-
-#### DiD Estimate
-
-
-```{r afd_scale}
-
-SingleDVModel("430i_clean")
-
-```
-
-
-## Variable: Issue Importance
-
-### Outcome: MIP Migration (840s)
-
-#### QUESTION TEXT MISSING
-
-#### DiD Estimate
-
-```{r did_mip_mig}
-
-SingleDVModel("mip_mig")
-
-```
-
-
-## Variable: Crime Considerations
-
-### Attitudes towards fighting crime (2880h)
-
-#### Question Text
-
-Die staatlichen Befugnisse in der Kriminalitätsbekämpfung sollten ausgeweitet werden, auch wenn das zu einer stärkeren Überwachung der Bürger führt.
-
-(1) stimme überhaupt nicht zu
-(2) stimme eher nicht zu
-(3) teils/teils
-(4) stimme eher zu
-(5) stimme voll und ganz zu
-
-#### Direct Effect
-
-```{r did_crime_att}
-
-SingleDVModel("2880h_clean")
-
-```
-
-#### Bootstrap of correlations
-
-```{r crime_mig_cor}
-
-cors <- 
-  fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
-  filter(!is.na(`1130_clean`), !is.na(`2880h_clean`), !is.na(treat)) %>% 
-  group_by(treat, post) %>% 
-  summarise(mig_crime_cor = cor(`1130_clean`, `2880h_clean`, use = "complete.obs")) %>% 
-  mutate(universe = "factual")
-
-cors <- 
-  cors %>% 
-  rbind(
-    data.frame(
-      treat = c(TRUE, TRUE),
-      post = c(FALSE, TRUE),
-      mig_crime_cor = c(cors[cors$treat & !cors$post, "mig_crime_cor"][[1]], 
-                        cors[cors$treat & !cors$post, "mig_crime_cor"][[1]] +  
-                          sqrt((cors[cors$treat & cors$post, "mig_crime_cor"][[1]] -
-                          cors[!cors$treat & cors$post, "mig_crime_cor"][[1]])^2)),
-      universe = "counterfactual"
-    ), 
-  ) %>% 
-  mutate(universe = factor(universe, levels = c("factual", "counterfactual")))
-
-
-cors %>% 
-  mutate(treat_universe = paste(treat, universe, sep = "_")) %>% 
-  ggplot(aes(x = post, y = mig_crime_cor, col = treat, lty = universe, group = treat_universe)) +
-  geom_point() +
-  geom_line() +
-  theme_minimal()
-
-```
-
-
-#### Interaction of DiD with Crime Attitude (following Nelson & Kinder 1996)
 
 ```{r did_cond_crime}
 
@@ -377,4 +387,26 @@ MigCrimeCorTable()
 
 
 ```
+
+## Readership models
+
+### Inward selection
+
+
+```{r inselection}
+
+InSelection()
+
+```
+
+Coefficients of OLS regression of readership on migration attitude across waves. Vertical lines indicate 95% confidence intervals, dashed (red) vertical line indicates editorial change.
+
+### Crowding out
+
+```{r crowdout}
+
+CrowdOutEstimates(vis = T)
+
+```
+
 
