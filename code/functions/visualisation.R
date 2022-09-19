@@ -1369,16 +1369,57 @@ LTPDiD <- function(return_table = F,
   
   }else{
     
+    ## return table
     return(single_model)
     
   }
   
-  
-  
-  
-  ## return table
-  
 }
 
 
+
+# Variable Descriptives ####
+
+GroupedDistPlot <- function(variable = NULL,
+                            header = "") {
+  
+  if(is.null(variable)){stop("Must provde variable name")}
+  
+  gles_p_long <- fread(here('data/raw/gles/Panel/long_cleaned.csv'))
+  
+  gles_p_long[["dv"]] <- gles_p_long[[variable]]
+  
+  p_upper <- 
+    gles_p_long %>% 
+    filter(treat) %>% 
+    ggplot(aes(dv)) +
+    geom_bar(aes(y = (..count..)/sum(..count..)),
+             fill = MetBrewer::met.brewer("Archambault")[4]) +
+    geom_vline(xintercept = 
+                 gles_p_long %>% 
+                 filter(treat) %>% 
+                 summarise(dv = mean(dv, na.rm = T)) %>% 
+                 .[1,]) +
+    theme_minimal() +
+    xlab("") + ylab("Share") +
+    ggtitle(header, "Bild Readers")
+  
+  p_lower <- 
+    gles_p_long %>% 
+    filter(!treat) %>% 
+    ggplot(aes(dv)) +
+    geom_bar(aes(y = (..count..)/sum(..count..)),
+             fill = MetBrewer::met.brewer("Archambault")[1]) +
+    geom_vline(xintercept = 
+                 gles_p_long %>% 
+                 filter(!treat) %>% 
+                 summarise(dv = mean(dv, na.rm = T)) %>% 
+                 .[1,]) +
+    theme_minimal() +
+    xlab("") + ylab("Share") +
+    ggtitle("", "Never Bild Readers")
+  
+  return(p_upper / p_lower)
+  
+}
 
