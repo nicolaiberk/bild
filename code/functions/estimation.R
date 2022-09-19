@@ -17,7 +17,9 @@ library(modelsummary)
 
 # Difference-in-Difference model
 
-SingleDVModel <- function(var){
+SingleDVModel <- function(varname = NULL){
+  
+  if(is.null(varname)){stop("Need to define varname!")}
   
   gles_p_long <- 
     fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
@@ -26,9 +28,50 @@ SingleDVModel <- function(var){
   postdate <- as.Date("2017-02-01")
   title <- "Mean migration attitude post-Reichelt takeover"
   
-  gles_p_long["dv"] <- gles_p_long[var]
+  gles_p_long["dv"] <- gles_p_long[varname]
   
-  single_model <- 
+  raw_model <- 
+    fixest::feglm(dv ~ post*treat, 
+                  data = gles_p_long)
+  
+  id_fes <- 
+    fixest::feglm(dv ~ post*treat | ID, 
+                  data = 
+                    gles_p_long %>% 
+                    filter(!is.na(dv)) %>% 
+                    mutate(
+                      ID = lfdn
+                    ) %>% 
+                    select(dv, post, treat, ID))
+  
+  id_fes_clustered <- 
+    fixest::feglm(dv ~ post*treat | ID, 
+                  data = 
+                    gles_p_long %>% 
+                    filter(!is.na(dv)) %>% 
+                    mutate(
+                      ID = lfdn
+                    ) %>% 
+                    select(dv, post, treat, ID),
+                  cluster = c("ID"))
+  
+  twfe_no_clustering <- 
+    fixest::feglm(dv ~ post*treat | ID + Wave, 
+                  data = 
+                    gles_p_long %>% 
+                    filter(!is.na(dv)) %>% 
+                    mutate(
+                      Wave = 
+                        ifelse(
+                          wave %in% unique(.$wave[c(1,2)]),
+                          "reference",
+                          wave
+                        ),
+                      ID = lfdn
+                    ) %>% 
+                    select(dv, post, treat, ID, Wave))
+  
+  full_model <- 
     fixest::feglm(dv ~ post*treat | ID + Wave, 
                   data = 
                     gles_p_long %>% 
@@ -45,9 +88,19 @@ SingleDVModel <- function(var){
                     select(dv, post, treat, ID, Wave),
                   cluster = c("ID", "Wave"))
   
-  modelsummary::modelsummary(single_model, 
-                             output = "markdown",
-                             stars = T)
+  modelsummary::modelsummary(
+    list(
+      raw_model,
+      id_fes,
+      id_fes_clustered,
+      twfe_no_clustering,
+      full_model
+    ), 
+    output = "latex",
+    stars = T) %>% 
+    kableExtra::kable_styling() %>% 
+    kableExtra::row_spec(6, bold = T) %>% 
+    return()
   
 }
 
