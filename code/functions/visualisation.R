@@ -1391,13 +1391,13 @@ GroupedDistPlot <- function(variable = NULL,
   
   p_upper <- 
     gles_p_long %>% 
-    filter(treat) %>% 
+    filter(treat, !is.na(dv)) %>% 
     ggplot(aes(dv)) +
     geom_bar(aes(y = (..count..)/sum(..count..)),
              fill = MetBrewer::met.brewer("Archambault")[4]) +
     geom_vline(xintercept = 
                  gles_p_long %>% 
-                 filter(treat) %>% 
+                 filter(treat, !is.na(dv)) %>% 
                  summarise(dv = mean(dv, na.rm = T)) %>% 
                  .[1,]) +
     theme_minimal() +
@@ -1406,13 +1406,13 @@ GroupedDistPlot <- function(variable = NULL,
   
   p_lower <- 
     gles_p_long %>% 
-    filter(!treat) %>% 
+    filter(!treat, !is.na(dv)) %>% 
     ggplot(aes(dv)) +
     geom_bar(aes(y = (..count..)/sum(..count..)),
              fill = MetBrewer::met.brewer("Archambault")[1]) +
     geom_vline(xintercept = 
                  gles_p_long %>% 
-                 filter(!treat) %>% 
+                 filter(!treat, !is.na(dv)) %>% 
                  summarise(dv = mean(dv, na.rm = T)) %>% 
                  .[1,]) +
     theme_minimal() +

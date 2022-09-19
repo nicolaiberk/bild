@@ -67,13 +67,16 @@ Jetzt geht es um Zuzugsmöglichkeiten für Ausländer. Sollten die Zuzugsmöglic
 
 ```{r}
 
-GroupedDistPlot()
+GroupedDistPlot("1130_clean",
+                header = "Distribution of Immigration Attitudes")
 
 ```
 
 
 
 ### Integration Attitudes (1210 in GLES)
+
+#### Question Text
 
 *Translated:*
 
@@ -104,7 +107,21 @@ Es gibt unterschiedliche Auffassungen darüber, wie sehr sich Ausländer in Deut
 (7) Ausländer sollten möglichst nach eigener Kultur leben können
 
 
+#### Distribution
+
+```{r}
+
+
+GroupedDistPlot("1210_clean",
+                header = "Distribution of Integration Attitudes")
+
+```
+
+
+
 ### MIP: Immigration (840 in GLES)
+
+#### Question Text
 
 *Translated:*
 
@@ -120,7 +137,20 @@ Please name only one *single* problem.
 Was ist Ihrer Meinung nach gegenwärtig das wichtigste politische Problem in Deutschland? 
 Hinweistext: Nennen Sie bitte nur ein *einziges* Problem.  
 
-### AfD Scalometer
+#### Distribution
+
+```{r}
+
+
+GroupedDistPlot("mip_mig",
+                header = "Mention of Migration as Most Important Problem")
+
+```
+
+
+### AfD Scalometer (430i in GLES)
+
+#### Question Text
 
 *Translated:*
 
@@ -162,6 +192,18 @@ Was halten Sie so ganz allgemein von den einzelnen politischen Parteien? AfD (Al
  
 (-71) kenne ich nicht [im Datensatz gelabelt als „nicht bekannt“]
 
+#### Distribution
+
+```{r}
+
+GroupedDistPlot("430i_clean",
+                header = "Distribution of Attitude Towards AfD")
+
+
+```
+
+
+
 ### Attitude towards fighting crime (2880h)
 
 #### Question Text
@@ -191,7 +233,15 @@ Die staatlichen Befugnisse in der Kriminalitätsbekämpfung sollten ausgeweitet 
 (5) stimme voll und ganz zu
 
 
-## Bild Readership
+#### Distribution
+
+```{r}
+
+GroupedDistPlot("2880h_clean",
+                header = "Distribution of Attitude towards Fighting Crime")
+
+
+```
 
 ## Media Exposure Variables
 
