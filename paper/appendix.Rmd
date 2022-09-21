@@ -562,7 +562,7 @@ Using this sampling procedure, I generate two samples of 1000 articles for annot
 
 Along with these instructions, coders were sent example articles which were considered to be especially difficult, annotated by me.
 
-Annotation took place in a shiny app (see screenshot below). This allowed faster annotation and minimized errors
+Annotation took place in a shiny app (see screenshot below). Coders were shown the title and text of a random news article in the sample. Then they were asked whether the article refers to the topics of crime, law and order, or public safety. Coders could see a more specific definition by clicking a button. After selecting whether the article referred to crime or not, they could either click a button to get to the next article or safe their progress to return later. Coders could also return to the preceding article in case they had selected the wrong option. The app allowed for faster annotation and minimized errors in the coding (compared to noting the annotations in an excel sheet).
 
 ```{r, fig.cap="Screenshot of Annotation App"}
 
@@ -570,12 +570,64 @@ knitr::include_graphics("vis/HandCodingScreenshot.png")
 
 ```
 
+```{r}
+
+library(irr)
+
+crime_coding_nat <- 
+  fread(here("code/content_analysis/bert/crime/handcoding/crime/nathalie/handcoding_nathalie.csv"), encoding = "UTF-8")
+
+crime_coding_rob <- 
+  fread(here("code/content_analysis/bert/crime/handcoding/crime/robin/handcoding_robin.csv"), encoding = "UTF-8")
+
+## correlation of codings
+common_nat <- 
+  crime_coding_nat %>% 
+  filter(url %in% crime_coding_rob$url) %>% 
+  arrange(url)
+
+common_rob <- 
+  crime_coding_rob %>% 
+  filter(url %in% crime_coding_nat$url) %>% 
+  arrange(url)
+
+# correlation table - not so great
+table(common_nat$crime, common_rob$crime)
+
+# merge for agreement metrics
+common <- 
+  common_nat %>% 
+  mutate(
+    coder = "nathalie"
+  ) %>% 
+  select(url, coder, crime) %>% 
+  rbind(common_rob %>% 
+              mutate(
+                  coder = "robin"
+                ) %>% 
+              select(url, coder, crime)
+               )
+
+common <- 
+  common %>% 
+  mutate(
+    crime = ifelse(crime == "Ja", 1, 0)
+  ) %>% 
+  pivot_wider(id_cols = url, names_from = coder, values_from = crime) %>% 
+  select(-url)
+
+agreement <- agree(common)$value
+k_alpha <- kripp.alpha(t(common), method = "ordinal")$value
 
 
+```
 
-### Preprocessing
+The migration annotation has been conducted by only one coder (1800 articles), while the crime articles have been annotated by two different coders separately (1000 each with 200 identical articles in each coder's sample). Annotation was very reliable with an agreement for `r agreement`% of annotated articles and a Krippendorff's alpha of `r round(k_alpha, 2)`. Conflicts were resolved by the author after inspection of the conflicting codings.
 
-### Training
+
+### Classifier Training
+
+
 
 ```{=tex}
 \begin{table}
