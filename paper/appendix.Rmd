@@ -9,7 +9,8 @@ toc: TRUE
 ---
 
 ```{r setup, include=FALSE, cache=FALSE}
-knitr::opts_chunk$set(echo = F, message = F, warning = F, cache = T, fig.height=6, fig.width=10, fig.align='center', fig.pos = "!ht", out.extra = "")
+knitr::opts_chunk$set(echo = F, message = F, warning = F, cache = T, fig.height=6, 
+                      fig.width=10, fig.align='center', fig.pos = "!ht", out.extra = "")
 
 library(tidyverse)
 library(dplyr)
@@ -245,11 +246,213 @@ GroupedDistPlot("2880h_clean",
 
 ## Media Exposure Variables
 
-### Other Newspapers
+### Reading Bild (1661a in GLES)
 
-### TV News
+#### Question Text
 
-### Internet News Consumption
+*Translated:*
+
+On how many days in the past week did you read political reports in the following newspapers or on their websites? [Bild]
+
+(1) 0 Days
+(2) 1 Day
+(3) 2 Days
+(4) 3 Days
+(5) 4 Days
+(6) 5 Days
+(7) 6 Days
+(8) 7 Days
+
+*Recoded to [0,7]*
+
+---
+
+*Original/DE:*
+
+An wie vielen Tagen haben Sie in der vergangenen Woche politische Berichte in den folgenden Zeitungen oder auf deren Internetseiten gelesen? [Bild]
+
+(1) 0 Tage 
+(2) 1 Tag 
+(3) 2 Tage 
+(4) 3 Tage 
+(5) 4 Tage 
+(6) 5 Tage 
+(7) 6 Tage 
+(8) 7 Tage 
+
+
+
+#### Distribution
+
+```{r}
+
+gles_p_long <- fread(here('data/raw/gles/Panel/long_cleaned.csv'))
+  
+gles_p_long %>% 
+  ggplot(aes(`1661a_clean`)) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  geom_vline(xintercept = 
+               gles_p_long %>% 
+               summarise(dv = mean(`1661a_clean`, na.rm = T)) %>% 
+               .[1,]) +
+  theme_minimal() +
+  xlab("") + ylab("Share") +
+  ggtitle("How many days last week did you read... Bild?")
+
+
+```
+
+
+### Treatment Indicator (Reading Bild recoded)
+
+The treatment definition is based on the "reading Bild" variable described above, but refined. The treatment is binarized, such that it is zero for those not reading Bild for any day last week and one for those indicating that they read it at least one day. Respondents indicating not to read Bild in the first wave, but reading it in later waves are dropped in order to maintain an untreated control group.
+
+
+```{r}
+
+gles_p_long %>%
+  filter(!is.na(treat)) %>% 
+  mutate(treat = ifelse(treat, "Treatment", "Control")) %>% 
+  ggplot(aes(treat, fill = treat)) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  theme_minimal() +
+  xlab("") + ylab("Share") +
+  ggtitle("Respondents by treatment group")
+
+
+```
+
+
+### Other Newspapers (1661 in GLES)
+
+Items identical to the one asking respondents about their consumption of *Bild* news in the past week have been asked regarding the consumption of other newspapers, namely *Frankfurter Rundschau*, *Frankfurter Allgemeine Zeitung (FAZ)*, *Süddeutsche Zeitung (SZ)*, *die tageszeitung (taz)*, and *die Welt*. Additionally, respondents could indicate if they had consumed any other daily newspaper, and how many days last week. Based on these responses, I constructed an additive index of exposure to content from newspapers other than *Bild* in the first (pre-treatment) wave. This variable measures exposure in newspaper-days, meaning that for each newspaper, the number of days it was read in the week preceding the interview was summed.
+
+```{r}
+
+gles_p_long <- 
+    gles_p_long %>% 
+    filter(wave == "1") %>% 
+    mutate(
+      other_print = 
+        `1661b_clean` +
+        `1661c_clean` +
+        `1661d_clean` +
+        `1661e_clean` +
+        `1661f_clean` +
+        `1661g_clean`,
+      tv_use = ifelse(`1681f_clean`, "False", "True"),
+      in_use = `1600_clean`
+    ) %>% 
+    select(lfdn, in_use, tv_use, other_print) %>% 
+    right_join(gles_p_long, by = c("lfdn"))
+
+gles_p_long %>% 
+  filter(!is.na(other_print)) %>% 
+  ggplot(aes(other_print)) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  geom_vline(xintercept = 
+               gles_p_long %>% 
+               summarise(dv = mean(other_print, na.rm = T)) %>% 
+               .[1,]) +
+  theme_minimal() +
+  xlab("") + ylab("Share") +
+  ggtitle("Additive index of exposure to newspapers other than Bild")
+
+
+```
+
+
+
+
+### TV News (1681f in GLES)
+
+#### Question Text
+
+*Translated:*
+
+I haven't watched TV news or read political reports on their websites.
+
+(1) mentioned
+(2) not mentioned
+
+*Recoded to (False = 1 (have not viewed); True = 2 (have viewed))*
+
+---
+
+*Original/DE:*
+
+Ich habe keine Fernsehnachrichten gesehen oder politische Berichte auf deren Internetseiten gelesen.
+
+(1) genannt 
+(2) nicht genannt 
+
+
+#### Distribution
+
+```{r}
+
+gles_p_long %>% 
+  filter(!is.na(tv_use)) %>% 
+  ggplot(aes(tv_use)) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  theme_minimal() +
+  xlab("") + ylab("Share") +
+  ggtitle("Exposure to TV news")
+
+
+```
+
+### Internet News Consumption (1600)
+
+
+#### Question Text
+
+*Translated:*
+
+An wie vielen Tagen haben Sie sich in der vergangenen Woche im Internet über Politik informiert?
+
+(1) 0 Days
+(2) 1 Days
+(3) 2 Days
+(4) 3 Days
+(5) 4 Days
+(6) 5 Days
+(7) 6 Days
+(8) 7 Days
+
+*Recoded to [0,7]*
+
+---
+
+*Original/DE:*
+
+An wie vielen Tagen haben Sie sich in der vergangenen Woche im Internet über Politik informiert?
+
+(1) 0 Tage 
+(2) 1 Tag 
+(3) 2 Tage 
+(4) 3 Tage 
+(5) 4 Tage 
+(6) 5 Tage 
+(7) 6 Tage 
+(8) 7 Tage 
+
+#### Distribution
+
+
+```{r}
+
+gles_p_long %>% 
+  filter(!is.na(in_use)) %>% 
+  ggplot(aes(in_use)) +
+  geom_bar(aes(y = (..count..)/sum(..count..))) +
+  theme_minimal() +
+  xlab("") + ylab("Share") +
+  ggtitle("Exposure to TV news")
+
+
+```
+
 
 
 # Treatment
@@ -283,7 +486,92 @@ Table 1 shows the number of print copies sold and online page impressions for ea
 
 ### Dictionaries
 
+```{r}
+
+seed_dict_mig <- 
+  c("asyl", "asylant", "asylanten", "asylantinnen", 
+     "asylbewerber", "asylbewerberin", "asylbewerberinnen", 
+     "auslander","auslanderinnen", 
+     "einwanderer", "einwandererin", "einwandererinnen", "einwandernde", "einwanderung",  
+     "fluchtling", "fluchtende", "fluchtlinge",
+     "migration", "immigration", 
+     "schutzsuchende", "schutzbedurftige",
+     "visa", "visum", 
+     "zuwanderung", "zuwanderer",  "zuwandernde",
+     "ausländer", "ausländerinnen", 
+     "flüchtling", "flüchtende", "flüchtlinge", 
+     "schutzbedürftige")
+
+ext_dict_mig <- 
+  read.csv("https://raw.githubusercontent.com/nicolaiberk/bild/main/code/content_analysis/bert/mig/dict/_dicts/german_glove.csv") %>% 
+  .[[2]]
+
+
+seed_dict_crime <- 
+  c("täter", "täterin", "polizei", "verbrechen", "überfall", "mord",
+    "attacke", "raub", "straftat", "ermittelt", "gericht", "prozess",
+    "staatsanwaltschaft", "staatsanwalt", "staatsanwältin", "gefährder", 
+    "haft", "festnahme", "betrug", "betrüger", "erstochen", "opfer", 
+    "anwalt", "drogen", "dealer", "getötet", "verletzung", "delikt",
+    "vergewaltigung")
+
+ext_dict_crime <- 
+  read.csv("https://raw.githubusercontent.com/nicolaiberk/bild/main/code/content_analysis/bert/crime/dict/_dicts/crime_glove.csv") %>% 
+  .[[2]]
+
+
+```
+
+In order to generate informative samples for the annotation, crime and migration content had to be oversampled from the raw data. To identify which articles likely contain relevant content, it is useful to construct dictionaries identifying the concept of interest and then use these dictionaries to assess what share of words in a given article is concerned with this content. In a first step, a seed dictionary is constructed to identify the concept of interest. To avoid missing any relevant words, word embeddings trained on large german language corpora can be used to identify terms with similar meaning. Using embeddings from a pre-trained model\footnote{Downloadable from \url{https://deepset.ai/german-word-embeddings}, I select the 100 most similar term for each term in the seed dictionary. Those terms associated with at least four terms in the seed dictionary (i.e. being among the 100 most similar words for at least four words) are included in the extended dictionary. You can see the seed and extended dictionaries below.
+
+#### Migration
+
+
+
+**Raw Dictionary**: 
+
+`r seed_dict_mig`
+
+**Dictionary after Extension using Embeddings**: 
+
+`r ext_dict_mig` 
+
+#### Crime
+
+
+
+
+**Raw Dictionary**: 
+
+`r seed_dict_crime`
+
+**Dictionary after Extension using Embeddings**: 
+
+`r ext_dict_crime`
+
+
+### Sampling
+
+Using the dictionaries, relevant words in each article are counted, and the share of relevant words out of all words is calculated. I then draw a stratified sample of migration articles, pulling 100 articles with no mention of migration-related terms, 100 with a moderate share of migration-related terms (25th to 75th percentile), and 100 with a high share of migration related words (above 75th percentile), for each newspaper in the sample. I repeat this process with the crime dictionary, however here I choose a higher cutoff (95th percentile) given the lower incidence of crime coverage compared to migration coverage in my sample.
+
 ### Handcoding
+
+Using this sampling procedure, I generate two samples of 1000 articles for annotation by research assistants. These samples oversample from articles likely to contain coverage of interest in order to provide a relatively balanced sample for training of the classifiers. Coders were sent a shiny app designed for annotations, together with the following instructions:
+
+> The task is to identify crime content in news articles. This should always be the main topic, i.e. articles discussing a specific incident/crime, court cases, or crime statistics. Please familiarise yourself with the examples and send me an email if you feel you need more specific instructions about the precise definition of what constitutes crime content or are unsure about a specific case (a brief definition is given in the app). 
+
+Along with these instructions, coders were sent example articles which were considered to be especially difficult, annotated by me.
+
+Annotation took place in a shiny app (see screenshot below). This allowed faster annotation and minimized errors
+
+```{r, fig.cap="Screenshot of Annotation App"}
+
+knitr::include_graphics("vis/HandCodingScreenshot.png")
+
+```
+
+
+
 
 ### Preprocessing
 
@@ -358,7 +646,7 @@ TreatmentTrendPlot(dpa_corrected = F) +
 
 Treated Group: Bild Readers in first (and only pre-treatment) wave. Control Group: Never-Readers of Bild. Post Date: $>=$ 01.02.2017
 
-```{r, bild_descriptives}
+```{r bild_descriptives, results = "asis"}
 
 gles_p_long <- fread(here('data/raw/gles/Panel/long_cleaned.csv'))
 
@@ -421,9 +709,9 @@ LTPDiD()
 
 ```
 
-```{r LTPDiD_table}
+```{r LTPDiD_table, results='asis'}
 
-modelsummary::modelsummary(LTPDiD(return_table = T), output = "markdown", stars = T)
+modelsummary::modelsummary(LTPDiD(return_table = T), output = "latex", stars = T)
 
 ```
 
@@ -431,7 +719,7 @@ modelsummary::modelsummary(LTPDiD(return_table = T), output = "markdown", stars 
 ## Association Model
 
 
-```{r did_cond_crime}
+```{r did_cond_crime, results='asis'}
 
 MigCrimeCorTable()
 
