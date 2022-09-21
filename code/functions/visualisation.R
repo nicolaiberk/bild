@@ -218,7 +218,6 @@ TreatmentDiDPlot <- function(size = 1,
 # Effect ####
 
 ## Descriptive visualisation - cntrl vs treatment (by group)
-
 DescPlot <- function(legend_position = "right",
                      colorful = F){
   
@@ -233,9 +232,9 @@ DescPlot <- function(legend_position = "right",
     group_by(treat, post, wave) %>% 
     summarise(
       dv_mean = mean(`1130_clean`),
-      date_min = min(date_clean)
+      date_max = max(date_clean)
     ) %>% 
-    ggplot(aes(x = date_min, y = dv_mean, 
+    ggplot(aes(x = date_max, y = dv_mean, 
                col = !treat, shape = !treat, lty = !treat)) +
     geom_line() + geom_point() +
     geom_vline(xintercept = postdate, lty = 2, col = ifelse(colorful, "red", "black")) +
@@ -256,7 +255,8 @@ DescPlot <- function(legend_position = "right",
                          rev()) +
     theme_minimal() +
     theme(legend.position = legend_position) +
-    ggtitle(title, subtitle) %>% 
+    ggtitle(title, subtitle) +
+    xlim(c(as.Date("2016-10-01"), as.Date("2020-06-01"))) %>% 
     return()
   
 }
@@ -475,15 +475,28 @@ DiDPlot <- function(multi = F,
 
 
 DiDByWavePlot <- function(dv = "1130_clean", 
-                             size = 1,
-                             scaled = F,
-                             boundary_share = 0.25,
-                             theoretical_effect_size = 0.6,
-                             return_ests = F) {
+                           size = 1,
+                           scaled = F,
+                           boundary_share = 0.25,
+                           theoretical_effect_size = 0.6,
+                           return_ests = F,
+                           group_by_exposure = F) {
   
   gles_p_long <- 
     fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
     as_tibble()
+  
+  # add potential grouping variable
+  gles_p_long <- 
+    gles_p_long %>% 
+    filter(wave == 1) %>% 
+    mutate(bild_exposure = 
+             case_when(
+               `1661a_clean` == 0 ~ "0 days",
+               `1661a_clean` %in% 1:3 ~ "1-3 days",
+               `1661a_clean` %in% 4:7 ~ "4-7 days")) %>% 
+    select(lfdn, bild_exposure) %>% 
+    right_join(gles_p_long, by = "lfdn")
   
   if(scaled){
     
@@ -514,22 +527,59 @@ DiDByWavePlot <- function(dv = "1130_clean",
       gles_p_long %>% 
       filter(wave %in% c("1", w))
     
-    single_model <- 
-      fixest::feglm(dv ~ post*treat | lfdn, 
-                    data = temp,
-                    cluster = c("lfdn"))
+    if(group_by_exposure){
+      
+      for (g in unique(gles_p_long %>% 
+                       select(bild_exposure) %>% 
+                       filter(!is.na(bild_exposure), bild_exposure != "0 days") %>% 
+                       .[[1]])){
+
+              single_model <- 
+              fixest::feglm(dv ~ post*treat | lfdn, 
+                            data = 
+                              temp %>% 
+                              filter(bild_exposure %in% c("0 days", g)),
+                            cluster = c("lfdn"))
+      
+      
+              ests <- 
+                rbind(ests,
+                      data.frame(
+                        wave = w,
+                        date = max(gles_p_long$date_clean[gles_p_long$wave == w], na.rm = T),
+                        point = single_model$coefficients[["postTRUE:treatTRUE"]],
+                        lower = confint(single_model)["postTRUE:treatTRUE", "2.5 %"],
+                        upper = confint(single_model)["postTRUE:treatTRUE", "97.5 %"],
+                        exposure = g
+                      )
+                )
+        
+      }
+      
+      
+      
+    }else{
+      
     
-    ests <- 
-      rbind(ests,
-            data.frame(
-              wave = w,
-              date = max(gles_p_long$date_clean[gles_p_long$wave == w], na.rm = T),
-              point = single_model$coefficients[["postTRUE:treatTRUE"]],
-              lower = confint(single_model)["postTRUE:treatTRUE", "2.5 %"],
-              upper = confint(single_model)["postTRUE:treatTRUE", "97.5 %"]
+      single_model <- 
+        fixest::feglm(dv ~ post*treat | lfdn, 
+                      data = temp,
+                      cluster = c("lfdn"))
+      
+      
+      ests <- 
+        rbind(ests,
+              data.frame(
+                wave = w,
+                date = max(gles_p_long$date_clean[gles_p_long$wave == w], na.rm = T),
+                point = single_model$coefficients[["postTRUE:treatTRUE"]],
+                lower = confint(single_model)["postTRUE:treatTRUE", "2.5 %"],
+                upper = confint(single_model)["postTRUE:treatTRUE", "97.5 %"],
+                exposure = NA
+                )
               )
-            )
-   
+     
+    }
     
   }
   
@@ -547,12 +597,15 @@ DiDByWavePlot <- function(dv = "1130_clean",
           date = max(gles_p_long$date_clean[gles_p_long$wave == 1], na.rm = T),
           point = 0,
           lower = 0,
-          upper = 0
+          upper = 0,
+          exposure = "all"
         )
       )
     
+    if(group_by_exposure){
+      
     ests %>% 
-      ggplot(aes(x = date, y = point, ymin = lower, ymax = upper)) +
+      ggplot(aes(x = date, y = point, ymin = lower, ymax = upper, col = exposure)) +
       geom_hline(yintercept = 0, col = "black", size = size) +
       geom_hline(yintercept = boundary_share*theoretical_effect_size,
                  lty = 3, col = "black", size = size) +
@@ -563,10 +616,34 @@ DiDByWavePlot <- function(dv = "1130_clean",
       geom_hline(yintercept = -1*theoretical_effect_size,
                  lty = 2, col = "black", size = size) +
       geom_vline(xintercept = as.Date(postdate), lty = 2, col = "black", size = size) +
-      geom_pointrange(size = size) +
+      geom_pointrange(size = size, position = position_dodge2(width = 30)) +
       xlab("Date") + ylab("Effect") +
-      theme_minimal() %>% 
+      theme_minimal() +
+        xlim(c(as.Date("2016-10-01"), as.Date("2020-06-01"))) %>% 
       return()
+      
+    }else{
+      
+      ests %>% 
+        ggplot(aes(x = date, y = point, ymin = lower, ymax = upper)) +
+        geom_hline(yintercept = 0, col = "black", size = size) +
+        geom_hline(yintercept = boundary_share*theoretical_effect_size,
+                   lty = 3, col = "black", size = size) +
+        geom_hline(yintercept = boundary_share*-1*theoretical_effect_size, 
+                   lty = 3, col = "black", size = size) +
+        geom_hline(yintercept = theoretical_effect_size,
+                   lty = 2, col = "black", size = size) +
+        geom_hline(yintercept = -1*theoretical_effect_size,
+                   lty = 2, col = "black", size = size) +
+        geom_vline(xintercept = as.Date(postdate), lty = 2, col = "black", size = size) +
+        geom_pointrange(size = size, position = position_dodge2(width = 30)) +
+        xlab("Date") + ylab("Effect") +
+        theme_minimal() +
+        xlim(c(as.Date("2016-10-01"), as.Date("2020-06-01"))) %>% 
+        return()
+      
+    }
+    
     
   }
 }
@@ -895,7 +972,7 @@ CrowdOutEstimates <- function(vis = T) {
         `1661e_clean` +
         `1661f_clean` +
         `1661g_clean`,
-      tv_use = `1681f_clean`,
+      tv_use = ifelse(`1681f_clean`, "0", "1"), # True in `1681f_clean` means that no tv news have been consumed,
       in_use = `1600_clean`
     ) %>% 
     mutate(other_print = 
