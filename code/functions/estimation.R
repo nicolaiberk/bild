@@ -96,7 +96,7 @@ SingleDVModel <- function(varname = NULL){
       twfe_no_clustering,
       full_model
     ), 
-    output = "latex",
+    output = "markdown",
     stars = T) %>% 
     kableExtra::kable_styling() %>% 
     kableExtra::row_spec(6, bold = T) %>% 
