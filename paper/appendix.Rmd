@@ -3,14 +3,15 @@ title: "Appendix for 'Framing Effects in the Wild'"
 author: "Nicolai Berk"
 date: "15 5 2022"
 output: 
-  pdf_document:
+  bookdown::pdf_document2:
     number_sections: TRUE
 toc: TRUE
+bibliography: C:/Users/nicol/Dropbox/Studium/BibTex/PhD.bib
 ---
 
 ```{r setup, include=FALSE, cache=FALSE}
 knitr::opts_chunk$set(echo = F, message = F, warning = F, cache = T, fig.height=6, 
-                      fig.width=10, fig.align='center', fig.pos = "!ht", out.extra = "")
+                      fig.width=10, fig.align='center', fig.pos = "!htp", out.extra = "")
 
 library(tidyverse)
 library(dplyr)
@@ -29,6 +30,38 @@ for (filename in list.files(here("code/functions"))){
 ## Dependent Variables
 
 ### Overview
+
+
+Treated Group: Bild Readers in first (and only pre-treatment) wave. Control Group: Never-Readers of Bild. Post Date: $>=$ 01.02.2017
+
+```{r bild_descriptives, results = "asis"}
+
+gles_p_long <- fread(here('data/raw/gles/Panel/long_cleaned.csv'))
+
+desc <- 
+  gles_p_long %>% 
+  filter(wave == "1", !is.na(treat)) %>% 
+  group_by(treat) %>% 
+  select(gender_clean, ybirth_clean, `010_clean`, 
+         `1130_clean`, `1500_clean`, `afd_vote`, `430i_clean`) %>%
+  mutate(gender_clean = gender_clean-1) %>% 
+  mutate(across(.fns = as.integer)) %>% 
+  summarise(across(.fns = mean, na.rm = T)) %>% 
+  select(-treat) %>% 
+  t() %>% round(2)
+
+colnames(desc) <- c("Control", "Treatment")
+row.names(desc) <- c("Gender (0 = m, 1 = f)", "Birthyear", 
+                     "Political interest (1, 5)", "Immigration Attitude (-3, 3)",
+                     "General left-right (0-10)", "Share of AfD supporters", "AfD attitude (-5, 5)")
+
+knitr::kable(desc, align = c("c", "c"))
+
+rm(gles_p_long, desc)
+
+```
+
+Note that the variable "Birthyear" is left-censored in the data. All respondents born before 1955 were assigned 1955 as birth year.
 
 Table, treated vs. untreated
 
@@ -142,9 +175,34 @@ Hinweistext: Nennen Sie bitte nur ein *einziges* Problem.
 
 ```{r}
 
+gles_p_long <- fread(here('data/raw/gles/Panel/long_cleaned.csv'))
+  
+gles_p_long[["dv"]] <- gles_p_long[["mip_mig"]]
 
-GroupedDistPlot("mip_mig",
-                header = "Mention of Migration as Most Important Problem")
+p_upper <- 
+  gles_p_long %>% 
+  filter(treat, !is.na(dv)) %>% 
+  ggplot(aes(dv)) +
+  geom_bar(aes(y = (..count..)/sum(..count..)),
+           fill = MetBrewer::met.brewer("Archambault")[4]) +
+  theme_minimal() +
+  xlab("") + ylab("Share") +
+  ggtitle("Mention of Migration as Most Important Problem", "Bild Readers")
+
+p_lower <- 
+  gles_p_long %>% 
+  filter(!treat, !is.na(dv)) %>% 
+  ggplot(aes(dv)) +
+  geom_bar(aes(y = (..count..)/sum(..count..)),
+           fill = MetBrewer::met.brewer("Archambault")[1]) +
+  theme_minimal() +
+  xlab("") + ylab("Share") +
+  ggtitle("", "Never Bild Readers")
+
+p_upper / p_lower
+
+
+rm(gles_p_long)
 
 ```
 
@@ -299,7 +357,6 @@ gles_p_long %>%
   xlab("") + ylab("Share") +
   ggtitle("How many days last week did you read... Bild?")
 
-
 ```
 
 
@@ -450,10 +507,11 @@ gles_p_long %>%
   xlab("") + ylab("Share") +
   ggtitle("Exposure to TV news")
 
+rm(gles_p_long)
 
 ```
 
-
+\pagebreak
 
 # Treatment
 
@@ -481,6 +539,8 @@ Table 1 shows the number of print copies sold and online page impressions for ea
   \label{tab:paper_sales}
 \end{table}
 ```
+
+\pagebreak
 
 ## BERT Classifiers
 
@@ -554,6 +614,8 @@ In order to generate informative samples for the annotation, crime and migration
 
 Using the dictionaries, relevant words in each article are counted, and the share of relevant words out of all words is calculated. I then draw a stratified sample of migration articles, pulling 100 articles with no mention of migration-related terms, 100 with a moderate share of migration-related terms (25th to 75th percentile), and 100 with a high share of migration related words (above 75th percentile), for each newspaper in the sample. I repeat this process with the crime dictionary, however here I choose a higher cutoff (95th percentile) given the lower incidence of crime coverage compared to migration coverage in my sample.
 
+\pagebreak
+
 ### Handcoding
 
 Using this sampling procedure, I generate two samples of 1000 articles for annotation by research assistants. These samples oversample from articles likely to contain coverage of interest in order to provide a relatively balanced sample for training of the classifiers. Coders were sent a shiny app designed for annotations, together with the following instructions:
@@ -562,13 +624,14 @@ Using this sampling procedure, I generate two samples of 1000 articles for annot
 
 Along with these instructions, coders were sent example articles which were considered to be especially difficult, annotated by me.
 
-Annotation took place in a shiny app (see screenshot below). Coders were shown the title and text of a random news article in the sample. Then they were asked whether the article refers to the topics of crime, law and order, or public safety. Coders could see a more specific definition by clicking a button. After selecting whether the article referred to crime or not, they could either click a button to get to the next article or safe their progress to return later. Coders could also return to the preceding article in case they had selected the wrong option. The app allowed for faster annotation and minimized errors in the coding (compared to noting the annotations in an excel sheet).
-
-```{r, fig.cap="Screenshot of Annotation App"}
+```{r, fig.cap="Screenshot of Annotation App", out.width = "\\textwidth"}
 
 knitr::include_graphics("vis/HandCodingScreenshot.png")
 
 ```
+
+Annotation took place in a shiny app (see screenshot above). Coders were shown the title and text of a random news article in the sample. Then they were asked whether the article refers to the topics of crime, law and order, or public safety. Coders could see a more specific definition by clicking a button. After selecting whether the article referred to crime or not, they could either click a button to get to the next article or safe their progress to return later. Coders could also return to the preceding article in case they had selected the wrong option. The app allowed for faster annotation and minimized errors in the coding (compared to e.g. noting the annotations in an excel sheet).
+
 
 ```{r}
 
@@ -590,9 +653,6 @@ common_rob <-
   crime_coding_rob %>% 
   filter(url %in% crime_coding_nat$url) %>% 
   arrange(url)
-
-# correlation table - not so great
-table(common_nat$crime, common_rob$crime)
 
 # merge for agreement metrics
 common <- 
@@ -622,15 +682,25 @@ k_alpha <- kripp.alpha(t(common), method = "ordinal")$value
 
 ```
 
-The migration annotation has been conducted by only one coder (1800 articles), while the crime articles have been annotated by two different coders separately (1000 each with 200 identical articles in each coder's sample). Annotation was very reliable with an agreement for `r agreement`% of annotated articles and a Krippendorff's alpha of `r round(k_alpha, 2)`. Conflicts were resolved by the author after inspection of the conflicting codings.
+The migration annotation has been conducted by only one coder (1800 articles), while the crime articles have been annotated by two different coders separately (1000 each with 200 identical articles in each coder's sample). Annotation was very congruent across coders with an agreement for `r agreement`% of annotated articles and a Krippendorff's alpha of `r round(k_alpha, 2)`. Conflicts were resolved by the author after inspection of the conflicting annotations.
+
+\pagebreak
+
+### Classifier Fine-tuning
+
+```{r}
+
+bert_ests_raw <- 
+    fread(here('data/processed/bert_crime_clean.csv')) 
+
+```
 
 
-### Classifier Training
-
+Using the annotated samples, I fine-tune BERT classifiers from Huggingface's 'transformers' library for python (bert-base-german-cased), pre-trained on german Wikipedia articles, legal documents, and news articles.  For each topic (crime/migration), 1400 articles served as training set, 200 each as validation and test set. Articles longer than 512 tokens (the maximum length of input for the BERT model) were truncated. I fine-tune for 10 epochs. Performance on the test set is outstanding for the migration classifier (F1 = 0.94, accuracy = 0.96, precision = 0.95, recall = 0.93) and very good for the crime classifier (F1 = 0.86, accuracy = 0.93, precision = 0.8, recall = 0.92). Both classifiers were subjected to sanity checks, before classifying first all articles according to their migration content, which returns `r nrow(bert_ests_raw)` articles (3.6% of all articles). For this subset, crime content is identified in `r sum(bert_ests_raw$crime_label)` articles (`r round(sum(bert_ests_raw$crime_label)/nrow(bert_ests_raw), 3)*100`).
 
 
 ```{=tex}
-\begin{table}
+\begin{table}[!h]
 \centering
 \begin{tabular}{|p{12cm}|}
 \hline
@@ -645,10 +715,12 @@ Cabin fever! Violence! Mass brawls! This is behind the increase in refugee clash
 \end{table}
 ```
 
+As a sanity check, and in order to exemplify the nature of the treatment, table \@ref(tab:exampleArticles) shows the five *Bild* articles classified as crime with the highest likelihood, out of all migration-related articles. All articles relate to both migration and crime: one mentions a police report on the mass sexual assaults on new years eve 2015 in Cologne, two discuss police raids in refugee homes, and two discuss violence in refugee shelters. 
+
+\pagebreak
 
 ### Correcting for change in DPA-sourced content
 
-Among the changes after Reichelt's takeover as chief editor of *Bild* was a severe drop in the overall number of articles published online. Figure \@ref(fig:dpaShare) shows the monthly number of articles *Bild* published in their online archive across time. Recall that Reichelt took over in February 2017, and briefly after - in June 2017 - the overall number of articles published decreases by over 60%. The graph also suggests an explanation for this sudden shift: the share of articles sourced from DPA, a major German press agency alike the Associated Press, sharply decreases at the same time as the major decrease in the number of articles takes place (see top blue bars). DPA is a press agency supplying many German news outlets, which means it must have a rather unbiased or at least centrist coverage, potentially decreasing the estimate of crime frames within Bild's migration content. This would not be a problem, as long as this content is equally likely to make it to the front page. However, *Bild* likely gives more weight to its own content compared to pre-written content from DPA. For this reason, the paper presented data excluding DPA content. On the other hand, the decision to discontinue buying content from DPA must have been made by Reichelt himself and is thus an outcome of the treatment. Hence, it is fruitful to assess the change including DPA-sourced content. 
 
 ```{r dpaShare, fig.cap="Monthly number of articles by source."}
 
@@ -672,8 +744,9 @@ data.table::fread(here("data/raw/newspapers/_bild_articles.csv"),
 
 ```
 
-The left panel of figure \@ref(fig:treatmentDPAcorr) displays the quarterly share of migration articles discussing crime for *Bild* compared to all other newspapers. A depression is visible in 2016-2017 which was not visible in the corrected data. The share of crime content in *Bild*'s migration coverage strongly increases a few months following the treatment, when the share of DPA-sourced content severely drop. The gap between *Bild* and all other newspapers increases, and this increased difference persists. This change becomes even more visible in the right-hand panel, which shows a difference-in-differences estimate of the change of the share of crime news in a newspapers migration content, this time controlling for whether the content is DPA-sourced or not. The general picture is quite similar to the original estimate in the paper, as migration coverage only increases in *Bild*, while all other outlets remain rather stable on this metric. In the estimate including DPA content, the share of migration coverage devoted to crime increases by an even stronger 6 percentage points, which still constitutes a very substantial increase. Both ways of handling the data suggest a strong increase in the emphasis of crime in migration coverage.
+Among the changes after Reichelt's takeover as chief editor of *Bild* was a severe drop in the overall number of articles published online. Figure \@ref(fig:dpaShare) shows the monthly number of articles *Bild* published in their online archive across time. Recall that Reichelt took over in February 2017, and briefly after - in June 2017 - the overall number of articles published decreases by over 60%. The graph also suggests an explanation for this sudden shift: the share of articles sourced from DPA, a major German press agency alike the Associated Press, sharply decreases at the same time as the major decrease in the number of articles takes place (see top blue bars). DPA is a press agency supplying many German news outlets, which means it must have a rather unbiased or at least centrist coverage, potentially decreasing the estimate of crime frames within Bild's migration content. This would not be a problem, as long as this content is equally likely to make it to the front page. However, *Bild* likely gives more weight to its own content compared to pre-written content from DPA. For this reason, the paper presented data excluding DPA content. On the other hand, the decision to discontinue buying content from DPA must have been made by Reichelt himself and is thus an outcome of the treatment. Hence, it is fruitful to assess the change including DPA-sourced content. 
 
+\pagebreak
 
 ### Raw Crime Estimates
 
@@ -684,119 +757,103 @@ TreatmentTrendPlot(dpa_corrected = F) +
 
 ```
 
+The left panel of figure \@ref(fig:treatmentDPAcorr) displays the quarterly share of migration articles discussing crime for *Bild* compared to all other newspapers. A depression is visible in 2016-2017 which was not visible in the corrected data. The share of crime content in *Bild*'s migration coverage strongly increases a few months following the treatment, when the share of DPA-sourced content severely drop. The gap between *Bild* and all other newspapers increases, and this increased difference persists. This change becomes even more visible in the right-hand panel, which shows a difference-in-differences estimate of the change of the share of crime news in a newspapers migration content, this time controlling for whether the content is DPA-sourced or not. The general picture is quite similar to the original estimate in the paper, as migration coverage only increases in *Bild*, while all other outlets remain rather stable on this metric. In the estimate including DPA content, the share of migration coverage devoted to crime increases by an even stronger 6 percentage points, which still constitutes a very substantial increase. Both ways of handling the data suggest a strong increase in the emphasis of crime in migration coverage.
+
+\pagebreak
 
 ### Migration Attention over Time
 
+```{r migSalience, fig.cap="Attention to Migration in Different News Outlets"}
 
-
-## Salience of Migration
-
-
-# Results
-
-## Treatment Groups
-
-Treated Group: Bild Readers in first (and only pre-treatment) wave. Control Group: Never-Readers of Bild. Post Date: $>=$ 01.02.2017
-
-```{r bild_descriptives, results = "asis"}
-
-gles_p_long <- fread(here('data/raw/gles/Panel/long_cleaned.csv'))
-
-desc <- 
-  gles_p_long %>% 
-  filter(wave == "1", !is.na(treat)) %>% 
-  group_by(treat) %>% 
-  select(gender_clean, ybirth_clean, `010_clean`, 
-         `1130_clean`, `1500_clean`, `afd_vote`, `430i_clean`) %>%
-  mutate(gender_clean = gender_clean-1) %>% 
-  mutate(across(.fns = as.integer)) %>% 
-  summarise(across(.fns = mean, na.rm = T)) %>% 
-  select(-treat) %>% 
-  t() %>% round(2)
-
-colnames(desc) <- c("Control", "Treatment")
-row.names(desc) <- c("Gender (0 = m, 1 = f)", "Birthyear", 
-                     "Political interest (1, 5)", "Immigration Attitude (-3, 3)",
-                     "General left-right (0-10)", "Share of AfD supporters", "AfD attitude (-5, 5)")
-
-knitr::kable(desc, align = c("c", "c"))
-
-rm(gles_p_long, desc)
+MigSaliencePlot()
 
 ```
 
-Note that the variable "Birthyear" is left-censored in the data. All respondents born before 1955 were assigned 1955 as birth year.
+Figure \@ref(fig:migSalience) shows that the prevalence of migration content as classified by the first Bert model generally follows expectations. Three distinct peaks can be observed: first during the migratory movements to Germany in 2015, then after the sexual assaults on new years eve in 2016, and during the conflict regarding migration policy within the conservative party alliance CDU/CSU in 2018. Prevalence differs strongly across newspapers, with *Bild* having the lowest prevalence of migration content. This is likely due to their tabloid format, which emphasizes entertainment over news and politics content. The left-leaning SZ shows the highest attention to migration (during the peak in September 2015, nearly every second article is concerned with migration). This is likely the result of a website highly focused on politics.
+
+\pagebreak
+
+# Results
 
 ## Parallel Trends
 
-Figure \@ref(fig:parallelTrends) shows the development of migration attitudes among a panel of Bild readers\footnote{Readership was measured in a single wave in late 2015.} and non-readers across time, recorded in the German Longitudinal Election Study's Longterm Panel [@SOURCE]. This is a far smaller sample with a limited time frame and hence less useful for the precise estimation of the effects of changing migration framing. The plot shows that both groups move along a similar long-term trend, slowly becoming more conservative, while moving into similar directions along the way. The only difference between the two groups is that Bild readers seem to be more conservative in late 2015 (note that only the last three interviews were conducted in January 2016). However this deviation lies well within the 95% confidence interval and those not reading Bild move in a similar direction, albeit less strongly. The parallel trends assumption seems to be generally met.
-
-```{r parallelTrends, fig.cap = "Migration Attitude among Bild-readers compared to non-readers across Time"}
+```{r parallelTrends, fig.cap="Migration Attitude among Bild-readers compared to non-readers across Time"}
 
 ParallelTrendsPlot()
 
 ```
 
+Figure \@ref(fig:parallelTrends) shows the development of migration attitudes among a panel of Bild readers\footnote{Readership was measured in a single wave in late 2015.} and non-readers across time, recorded in the German Longitudinal Election Study's Longterm Panel [@GLES2018LangfristPanel]. This is a far smaller sample with a limited time frame and hence less useful for the precise estimation of the effects of changing migration framing. The plot shows that both groups move along a similar long-term trend, slowly becoming more conservative, while moving into similar directions along the way. The only difference between the two groups is that Bild readers seem to be more conservative in late 2015 (note that only the last three interviews were conducted in January 2016). However this deviation lies well within the 95% confidence interval and those not reading Bild move in a similar direction, albeit less strongly. The parallel trends assumption seems to be generally met.
+
+\pagebreak
 
 ## Robustness of Main Effect
 
-```{r did_imm_att, results='asis'}
+```{r did_imm_att}
 
 SingleDVModel('1130_clean')
 
 ```
 
+\pagebreak
 
 ## Multiple DV Table
 
-## Longterm-Panel Model
+```{r}
 
+DiDPlot(return_table = T, multi = T)
 
+```
+
+\pagebreak
 
 ## Effect in Longterm-Panel
 
-```{r LTPDiD, fig.height=2}
+It is also possible to estimate the effect of the change in editorship from the smaller and less frequent long-term panel, with a smaller sample size (between 1,700 and 5,000). The only post-treatment wave has been conducted from September to December 2017. The question wording of the variable measuring immigration attitudes is identical to the Panel study used in the main paper, however responses have been recorded on a 11-point scale. Treatment was defined similar to the main paper, with respondents who indicated to read *Bild* in the pre-treatment wave in the treatment group, and respondents indicating never to read *Bild* in the control group.
 
-LTPDiD()
+```{r LTPDiD_table, fig.cap="Effect of Reichelt Takeover on Immigration Attitudes among Bild-reader"}
+
+rawmodel <- LTPDiD(return_table = T)
+
+delta_pt <- rawmodel$coefficients[["postTRUE:treatTRUE"]]
+delta_lower <- confint(rawmodel)["postTRUE:treatTRUE", 1]
+delta_upper <- confint(rawmodel)["postTRUE:treatTRUE", 2]
+
+modelsummary::modelsummary(LTPDiD(return_table = T), output = "markdown", stars = T)
 
 ```
 
-```{r LTPDiD_table, results='asis'}
+The model suggests a liberalizing effect of `r round(delta_pt, 2)` (`r abs(round(delta_pt, 3))/10*100`% of the scale range), which is not significant (lower CI `r round(delta_lower, 2)`; upper CI `r round(delta_upper, 2)`), suggesting a null effect, similar to the main model.
 
-modelsummary::modelsummary(LTPDiD(return_table = T), output = "latex", stars = T)
-
-```
-
+\pagebreak
 
 ## Association Model
 
 
-```{r did_cond_crime, results='asis'}
+```{r did_cond_crime}
 
 MigCrimeCorTable()
 
 
 ```
 
+\pagebreak
+
 ## Readership models
 
 ### Inward selection
 
 
-```{r inselection}
+```{r inselection, fig.cap="Coefficients of OLS regression of readership on migration attitude across waves. Vertical lines indicate 95 percent confidence intervals, dashed (red) vertical line indicates editorial change."}
 
 InSelection()
 
 ```
 
-Coefficients of OLS regression of readership on migration attitude across waves. Vertical lines indicate 95% confidence intervals, dashed (red) vertical line indicates editorial change.
 
-### Crowding out
 
-```{r crowdout}
 
-CrowdOutEstimates(vis = T)
 
-```
 
+# Resources
 
