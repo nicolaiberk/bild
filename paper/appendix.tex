@@ -1,0 +1,961 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={Appendix for `Framing Effects in the Wild'},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\newlength{\cslhangindent}
+\setlength{\cslhangindent}{1.5em}
+\newlength{\csllabelwidth}
+\setlength{\csllabelwidth}{3em}
+\newlength{\cslentryspacingunit} % times entry-spacing
+\setlength{\cslentryspacingunit}{\parskip}
+\newenvironment{CSLReferences}[2] % #1 hanging-ident, #2 entry spacing
+ {% don't indent paragraphs
+  \setlength{\parindent}{0pt}
+  % turn on hanging indent if param 1 is 1
+  \ifodd #1
+  \let\oldpar\par
+  \def\par{\hangindent=\cslhangindent\oldpar}
+  \fi
+  % set entry spacing
+  \setlength{\parskip}{#2\cslentryspacingunit}
+ }%
+ {}
+\usepackage{calc}
+\newcommand{\CSLBlock}[1]{#1\hfill\break}
+\newcommand{\CSLLeftMargin}[1]{\parbox[t]{\csllabelwidth}{#1}}
+\newcommand{\CSLRightInline}[1]{\parbox[t]{\linewidth - \csllabelwidth}{#1}\break}
+\newcommand{\CSLIndent}[1]{\hspace{\cslhangindent}#1}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{Appendix for `Framing Effects in the Wild'}
+\author{}
+\date{\vspace{-2.5em}15 5 2022}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\hypertarget{variables-decriptives}{%
+\section{Variables \& Decriptives}\label{variables-decriptives}}
+
+\hypertarget{dependent-variables}{%
+\subsection{Dependent Variables}\label{dependent-variables}}
+
+\hypertarget{overview}{%
+\subsubsection{Overview}\label{overview}}
+
+Treated Group: Bild Readers in first (and only pre-treatment) wave. Control Group: Never-Readers of Bild. Post Date: \(>=\) 01.02.2017
+
+\begin{tabular}{l|c|c}
+\hline
+  & Control & Treatment\\
+\hline
+Gender (0 = m, 1 = f) & 0.57 & 0.44\\
+\hline
+Birthyear & 1971.18 & 1972.24\\
+\hline
+Political interest (1, 5) & 3.24 & 3.54\\
+\hline
+Immigration Attitude (-3, 3) & 1.00 & 1.43\\
+\hline
+General left-right (0-10) & 4.30 & 4.96\\
+\hline
+Share of AfD supporters & 0.16 & 0.22\\
+\hline
+AfD attitude (-5, 5) & -3.05 & -1.94\\
+\hline
+\end{tabular}
+
+Note that the variable ``Birthyear'' is left-censored in the data. All respondents born before 1955 were assigned 1955 as birth year.
+
+Table, treated vs.~untreated
+
+\hypertarget{immigration-attitudes-1130-in-gles}{%
+\subsubsection{Immigration Attitudes (1130 in GLES)}\label{immigration-attitudes-1130-in-gles}}
+
+\hypertarget{question-text}{%
+\paragraph{Question Text}\label{question-text}}
+
+\emph{Translated:}
+
+Now it's about immigration opportunities for foreigners. Should immigration opportunities for foreigners be made easier or restricted?
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  Make it easier for foreigners to move here
+\item
+\item
+\item
+\item
+\item
+\item
+  Restrict immigration of foreigners
+\end{enumerate}
+
+\emph{Recoded to {[}-3, 3{]}.}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\emph{Original/DE:}
+
+Jetzt geht es um Zuzugsmöglichkeiten für Ausländer. Sollten die Zuzugsmöglichkeiten für Ausländer erleichtert oder eingeschränkt werden?
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  Zuzug von Ausländern erleichtern
+\item
+\item
+\item
+\item
+\item
+\item
+  Zuzug von Ausländern einschränken
+\end{enumerate}
+
+\hypertarget{distribution}{%
+\paragraph{Distribution}\label{distribution}}
+
+\begin{center}\includegraphics{appendix_files/figure-latex/unnamed-chunk-1-1} \end{center}
+
+\hypertarget{integration-attitudes-1210-in-gles}{%
+\subsubsection{Integration Attitudes (1210 in GLES)}\label{integration-attitudes-1210-in-gles}}
+
+\hypertarget{question-text-1}{%
+\paragraph{Question Text}\label{question-text-1}}
+
+\emph{Translated:}
+
+There are different opinions about how much foreigners in Germany should adapt. Some think that foreigners should fully assimilate to German culture. Others think that foreigners should be able to live according to their own culture if possible.
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  Foreigners should fully assimilate to German culture
+\item
+\item
+\item
+\item
+\item
+\item
+  Foreigners should, if possible, be able to live according to their own culture
+\end{enumerate}
+
+\emph{Recoded to {[}-3, 3{]}.}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\emph{Original/DE:}
+
+Es gibt unterschiedliche Auffassungen darüber, wie sehr sich Ausländer in Deutschland anpassen sollten. Manche denken, dass sich Ausländer vollständig an die deutsche Kultur anpassen sollten. Andere denken, Ausländer sollten auch hier möglichst nach der eigenen Kultur leben können.
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  Ausländer sollten sich vollständig an die deutsche Kultur anpassen
+\item
+\item
+\item
+\item
+\item
+\item
+  Ausländer sollten möglichst nach eigener Kultur leben können
+\end{enumerate}
+
+\hypertarget{distribution-1}{%
+\paragraph{Distribution}\label{distribution-1}}
+
+\begin{center}\includegraphics{appendix_files/figure-latex/unnamed-chunk-2-1} \end{center}
+
+\hypertarget{mip-immigration-840-in-gles}{%
+\subsubsection{MIP: Immigration (840 in GLES)}\label{mip-immigration-840-in-gles}}
+
+\hypertarget{question-text-2}{%
+\paragraph{Question Text}\label{question-text-2}}
+
+\emph{Translated:}
+
+In your opinion, what is the most important political problem in Germany at the moment?
+Please name only one \emph{single} problem.
+
+\emph{0/1 indicator assessing mention of any migration related code (3411-3413 or 3750-3759; find coding scheme on GLES website).}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\emph{Original/DE:}
+
+Was ist Ihrer Meinung nach gegenwärtig das wichtigste politische Problem in Deutschland?
+Hinweistext: Nennen Sie bitte nur ein \emph{einziges} Problem.
+
+\hypertarget{distribution-2}{%
+\paragraph{Distribution}\label{distribution-2}}
+
+\begin{center}\includegraphics{appendix_files/figure-latex/unnamed-chunk-3-1} \end{center}
+
+\hypertarget{afd-scalometer-430i-in-gles}{%
+\subsubsection{AfD Scalometer (430i in GLES)}\label{afd-scalometer-430i-in-gles}}
+
+\hypertarget{question-text-3}{%
+\paragraph{Question Text}\label{question-text-3}}
+
+\emph{Translated:}
+
+What do you think of the individual political parties in general? AfD (Alternative for Germany)
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  -5 don't think much of the party at all
+\item
+  -4
+\item
+  -3
+\item
+  -2
+\item
+  -1
+\item
+  0
+\item
+  +1
+\item
+  +2
+\item
+  +3
+\item
+  +4
+\item
+  +5 think very highly of the party
+\end{enumerate}
+
+(-71) I don't know {[}labeled as ``not known'' in the data set{]}
+
+\emph{Recoded to {[}-5, 5{]}.}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\emph{Original/DE:}
+
+Was halten Sie so ganz allgemein von den einzelnen politischen Parteien? AfD (Alternative für Deutschland)
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  -5 halte überhaupt nichts von der Partei
+\item
+  -4
+\item
+  -3
+\item
+  -2
+\item
+  -1
+\item
+  0
+\item
+  +1
+\item
+  +2
+\item
+  +3
+\item
+  +4
+\item
+  +5 halte sehr viel von der Partei
+\end{enumerate}
+
+(-71) kenne ich nicht {[}im Datensatz gelabelt als „nicht bekannt``{]}
+
+\hypertarget{distribution-3}{%
+\paragraph{Distribution}\label{distribution-3}}
+
+\begin{center}\includegraphics{appendix_files/figure-latex/unnamed-chunk-4-1} \end{center}
+
+\hypertarget{attitude-towards-fighting-crime-2880h}{%
+\subsubsection{Attitude towards fighting crime (2880h)}\label{attitude-towards-fighting-crime-2880h}}
+
+\hypertarget{question-text-4}{%
+\paragraph{Question Text}\label{question-text-4}}
+
+\emph{Translated:}
+
+State powers to fight crime should be expanded, even if this means more surveillance of citizens.
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  totally disagree
+\item
+  rather disagree
+\item
+  partly/partly
+\item
+  tend to agree
+\item
+  I totally agree
+\end{enumerate}
+
+\emph{Recoded to {[}-2, 2{]}.}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\emph{Original/DE:}
+
+Die staatlichen Befugnisse in der Kriminalitätsbekämpfung sollten ausgeweitet werden, auch wenn das zu einer stärkeren Überwachung der Bürger führt.
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  stimme überhaupt nicht zu
+\item
+  stimme eher nicht zu
+\item
+  teils/teils
+\item
+  stimme eher zu
+\item
+  stimme voll und ganz zu
+\end{enumerate}
+
+\hypertarget{distribution-4}{%
+\paragraph{Distribution}\label{distribution-4}}
+
+\begin{center}\includegraphics{appendix_files/figure-latex/unnamed-chunk-5-1} \end{center}
+
+\hypertarget{media-exposure-variables}{%
+\subsection{Media Exposure Variables}\label{media-exposure-variables}}
+
+\hypertarget{reading-bild-1661a-in-gles}{%
+\subsubsection{Reading Bild (1661a in GLES)}\label{reading-bild-1661a-in-gles}}
+
+\hypertarget{question-text-5}{%
+\paragraph{Question Text}\label{question-text-5}}
+
+\emph{Translated:}
+
+On how many days in the past week did you read political reports in the following newspapers or on their websites? {[}Bild{]}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  0 Days
+\item
+  1 Day
+\item
+  2 Days
+\item
+  3 Days
+\item
+  4 Days
+\item
+  5 Days
+\item
+  6 Days
+\item
+  7 Days
+\end{enumerate}
+
+\emph{Recoded to {[}0,7{]}}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\emph{Original/DE:}
+
+An wie vielen Tagen haben Sie in der vergangenen Woche politische Berichte in den folgenden Zeitungen oder auf deren Internetseiten gelesen? {[}Bild{]}
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  0 Tage
+\item
+  1 Tag
+\item
+  2 Tage
+\item
+  3 Tage
+\item
+  4 Tage
+\item
+  5 Tage
+\item
+  6 Tage
+\item
+  7 Tage
+\end{enumerate}
+
+\hypertarget{distribution-5}{%
+\paragraph{Distribution}\label{distribution-5}}
+
+\begin{center}\includegraphics{appendix_files/figure-latex/unnamed-chunk-6-1} \end{center}
+
+\hypertarget{treatment-indicator-reading-bild-recoded}{%
+\subsubsection{Treatment Indicator (Reading Bild recoded)}\label{treatment-indicator-reading-bild-recoded}}
+
+The treatment definition is based on the ``reading Bild'' variable described above, but refined. The treatment is binarized, such that it is zero for those not reading Bild for any day last week and one for those indicating that they read it at least one day. Respondents indicating not to read Bild in the first wave, but reading it in later waves are dropped in order to maintain an untreated control group.
+
+\begin{center}\includegraphics{appendix_files/figure-latex/unnamed-chunk-7-1} \end{center}
+
+\hypertarget{other-newspapers-1661-in-gles}{%
+\subsubsection{Other Newspapers (1661 in GLES)}\label{other-newspapers-1661-in-gles}}
+
+Items identical to the one asking respondents about their consumption of \emph{Bild} news in the past week have been asked regarding the consumption of other newspapers, namely \emph{Frankfurter Rundschau}, \emph{Frankfurter Allgemeine Zeitung (FAZ)}, \emph{Süddeutsche Zeitung (SZ)}, \emph{die tageszeitung (taz)}, and \emph{die Welt}. Additionally, respondents could indicate if they had consumed any other daily newspaper, and how many days last week. Based on these responses, I constructed an additive index of exposure to content from newspapers other than \emph{Bild} in the first (pre-treatment) wave. This variable measures exposure in newspaper-days, meaning that for each newspaper, the number of days it was read in the week preceding the interview was summed.
+
+\begin{center}\includegraphics{appendix_files/figure-latex/unnamed-chunk-8-1} \end{center}
+
+\hypertarget{tv-news-1681f-in-gles}{%
+\subsubsection{TV News (1681f in GLES)}\label{tv-news-1681f-in-gles}}
+
+\hypertarget{question-text-6}{%
+\paragraph{Question Text}\label{question-text-6}}
+
+\emph{Translated:}
+
+I haven't watched TV news or read political reports on their websites.
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  mentioned
+\item
+  not mentioned
+\end{enumerate}
+
+\emph{Recoded to (False = 1 (have not viewed); True = 2 (have viewed))}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\emph{Original/DE:}
+
+Ich habe keine Fernsehnachrichten gesehen oder politische Berichte auf deren Internetseiten gelesen.
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  genannt
+\item
+  nicht genannt
+\end{enumerate}
+
+\hypertarget{distribution-6}{%
+\paragraph{Distribution}\label{distribution-6}}
+
+\begin{center}\includegraphics{appendix_files/figure-latex/unnamed-chunk-9-1} \end{center}
+
+\hypertarget{internet-news-consumption-1600}{%
+\subsubsection{Internet News Consumption (1600)}\label{internet-news-consumption-1600}}
+
+\hypertarget{question-text-7}{%
+\paragraph{Question Text}\label{question-text-7}}
+
+\emph{Translated:}
+
+An wie vielen Tagen haben Sie sich in der vergangenen Woche im Internet über Politik informiert?
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  0 Days
+\item
+  1 Days
+\item
+  2 Days
+\item
+  3 Days
+\item
+  4 Days
+\item
+  5 Days
+\item
+  6 Days
+\item
+  7 Days
+\end{enumerate}
+
+\emph{Recoded to {[}0,7{]}}
+
+\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
+
+\emph{Original/DE:}
+
+An wie vielen Tagen haben Sie sich in der vergangenen Woche im Internet über Politik informiert?
+
+\begin{enumerate}
+\def\labelenumi{(\arabic{enumi})}
+\tightlist
+\item
+  0 Tage
+\item
+  1 Tag
+\item
+  2 Tage
+\item
+  3 Tage
+\item
+  4 Tage
+\item
+  5 Tage
+\item
+  6 Tage
+\item
+  7 Tage
+\end{enumerate}
+
+\hypertarget{distribution-7}{%
+\paragraph{Distribution}\label{distribution-7}}
+
+\begin{center}\includegraphics{appendix_files/figure-latex/unnamed-chunk-10-1} \end{center}
+
+\pagebreak
+
+\hypertarget{treatment}{%
+\section{Treatment}\label{treatment}}
+
+\hypertarget{market-coverage-of-different-newspapers}{%
+\subsection{Market Coverage of Different Newspapers}\label{market-coverage-of-different-newspapers}}
+
+Table 1 shows the number of print copies sold and online page impressions for each newspaper per day. It becomes clear that German newspapers have a rather important position in the German news market. The tabloid \textit{Bild} has by far the largest reach, with over 1.7 Million sold newspaper daily and around 550 million web visits per month. For reference: the German Wikipedia site had less than twice as many visits (975 million) in the same time frame \footnote{Wikipedia Siteviews Analyisis: https://pageviews.wmcloud.org/siteviews/}. Bild is closely followed by the weekly published \textit{Spiegel}. The daily broadsheets sell less, and interestingly the online presence seems to be dominated by the right, given the weak presence of centre-left \textit{SZ} and left-wing \textit{taz}.
+
+\begin{table}[!htbp] \centering
+    \begin{tabular}{@{\extracolsep{5pt}} lcc}
+    \\[-1.8ex]\hline
+    \hline \\[-1.8ex]
+    Paper & Print Sales & Web Impressions \\
+     & (thousands) & (millions) \\
+    \hline \\[-1.8ex]
+    Bild & 1756 & 555 \\
+    Spiegel & 758 & 388 \\
+    FAZ & 242 & 123 \\
+    SZ & 358 & 13 \\
+    taz & 51 & 7 \\
+    Welt & 521 & 135 \\
+    \hline \\[-1.8ex]
+    \end{tabular}
+  \caption{Average daily sales and monthly online impressions of different newspapers in 2017. Source: Informationsgemeinschaft zur Feststellung der Verbreitung von Werbeträgern e. V. (2021). Quartalsauflagen. https://ivw.de/aw/print/qa. Table generated with stargazer.}
+  \label{tab:paper_sales}
+\end{table}
+
+\pagebreak
+
+\hypertarget{bert-classifiers}{%
+\subsection{BERT Classifiers}\label{bert-classifiers}}
+
+\hypertarget{dictionaries}{%
+\subsubsection{Dictionaries}\label{dictionaries}}
+
+In order to generate informative samples for the annotation, crime and migration content had to be oversampled from the raw data. To identify which articles likely contain relevant content, it is useful to construct dictionaries identifying the concept of interest and then use these dictionaries to assess what share of words in a given article is concerned with this content. In a first step, a seed dictionary is constructed to identify the concept of interest. To avoid missing any relevant words, word embeddings trained on large german language corpora can be used to identify terms with similar meaning. Using embeddings from a pre-trained model\textbackslash footnote\{Downloadable from \url{https://deepset.ai/german-word-embeddings}, I select the 100 most similar term for each term in the seed dictionary. Those terms associated with at least four terms in the seed dictionary (i.e.~being among the 100 most similar words for at least four words) are included in the extended dictionary. You can see the seed and extended dictionaries below.
+
+\hypertarget{migration}{%
+\paragraph{Migration}\label{migration}}
+
+\textbf{Raw Dictionary}:
+
+asyl, asylant, asylanten, asylantinnen, asylbewerber, asylbewerberin, asylbewerberinnen, auslander, auslanderinnen, einwanderer, einwandererin, einwandererinnen, einwandernde, einwanderung, fluchtling, fluchtende, fluchtlinge, migration, immigration, schutzsuchende, schutzbedurftige, visa, visum, zuwanderung, zuwanderer, zuwandernde, ausländer, ausländerinnen, flüchtling, flüchtende, flüchtlinge, schutzbedürftige
+
+\textbf{Dictionary after Extension using Embeddings}:
+
+asyl, asylant, asylanten, asylbewerber, asylbewerberin, auslander, einwanderer, einwandernde, einwanderung, migration, immigration, schutzsuchende, visa, visum, zuwanderung, zuwanderer, zuwandernde, ausländer, ausländerinnen, flüchtling, flüchtende, flüchtlinge, flüchtlingen, migranten, vertriebene, asylantinnen, asylbewerberinnen, auslanderinnen, einwandererin, einwandererinnen, fluchtling, fluchtende, fluchtlinge, schutzbedurftige, schutzbedürftige
+
+\hypertarget{crime}{%
+\paragraph{Crime}\label{crime}}
+
+\textbf{Raw Dictionary}:
+
+täter, täterin, polizei, verbrechen, überfall, mord, attacke, raub, straftat, ermittelt, gericht, prozess, staatsanwaltschaft, staatsanwalt, staatsanwältin, gefährder, haft, festnahme, betrug, betrüger, erstochen, opfer, anwalt, drogen, dealer, getötet, verletzung, delikt, vergewaltigung
+
+\textbf{Dictionary after Extension using Embeddings}:
+
+täter, täterin, polizei, verbrechen, überfall, mord, attacke, raub, straftat, ermittelt, gericht, prozess, staatsanwalt, staatsanwältin, gefährder, haft, festnahme, betrug, betrüger, erstochen, opfer, anwalt, drogen, dealer, getötet, verletzung, delikt, vergewaltigung, begangen, angeklagt, sexuelle, vorwurf, sexuellen, entführung, folter, mordes, missbrauch, morde, tötung, vergehen, beschuldigt, diebstahl, sexueller, übergriffe, brandstiftung, untreue, erpressung, bezichtigt, missbrauchs, misshandlung, ehebruch, totschlag, belästigung, nötigung, inzest, todesfolge, versuchter, staatsanwaltschaft
+
+\hypertarget{sampling}{%
+\subsubsection{Sampling}\label{sampling}}
+
+Using the dictionaries, relevant words in each article are counted, and the share of relevant words out of all words is calculated. I then draw a stratified sample of migration articles, pulling 100 articles with no mention of migration-related terms, 100 with a moderate share of migration-related terms (25th to 75th percentile), and 100 with a high share of migration related words (above 75th percentile), for each newspaper in the sample. I repeat this process with the crime dictionary, however here I choose a higher cutoff (95th percentile) given the lower incidence of crime coverage compared to migration coverage in my sample.
+
+\pagebreak
+
+\hypertarget{handcoding}{%
+\subsubsection{Handcoding}\label{handcoding}}
+
+Using this sampling procedure, I generate two samples of 1000 articles for annotation by research assistants. These samples oversample from articles likely to contain coverage of interest in order to provide a relatively balanced sample for training of the classifiers. Coders were sent a shiny app designed for annotations, together with the following instructions:
+
+\begin{quote}
+The task is to identify crime content in news articles. This should always be the main topic, i.e.~articles discussing a specific incident/crime, court cases, or crime statistics. Please familiarise yourself with the examples and send me an email if you feel you need more specific instructions about the precise definition of what constitutes crime content or are unsure about a specific case (a brief definition is given in the app).
+\end{quote}
+
+Along with these instructions, coders were sent example articles which were considered to be especially difficult, annotated by me.
+
+\begin{figure}[!htp]
+
+{\centering \includegraphics[width=\textwidth,]{vis/HandCodingScreenshot} 
+
+}
+
+\caption{Screenshot of Annotation App}\label{fig:unnamed-chunk-12}
+\end{figure}
+
+Annotation took place in a shiny app (see screenshot above). Coders were shown the title and text of a random news article in the sample. Then they were asked whether the article refers to the topics of crime, law and order, or public safety. Coders could see a more specific definition by clicking a button. After selecting whether the article referred to crime or not, they could either click a button to get to the next article or safe their progress to return later. Coders could also return to the preceding article in case they had selected the wrong option. The app allowed for faster annotation and minimized errors in the coding (compared to e.g.~noting the annotations in an excel sheet).
+
+The migration annotation has been conducted by only one coder (1800 articles), while the crime articles have been annotated by two different coders separately (1000 each with 200 identical articles in each coder's sample). Annotation was very congruent across coders with an agreement for 91.5\% of annotated articles and a Krippendorff's alpha of 0.79. Conflicts were resolved by the author after inspection of the conflicting annotations.
+
+\pagebreak
+
+\hypertarget{classifier-fine-tuning}{%
+\subsubsection{Classifier Fine-tuning}\label{classifier-fine-tuning}}
+
+Using the annotated samples, I fine-tune BERT classifiers from Huggingface's `transformers' library for python (bert-base-german-cased), pre-trained on german Wikipedia articles, legal documents, and news articles. For each topic (crime/migration), 1400 articles served as training set, 200 each as validation and test set. Articles longer than 512 tokens (the maximum length of input for the BERT model) were truncated. I fine-tune for 10 epochs. Performance on the test set is outstanding for the migration classifier (F1 = 0.94, accuracy = 0.96, precision = 0.95, recall = 0.93) and very good for the crime classifier (F1 = 0.86, accuracy = 0.93, precision = 0.8, recall = 0.92). Both classifiers were subjected to sanity checks, before classifying first all articles according to their migration content, which returns 85691 articles (3.6\% of all articles). For this subset, crime content is identified in 6045 articles (7.1).
+
+\begin{table}[!h]
+\centering
+\begin{tabular}{|p{12cm}|}
+\hline
+Final new years eve report of Cologne police: male groups identified \\ \hline
+Police searching for Northern-african offender: asylum-raid in Dortmund! \\ \hline
+Search in refugee home - mega-raid addressing asylum fraud \\ \hline
+Two groups attacking each other - again bloody conflict in refugee shelter \\ \hline
+Cabin fever! Violence! Mass brawls! This is behind the increase in refugee clashes \\ \hline
+\end{tabular}
+\caption{Headlines of five migration articles most likely to concern crime, according to BERT crime classifier. Translation by author.}
+\label{tab:exampleArticles}
+\end{table}
+
+As a sanity check, and in order to exemplify the nature of the treatment, table \ref{tab:exampleArticles} shows the five \emph{Bild} articles classified as crime with the highest likelihood, out of all migration-related articles. All articles relate to both migration and crime: one mentions a police report on the mass sexual assaults on new years eve 2015 in Cologne, two discuss police raids in refugee homes, and two discuss violence in refugee shelters.
+
+\pagebreak
+
+\hypertarget{correcting-for-change-in-dpa-sourced-content}{%
+\subsubsection{Correcting for change in DPA-sourced content}\label{correcting-for-change-in-dpa-sourced-content}}
+
+\begin{figure}[!htp]
+
+{\centering \includegraphics{appendix_files/figure-latex/dpaShare-1} 
+
+}
+
+\caption{Monthly number of articles by source.}\label{fig:dpaShare}
+\end{figure}
+
+Among the changes after Reichelt's takeover as chief editor of \emph{Bild} was a severe drop in the overall number of articles published online. Figure \ref{fig:dpaShare} shows the monthly number of articles \emph{Bild} published in their online archive across time. Recall that Reichelt took over in February 2017, and briefly after - in June 2017 - the overall number of articles published decreases by over 60\%. The graph also suggests an explanation for this sudden shift: the share of articles sourced from DPA, a major German press agency alike the Associated Press, sharply decreases at the same time as the major decrease in the number of articles takes place (see top blue bars). DPA is a press agency supplying many German news outlets, which means it must have a rather unbiased or at least centrist coverage, potentially decreasing the estimate of crime frames within Bild's migration content. This would not be a problem, as long as this content is equally likely to make it to the front page. However, \emph{Bild} likely gives more weight to its own content compared to pre-written content from DPA. For this reason, the paper presented data excluding DPA content. On the other hand, the decision to discontinue buying content from DPA must have been made by Reichelt himself and is thus an outcome of the treatment. Hence, it is fruitful to assess the change including DPA-sourced content.
+
+\pagebreak
+
+\hypertarget{raw-crime-estimates}{%
+\subsubsection{Raw Crime Estimates}\label{raw-crime-estimates}}
+
+\begin{figure}[!htp]
+
+{\centering \includegraphics{appendix_files/figure-latex/treatmentDPAcorr-1} 
+
+}
+
+\caption{Change in share of crime content in newspaper coverage, excluding DPA-sourced news content. Left panel: quarterly share across time, Bild compared to other newspapers' average. Right panel: difference-in-differences estimates of change in newspaper coverage compared to other newspapers, controlling for source of content.}\label{fig:treatmentDPAcorr}
+\end{figure}
+
+The left panel of figure \ref{fig:treatmentDPAcorr} displays the quarterly share of migration articles discussing crime for \emph{Bild} compared to all other newspapers. A depression is visible in 2016-2017 which was not visible in the corrected data. The share of crime content in \emph{Bild}'s migration coverage strongly increases a few months following the treatment, when the share of DPA-sourced content severely drop. The gap between \emph{Bild} and all other newspapers increases, and this increased difference persists. This change becomes even more visible in the right-hand panel, which shows a difference-in-differences estimate of the change of the share of crime news in a newspapers migration content, this time controlling for whether the content is DPA-sourced or not. The general picture is quite similar to the original estimate in the paper, as migration coverage only increases in \emph{Bild}, while all other outlets remain rather stable on this metric. In the estimate including DPA content, the share of migration coverage devoted to crime increases by an even stronger 6 percentage points, which still constitutes a very substantial increase. Both ways of handling the data suggest a strong increase in the emphasis of crime in migration coverage.
+
+\pagebreak
+
+\hypertarget{migration-attention-over-time}{%
+\subsubsection{Migration Attention over Time}\label{migration-attention-over-time}}
+
+\begin{figure}[!htp]
+
+{\centering \includegraphics{appendix_files/figure-latex/migSalience-1} 
+
+}
+
+\caption{Attention to Migration in Different News Outlets}\label{fig:migSalience}
+\end{figure}
+
+Figure \ref{fig:migSalience} shows that the prevalence of migration content as classified by the first Bert model generally follows expectations. Three distinct peaks can be observed: first during the migratory movements to Germany in 2015, then after the sexual assaults on new years eve in 2016, and during the conflict regarding migration policy within the conservative party alliance CDU/CSU in 2018. Prevalence differs strongly across newspapers, with \emph{Bild} having the lowest prevalence of migration content. This is likely due to their tabloid format, which emphasizes entertainment over news and politics content. The left-leaning SZ shows the highest attention to migration (during the peak in September 2015, nearly every second article is concerned with migration). This is likely the result of a website highly focused on politics.
+
+\pagebreak
+
+\hypertarget{results}{%
+\section{Results}\label{results}}
+
+\hypertarget{parallel-trends}{%
+\subsection{Parallel Trends}\label{parallel-trends}}
+
+\begin{figure}[!htp]
+
+{\centering \includegraphics{appendix_files/figure-latex/parallelTrends-1} 
+
+}
+
+\caption{Migration Attitude among Bild-readers compared to non-readers across Time}\label{fig:parallelTrends}
+\end{figure}
+
+Figure \ref{fig:parallelTrends} shows the development of migration attitudes among a panel of Bild readers\footnote{Readership was measured in a single wave in late 2015.} and non-readers across time, recorded in the German Longitudinal Election Study's Longterm Panel (Roßteutscher et al. 2018). This is a far smaller sample with a limited time frame and hence less useful for the precise estimation of the effects of changing migration framing. The plot shows that both groups move along a similar long-term trend, slowly becoming more conservative, while moving into similar directions along the way. The only difference between the two groups is that Bild readers seem to be more conservative in late 2015 (note that only the last three interviews were conducted in January 2016). However this deviation lies well within the 95\% confidence interval and those not reading Bild move in a similar direction, albeit less strongly. The parallel trends assumption seems to be generally met.
+
+\pagebreak
+
+\hypertarget{robustness-of-main-effect}{%
+\subsection{Robustness of Main Effect}\label{robustness-of-main-effect}}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.2386}}
+  >{\centering\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1477}}
+  >{\centering\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1477}}
+  >{\centering\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1477}}
+  >{\centering\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1477}}
+  >{\centering\arraybackslash}p{(\columnwidth - 10\tabcolsep) * \real{0.1705}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Model 1
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Model 2
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Model 3
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Model 4
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Model 5
+\end{minipage} \\
+\midrule
+\endhead
+(Intercept) & 0.999*** & & & & \\
+& (0.016) & & & & \\
+postTRUE & -0.061*** & -0.027* & -0.027* & -0.103*** & -0.103*** \\
+& (0.017) & (0.011) & (0.011) & (0.012) & (0.004) \\
+treatTRUE & 0.434*** & & & & \\
+& (0.032) & & & & \\
+postTRUE × treatTRUE & 0.067+ & 0.018 & 0.018 & 0.019 & 0.019 \\
+& (0.035) & (0.023) & (0.023) & (0.023) & (0.014) \\
+Num.Obs. & 102373 & 102373 & 102373 & 102373 & 102373 \\
+R2 & & & & & \\
+R2 Adj. & & & & & \\
+R2 Within & & & & & \\
+R2 Pseudo & 0.003 & 0.404 & 0.404 & 0.407 & 0.407 \\
+AIC & 405382.7 & 275755.8 & 275755.8 & 274534.5 & 274534.5 \\
+BIC & 405420.9 & 434431.6 & 434431.6 & 433296.1 & 433296.1 \\
+Log.Lik. & -202687.360 & -121238.885 & -121238.885 & -120619.252 & -120619.252 \\
+Std.Errors & Standard & by: ID & by: ID & by: ID & by: ID \& Wave \\
+FE: ID & & X & X & X & X \\
+FE: Wave & & & & X & X \\
+\bottomrule
+\end{longtable}
+
+\textbf{Note:}
+\^{}\^{} + p \textless{} 0.1, * p \textless{} 0.05, ** p \textless{} 0.01, *** p \textless{} 0.001
+
+\pagebreak
+
+\hypertarget{multiple-dv-table}{%
+\subsection{Multiple DV Table}\label{multiple-dv-table}}
+
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.1927}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2018}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2018}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2018}}
+  >{\centering\arraybackslash}p{(\columnwidth - 8\tabcolsep) * \real{0.2018}}@{}}
+\toprule
+\begin{minipage}[b]{\linewidth}\raggedright
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+AfD thermometer
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+MIP: Migration
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Integration Attitude
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Migration Attitude
+\end{minipage} \\
+\midrule
+\endhead
+postTRUE & -0.028*** & -0.090*** & 0.059*** & -0.058*** \\
+& (0.002) & (0.003) & (0.003) & (0.002) \\
+postTRUE × treatTRUE & -0.021* & -0.007 & -0.008 & 0.011 \\
+& (0.007) & (0.010) & (0.011) & (0.008) \\
+Num.Obs. & 119245 & 86636 & 76633 & 102373 \\
+R2 & & & & \\
+R2 Adj. & & & & \\
+R2 Within & & & & \\
+R2 Pseudo & 0.636 & 0.308 & 0.434 & 0.570 \\
+AIC & 155449.1 & 202562.0 & 155613.8 & 158189.8 \\
+BIC & 315810.7 & 354356.8 & 309840.9 & 316951.4 \\
+Log.Lik. & -61173.562 & -85080.017 & -61127.913 & -62446.895 \\
+Std.Errors & by: lfdn \& wave\_ctrl & by: lfdn \& wave\_ctrl & by: lfdn \& wave\_ctrl & by: lfdn \& wave\_ctrl \\
+FE: lfdn & X & X & X & X \\
+FE: wave\_ctrl & X & X & X & X \\
+\bottomrule
+\end{longtable}
+
+\textbf{Note:}
+\^{}\^{} + p \textless{} 0.1, * p \textless{} 0.05, ** p \textless{} 0.01, *** p \textless{} 0.001
+
+\pagebreak
+
+\hypertarget{effect-in-longterm-panel}{%
+\subsection{Effect in Longterm-Panel}\label{effect-in-longterm-panel}}
+
+It is also possible to estimate the effect of the change in editorship from the smaller and less frequent long-term panel, with a smaller sample size (between 1,700 and 5,000). The only post-treatment wave has been conducted from September to December 2017. The question wording of the variable measuring immigration attitudes is identical to the Panel study used in the main paper, however responses have been recorded on a 11-point scale. Treatment was defined similar to the main paper, with respondents who indicated to read \emph{Bild} in the pre-treatment wave in the treatment group, and respondents indicating never to read \emph{Bild} in the control group.
+
+\begin{longtable}[]{@{}lc@{}}
+\toprule
+& Model 1 \\
+\midrule
+\endhead
+postTRUE & 0.178* \\
+& (0.078) \\
+postTRUE × treatTRUE & -0.233 \\
+& (0.216) \\
+Num.Obs. & 3255 \\
+R2 & \\
+R2 Adj. & \\
+R2 Within & \\
+R2 Pseudo & 0.264 \\
+AIC & 13743.6 \\
+BIC & 19271.5 \\
+Log.Lik. & -5963.811 \\
+Std.Errors & by: lfdn \\
+FE: Wave & X \\
+FE: ID & X \\
+\bottomrule
+\end{longtable}
+
+\textbf{Note:}
+\^{}\^{} + p \textless{} 0.1, * p \textless{} 0.05, ** p \textless{} 0.01, *** p \textless{} 0.001
+
+The model suggests a liberalizing effect of -0.23 (2.33\% of the scale range), which is not significant (lower CI -0.66; upper CI 0.19), suggesting a null effect, similar to the main model.
+
+\pagebreak
+
+\hypertarget{association-model}{%
+\subsection{Association Model}\label{association-model}}
+
+\begin{longtable}[]{@{}lc@{}}
+\toprule
+& Model 1 \\
+\midrule
+\endhead
+Crime Attitude & 0.478*** \\
+& (0.015) \\
+Crime Attitude X Post & 0.000 \\
+& (0.017) \\
+Crime Attitude X Bild Reader & -0.106*** \\
+& (0.030) \\
+Crime Attitude X Post X Bild & 0.004 \\
+& (0.037) \\
+Num.Obs. & 33164 \\
+Std.Errors & by: ID \\
+\bottomrule
+\end{longtable}
+
+\textbf{Note:}
+\^{}\^{} + p \textless{} 0.1, * p \textless{} 0.05, ** p \textless{} 0.01, *** p \textless{} 0.001
+
+\pagebreak
+
+\hypertarget{readership-models}{%
+\subsection{Readership models}\label{readership-models}}
+
+\hypertarget{inward-selection}{%
+\subsubsection{Inward selection}\label{inward-selection}}
+
+\begin{figure}[!htp]
+
+{\centering \includegraphics{appendix_files/figure-latex/inselection-1} 
+
+}
+
+\caption{Coefficients of OLS regression of readership on migration attitude across waves. Vertical lines indicate 95 percent confidence intervals, dashed (red) vertical line indicates editorial change.}\label{fig:inselection}
+\end{figure}
+
+\hypertarget{resources}{%
+\section*{Resources}\label{resources}}
+\addcontentsline{toc}{section}{Resources}
+
+\hypertarget{refs}{}
+\begin{CSLReferences}{1}{0}
+\leavevmode\vadjust pre{\hypertarget{ref-GLES2018LangfristPanel}{}}%
+Roßteutscher, Sigrid, Rüdiger Schmitt-Beck, Harald Schoen, Bernhard Weßels, Christof Wolf, Maria Preißinger, Agatha Kratz, and Alexander Wuttke. 2018. {``{Langfrist-Panel 2013-2017 (GLES)}.''} K{ö}ln: GESIS Datenarchiv. \url{https://doi.org/10.4232/1.13018}.
+
+\end{CSLReferences}
+
+\end{document}

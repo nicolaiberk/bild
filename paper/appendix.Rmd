@@ -4,6 +4,7 @@ date: "15 5 2022"
 output: 
   bookdown::pdf_document2:
     number_sections: TRUE
+    keep_tex: true
 toc: TRUE
 bibliography: C:/Users/nicol/Dropbox/Studium/BibTex/PhD.bib
 ---
