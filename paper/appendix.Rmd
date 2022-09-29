@@ -1,6 +1,5 @@
 ---
 title: "Appendix for 'Framing Effects in the Wild'"
-author: "Nicolai Berk"
 date: "15 5 2022"
 output: 
   bookdown::pdf_document2:
