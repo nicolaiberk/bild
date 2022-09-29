@@ -18,10 +18,21 @@ library(ggrepel)
 
 # Migration Salience ####
 
-MigSaliencePlot <- function(aggregation = "months"){
+MigSaliencePlot <- function(aggregation = "months",
+                            dpa_corrected = T){
   
-  mig_salience_plot <- 
-    fread(here("data/processed/bert_crime_daily.csv")) %>% 
+  bert_ests <- 
+    fread(
+      here(
+        ifelse(dpa_corrected,
+               "data/processed/bert_crime_daily_nodpaBild.csv",
+                "data/processed/bert_crime_daily.csv"
+               )
+        )
+      
+      )
+  
+  bert_ests %>% 
     select(date_clean, paper, mig_share) %>% 
     mutate(date_new = lubridate::floor_date(date_clean, aggregation)) %>% 
     group_by(date_new, paper) %>% 
@@ -32,9 +43,9 @@ MigSaliencePlot <- function(aggregation = "months"){
     ggtitle('Migration salience in different newspapers') +
     xlab('') + ylab('Share of migration articles') +
     theme_minimal() +
-    labs(color = "Outlet", lty = "Outlet", shape = "Outlet")
-  
-  return(mig_salience_plot)
+    theme(text = element_text(family = "serif")) +
+    labs(color = "Outlet", lty = "Outlet", shape = "Outlet") %>% 
+    return()
 }
 
 TenMostCrime <- function(){
@@ -91,7 +102,7 @@ TreatmentTrendPlot <- function(size = 1,
       bert_ests %>% 
       filter(month < maxdate, month >= mindate) %>% 
       ggplot(aes(x = month, y = crime, col = paper, lty = paper)) +
-      geom_vline(xintercept = as.Date("2017-02-01"), lty = 2, col = "red", size = size) +
+      geom_vline(xintercept = as.Date("2017-02-01"), lty = 2, col = "black", size = size) +
       geom_line(size = size) +
       geom_rug(data = survey_dates, aes(x = date), sides = 't', inherit.aes = F) +
       ggtitle(paste0(aggregation, "ly Share of Migration Content Devoted to Crime Frames"), 
@@ -104,7 +115,8 @@ TreatmentTrendPlot <- function(size = 1,
                   )
            ) +
       theme_minimal() +
-      theme(legend.position = "none") +
+      theme(legend.position = "none", 
+            text = element_text(family = "serif")) +
       scale_color_manual(values = palette)
     
     return(trendplot)
@@ -203,10 +215,11 @@ TreatmentDiDPlot <- function(size = 1,
                   hjust = 1.5, size = 20),
                   col = palette[1]) +
     geom_vline(xintercept = 0,
-               col = "red", lty = 2) +
+               col = "black", lty = 2) +
     theme_minimal() +
     xlab("Estimated DiD") + ylab("") +
-    theme(legend.position = "None") +
+    theme(legend.position = "None",
+          text = element_text(family = "serif")) +
     scale_color_manual(values = palette) +
     coord_flip() %>% 
     return()
@@ -254,7 +267,8 @@ DescPlot <- function(legend_position = "right",
                        labels = c("Not Bild-reader", "Bild reader") %>% 
                          rev()) +
     theme_minimal() +
-    theme(legend.position = legend_position) +
+    theme(legend.position = legend_position, 
+          text = element_text(family = "serif")) +
     ggtitle(title, subtitle) +
     xlim(c(as.Date("2016-10-01"), as.Date("2020-06-01"))) %>% 
     return()
@@ -264,13 +278,14 @@ DescPlot <- function(legend_position = "right",
 
 
 DiDPlot <- function(multi = F, 
-                       dv_var = "1130_clean",
-                       dv_name = "Migration Attitude",
-                       scaled = T,
-                       size = 1,
-                       boundary_share = 0.25,
-                       theoretical_effect_size = 0.6,
-                       clustering = "lfdn") {
+                    dv_var = "1130_clean",
+                    dv_name = "Migration Attitude",
+                    scaled = T,
+                    size = 1,
+                    boundary_share = 0.25,
+                    theoretical_effect_size = 0.6,
+                    clustering = "lfdn",
+                    return_table = F) {
   
   gles_p_long <- 
     fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
@@ -403,19 +418,37 @@ DiDPlot <- function(multi = F,
                       select(dv, post, treat, lfdn, wave_ctrl),
                     cluster = clustering)
     
-    modelsummary::modelplot(
-      list("AfD thermometer" = afd_model,
-           "MIP: Migration" = mip_model,
-           "Integration Attitude" = int_att_model,
-           "Migration Attitude" = mig_att_model),
-      coef_map = list("postTRUE:treatTRUE" = ""),
-      facet = T, 
-      ) +
-      geom_vline(xintercept = 0, lty = 1, col = "red", size = size) +
-      geom_vline(xintercept = theoretical_effect_size*boundary_share, lty = 3, col = "black", size = size) +
-      geom_vline(xintercept = -1*theoretical_effect_size*boundary_share, lty = 3, col = "black", size = size) +
-      geom_vline(xintercept = theoretical_effect_size, lty = 2, col = "black", size = size) +
-      geom_vline(xintercept = -1*theoretical_effect_size, lty = 2, col = "black", size = size)
+    
+    if(!return_table){
+      
+      modelsummary::modelplot(
+        list("AfD thermometer" = afd_model,
+             "MIP: Migration" = mip_model,
+             "Integration Attitude" = int_att_model,
+             "Migration Attitude" = mig_att_model),
+        coef_map = list("postTRUE:treatTRUE" = ""),
+        facet = T, 
+        ) +
+        geom_vline(xintercept = 0, lty = 1, col = "darkgray", size = size) +
+        geom_vline(xintercept = theoretical_effect_size*boundary_share, lty = 3, col = "black", size = size) +
+        geom_vline(xintercept = -1*theoretical_effect_size*boundary_share, lty = 3, col = "black", size = size) +
+        geom_vline(xintercept = theoretical_effect_size, lty = 2, col = "black", size = size) +
+        geom_vline(xintercept = -1*theoretical_effect_size, lty = 2, col = "black", size = size) +
+        theme(text = element_text(family = "serif")) +
+        xlab("DiD")
+      
+    }else{
+      
+      modelsummary::modelsummary(
+        list("AfD thermometer" = afd_model,
+             "MIP: Migration" = mip_model,
+             "Integration Attitude" = int_att_model,
+             "Migration Attitude" = mig_att_model), 
+        output = "markdown",
+        stars = T)
+      
+    }
+    
 
   }else{
     
@@ -453,21 +486,33 @@ DiDPlot <- function(multi = F,
                       select(dv, post, treat, lfdn, wave_ctrl),
                     cluster = clustering)
     
-    modelsummary::modelplot(
-      list(dv_name = single_model),
-      coef_map = list("postTRUE:treatTRUE" = ""),
-      facet = T
-    ) +
-      # indicate either 0.5 SDs or 10% of the sclae (adjusted to scale in raw case)
-      geom_vline(xintercept = 0, lty = 1, col = "red", size = size) +
-      geom_vline(xintercept = boundary_share*theoretical_effect_size, 
-                 lty = 3, col = "black", size = size) +
-      geom_vline(xintercept = boundary_share*-1*theoretical_effect_size, 
-                 lty = 3, col = "black", size = size) +
-      geom_vline(xintercept = theoretical_effect_size, 
-                 lty = 2, col = "black", size = size) +
-      geom_vline(xintercept = -1*theoretical_effect_size, 
-                 lty = 2, col = "black", size = size)
+    
+    if(!return_table){
+      
+      modelsummary::modelplot(
+        list(dv_name = single_model),
+        coef_map = list("postTRUE:treatTRUE" = ""),
+        facet = T
+      ) +
+        geom_vline(xintercept = 0, lty = 1, col = "darkgray", size = size) +
+        geom_vline(xintercept = boundary_share*theoretical_effect_size,
+                   lty = 3, col = "black", size = size) +
+        geom_vline(xintercept = boundary_share*-1*theoretical_effect_size,
+                   lty = 3, col = "black", size = size) +
+        geom_vline(xintercept = theoretical_effect_size,
+                   lty = 2, col = "black", size = size) +
+        geom_vline(xintercept = -1*theoretical_effect_size,
+                   lty = 2, col = "black", size = size) +
+        theme(text = element_text(family = "serif")) +
+        xlab("DiD")
+      
+    }else{
+      
+      modelsummary::modelsummary(single_model, 
+                                 output = "markdown",
+                                 stars = T)
+      
+    }
     
   }
 
@@ -618,8 +663,9 @@ DiDByWavePlot <- function(dv = "1130_clean",
       geom_vline(xintercept = as.Date(postdate), lty = 2, col = "black", size = size) +
       geom_pointrange(size = size, position = position_dodge2(width = 30)) +
       xlab("Date") + ylab("Effect") +
+      theme(text = element_text(family = "serif")) +
       theme_minimal() +
-        xlim(c(as.Date("2016-10-01"), as.Date("2020-06-01"))) %>% 
+      xlim(c(as.Date("2016-10-01"), as.Date("2020-06-01"))) %>% 
       return()
       
     }else{
@@ -639,6 +685,7 @@ DiDByWavePlot <- function(dv = "1130_clean",
         geom_pointrange(size = size, position = position_dodge2(width = 30)) +
         xlab("Date") + ylab("Effect") +
         theme_minimal() +
+        theme(text = element_text(family = "serif")) +
         xlim(c(as.Date("2016-10-01"), as.Date("2020-06-01"))) %>% 
         return()
       
@@ -698,6 +745,7 @@ MigCrimeCorPlot <- function(size = 1){
     geom_point(size = size*2) +
     geom_line(size = size) +
     theme_minimal() +
+    theme(text = element_text(family = "serif")) +
     xlab("") + ylab("Pearson's r") +
     scale_color_discrete(name = "Readership", 
                          labels = c("FALSE" = "Not Bild", 
@@ -768,7 +816,8 @@ MigCrimeCorPlotBS <- function(size = 1, return_ests = F){
       geom_point(size = size) +
       geom_line(size = size) +
       theme_minimal() +
-      xlab("") + ylab("Pearson's r") +
+      xlab("") + ylab("Pearson's r")  +
+      theme(text = element_text(family = "serif")) +
       scale_color_manual(name = "Readership", 
                            labels = c("FALSE" = "Not Bild", 
                                       "TRUE" = "Bild"),
@@ -784,7 +833,8 @@ MigCrimeCorPlotBS <- function(size = 1, return_ests = F){
 
 # Readership ####
 
-OutSelection <- function(color_palette = MetBrewer::met.brewer("Archambault", 3)[c(1,3,2)]) {
+OutSelection <- function(color_palette = MetBrewer::met.brewer("Archambault", 3)[c(1,3,2)],
+                         main_only = T) {
   
   ## load data
   gles_p_long <- 
@@ -816,57 +866,94 @@ OutSelection <- function(color_palette = MetBrewer::met.brewer("Archambault", 3)
                             `1661a_clean` > 0)
       ) %>% 
     mutate(reader_share = still_readers/N_readers)
-
-  hist <- 
-    gles_p_long %>% 
-    filter(wave == 1) %>% 
-    ggplot(aes(x = init_mig_groups,
-               y = N_readers,
-               fill = init_mig_groups)) +
-    geom_col() +
-    xlab("") + ylab("N") +
-    guides(fill = "none", x = "none") +
-    scale_fill_manual(values = color_palette) +
-    theme_minimal()
   
-  gles_p_long %>%
-    filter(still_readers > 0) %>% 
-    ggplot(aes(date_clean, 
-               reader_share,
-               col = init_mig_groups,
-               shape = init_mig_groups,
-               lty = init_mig_groups)) +
-    geom_vline(xintercept = postdate, col = "red", lty = 2) +
-    geom_line() +
-    geom_point() +
-    geom_label_repel(data = 
-                gles_p_long %>% 
-                ungroup() %>% 
-                filter(reader_share > 0) %>% 
-                filter(date_clean == max(date_clean)),
-              aes(label = as.character(round(reader_share, 2)),
-                  fill = init_mig_groups),
-              col = "black",
-              size = 4) +
-    theme_minimal() +
-    scale_color_manual(name = "Migration Attitude",
+  if(!main_only){
+    
+  
+    hist <- 
+      gles_p_long %>% 
+      filter(wave == 1) %>% 
+      ggplot(aes(x = init_mig_groups,
+                 y = N_readers,
+                 fill = init_mig_groups)) +
+      geom_col() +
+      xlab("") + ylab("N") +
+      guides(fill = "none", x = "none") +
+      scale_fill_manual(values = color_palette) +
+      theme(text = element_text(family = "serif")) +
+      theme_minimal()
+    
+    gles_p_long %>%
+      filter(still_readers > 0) %>% 
+      ggplot(aes(date_clean, 
+                 reader_share,
+                 col = init_mig_groups,
+                 shape = init_mig_groups,
+                 lty = init_mig_groups)) +
+      geom_vline(xintercept = postdate, col = "red", lty = 2) +
+      geom_line() +
+      geom_point() +
+      geom_label_repel(data = 
+                  gles_p_long %>% 
+                  ungroup() %>% 
+                  filter(reader_share > 0) %>% 
+                  filter(date_clean == max(date_clean)),
+                aes(label = as.character(round(reader_share, 2)),
+                    fill = init_mig_groups),
+                col = "black",
+                size = 4) +
+      theme_minimal() +
+      theme(text = element_text(family = "serif")) +
+      scale_color_manual(name = "Migration Attitude",
+                           values = color_palette) +
+      scale_fill_manual(values = color_palette) +
+      scale_shape_discrete(name = "Migration Attitude") +
+      guides(lty = "none", fill = "none") +
+      ggtitle("Share of Initial Readers Reporting Readership in subsequent Waves", "by Initial Migration Attitude") +
+      ylab("Share") + xlab("") +
+      hist + 
+      guide_area() +
+      plot_layout(guides = "collect",
+                  design = 
+                  "
+                  AAAC
+                  AAAB
+                  ") %>% 
+      return()
+  }else{
+    
+    gles_p_long %>%
+      filter(still_readers > 0) %>% 
+      ggplot(aes(date_clean, 
+                 reader_share,
+                 col = init_mig_groups,
+                 shape = init_mig_groups,
+                 lty = init_mig_groups)) +
+      geom_vline(xintercept = postdate, col = "black", lty = 2) +
+      geom_line() +
+      geom_point() +
+      geom_label_repel(data = 
+                         gles_p_long %>% 
+                         ungroup() %>% 
+                         filter(reader_share > 0) %>% 
+                         filter(date_clean == max(date_clean)),
+                       aes(label = as.character(round(reader_share, 2)),
+                           fill = init_mig_groups),
+                       col = "white",
+                       size = 4) +
+      theme_minimal() +
+      theme(text = element_text(family = "serif")) +
+      scale_color_manual(name = "Migration Attitude",
                          values = color_palette) +
-    scale_fill_manual(values = color_palette) +
-    scale_shape_discrete(name = "Migration Attitude") +
-    guides(lty = "none", fill = "none") +
-    ggtitle("Share of Initial Readers Reporting Readership in subsequent Waves", "by Initial Migration Attitude") +
-    ylab("Share") + xlab("") +
-    hist + 
-    guide_area() +
-    plot_layout(guides = "collect",
-                design = 
-                "
-                AAAC
-                AAAB
-                ")
-  
-  
+      scale_fill_manual(values = color_palette) +
+      scale_shape_discrete(name = "Migration Attitude") +
+      guides(lty = "none", fill = "none") +
+      ggtitle("Share of Initial Readers Reporting Readership in subsequent Waves", "by Initial Migration Attitude") +
+      ylab("Share") + xlab("") %>% 
+      return()
+  }
 }
+
 
 InSelection <- function() {
   
@@ -941,6 +1028,7 @@ InSelection <- function() {
     geom_pointrange() +
     geom_line() +
     theme_minimal() +
+    theme(text = element_text(family = "serif")) +
     scale_color_discrete(name = "Readership") +
     scale_shape_discrete(name = "Readership") +
     ggtitle("Association of Readership with Immigration Attitude", "Bild and Placebo Paper") +
@@ -1005,7 +1093,7 @@ CrowdOutEstimates <- function(vis = T) {
     values <- 
       gles_long %>%
       filter(!is.na(get(mod))) %>% 
-      select(mod) %>% 
+      select(contains(mod)) %>% 
       unique() %>% 
       .[[1]]
     
@@ -1082,16 +1170,18 @@ CrowdOutEstimates <- function(vis = T) {
       geom_hline(yintercept = 0) +
       geom_hline(yintercept = c(0.15, -0.15), lty = 3) +
       geom_hline(yintercept = c(0.6, -0.6), lty = 2) +
-      geom_pointrange() +
       geom_text(aes(x = "0", 
                     y = CATE, 
                     label = effect_label,
                     hjust = -.3)
       ) +
+      geom_pointrange() +
       facet_wrap(~moderator, scales = "free_x",
                  labeller = labeller) +
       theme_minimal() +
+      theme(text = element_text(family = "serif")) +
       xlab("") +
+      scale_color_manual(values = c("#333333", "#989898")) +
       theme(legend.position = "None") %>% 
       return()
     
@@ -1174,6 +1264,7 @@ ParallelTrendsPlot <- function(){
     geom_pointrange() +
     geom_line() +
     theme_minimal() +
+    theme(text = element_text(family = "serif")) +
     scale_shape_discrete(name = "Bild Readership", 
                        labels = c("No", "Yes")) +
     scale_color_manual(name = "Bild Readership", 
@@ -1289,7 +1380,8 @@ MigChangePlot <- function(return_table = F,
         # removes facet labels
         theme(
           strip.background = element_blank(),
-          strip.text.x = element_blank()
+          strip.text.x = element_blank(),
+          text = element_text(family = "serif")
         ) %>% 
         return()
     
@@ -1314,7 +1406,8 @@ MigChangePlot <- function(return_table = F,
                            breaks = seq(0, 10, 2)) +
         ylab("Relative frequency") +
         theme_minimal() +
-        theme(legend.position = "None") +
+        theme(legend.position = "None",
+              text = element_text(family = "serif")) +
         facet_grid(Erhebung=="n"~Distance) %>% 
         return()
     
@@ -1397,8 +1490,8 @@ LTPDiD <- function(return_table = F,
   gles_ltp <- 
     gles_ltp %>% 
     filter(Erhebung == "l") %>% 
-    mutate(bild_reader = `285a_clean` > 0) %>% # misdefined - exclude ever-readers
-    select(lfdn, bild_reader) %>% 
+    mutate(bild_init = `285a_clean` > 0) %>%
+    select(lfdn, bild_init) %>% 
     right_join(gles_ltp, by = "lfdn") %>% 
     mutate(
       post = date_clean >= as.Date(treatment_timing),
@@ -1414,12 +1507,26 @@ LTPDiD <- function(return_table = F,
       ID = lfdn
     )
   
+  # check if ever read Bild
+  gles_ltp <- 
+    gles_ltp %>% 
+    select(ID, Erhebung, `285a_clean`) %>% 
+    group_by(ID) %>% 
+    summarise(bild_ever = sum(`285a_clean`, na.rm = T)) %>% 
+    filter(!is.na(bild_ever)) %>% 
+    right_join(gles_ltp, by = "ID")
+  
+  # recode treatment to NA if not never read bild
+  gles_ltp <- 
+    gles_ltp %>% 
+    mutate(treat = ifelse(bild_init, T, ifelse(bild_ever == 0, F, NA)))
+  
   
   ## model
   single_model <- 
     fixest::feglm(
     
-      dv ~ post*bild_reader | Wave + ID,
+      dv ~ post*treat | Wave + ID,
       data = gles_ltp,
       cluster = "lfdn"
       
@@ -1441,7 +1548,8 @@ LTPDiD <- function(return_table = F,
         geom_vline(xintercept = theoretical_effect_size, 
                    lty = 2, col = "black", size = size) +
         geom_vline(xintercept = -1*theoretical_effect_size, 
-                   lty = 2, col = "black", size = size) %>% 
+                   lty = 2, col = "black", size = size) +
+      theme(text = element_text(family = "serif")) %>% 
       return()
   
   }else{
@@ -1493,6 +1601,7 @@ GroupedDistPlot <- function(variable = NULL,
                  summarise(dv = mean(dv, na.rm = T)) %>% 
                  .[1,]) +
     theme_minimal() +
+    theme(text = element_text(family = "serif")) +
     xlab("") + ylab("Share") +
     ggtitle("", "Never Bild Readers")
   
