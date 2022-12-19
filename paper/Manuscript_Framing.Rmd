@@ -159,13 +159,13 @@ In order to assess the effect on the association of immigration and crime, I als
 
 ## Estimation
 
-To assess the precise impact of increased attention to crime in migration coverage, I will present evidence from a *difference-in-differences* (DiD) estimator to show the effect of the editorial change – and the related content shift – on migration attitudes:
+To assess the precise impact of increased attention to crime in migration coverage, I will present evidence from a two-way fixed effects (TWFE) *difference-in-differences* (DiD) estimator to show the effect of the editorial change – and the related content shift – on migration attitudes:
 
 $$
-y_{iw} = \alpha + \beta_1*Post_w + \beta_2 * Post_w * BildReader_i + \phi_w + \rho_i + \epsilon_{it} 
+y_{w,i} = \alpha + \beta * D_{w,i}+ \phi_w + \rho_i + \epsilon_{w,i} 
 $$
 
-The dependent variable $y_{iw}$ indicates respondent $i$'s migration attitude in a given survey wave $w$, measured on the Likert scale described above. The conditioning variable $BildReader_i$ is a simple binary variable indicating whether respondents read *Bild* in the past week and is measured in the pre-treatment wave. $Post_w$ indicates whether an interview took place preceding or following the editorial change. The estimator of interest is $\beta_2$, which indicates the change in migration attitudes of *Bild* readers following the editorial change, controlling for time-constant ($\rho_i$) and wave-specific ($\phi_w$) factors with fixed effects, as well as general pre-post shifts in migration attitudes ($Post_w$). Note that the pre-treatment differences of treatment and control group are corrected for in the individual fixed effects, as the groups are constant over time (readership is only assessed pre-treatment). As the panel data contains only one pre-treatment wave, the parallel trends assumption cannot be tested with this data directly, but assessing the trends using the GLES Longterm Panel [@GLES2018LangfristPanel] shows that *Bild* and non-*Bild* readers' immigration attitudes move in parallel preceding the treatment (see appendix 3.1).
+The dependent variable $y_{w,i}$ indicates respondent $i$'s migration attitude in a given survey wave $w$, measured on the Likert scale described above. The treatment variable $D_{w,i}$ is a simple binary variable indicating whether respondents are treated, specifically it indicates post-treatment whether respondents indicated to read *Bild* preceding the editorial change. This variable is identical to the interaction of a variable indicating whether an interview took place post-treatment and whether someone reported *Bild* readership pre-treatment. The estimator of interest is $\beta$, which indicates the change in migration attitudes of *Bild* readers following the editorial change, controlling for time-constant ($\rho_i$) and wave-specific ($\phi_w$) factors with fixed effects. Note that the pre-treatment differences of treatment and control group are corrected for in the individual fixed effects, as the groups are constant over time (readership is only assessed pre-treatment), while any time trends are corrected for in the wave fixed effects ($\phi_w$). As the panel data contains only one pre-treatment wave, the parallel trends assumption cannot be tested with this data directly, but assessing the trends using the GLES Longterm Panel [@GLES2018LangfristPanel] shows that *Bild* and non-*Bild* readers' immigration attitudes move in parallel preceding the treatment (see online appendix 3.1).
 
 
 ## Expected Effect Size
@@ -212,7 +212,7 @@ single_model <-
 
 ATT <- single_model$coefficients[["postTRUE:treatTRUE"]]
 t_ATT <- single_model$coeftable["postTRUE:treatTRUE", "t value"]
-p_ATT <- single_model$coeftable["postTRUE:treatTRUE", "Pr(>|t|))"]
+p_ATT <- single_model$coeftable["postTRUE:treatTRUE", "Pr(>|t|)"]
 
 ```
 
