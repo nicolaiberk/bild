@@ -14,12 +14,15 @@ library(dplyr)
 library(here)
 library(data.table)
 library(ggrepel)
+library(modelsummary)
+library(gt)
 
 
 # Migration Salience ####
 
 MigSaliencePlot <- function(aggregation = "months",
-                            dpa_corrected = T){
+                            dpa_corrected = T,
+                            papers = c("Bild", "FAZ", "Spiegel", "SZ", "TAZ", "Welt")){
   
   bert_ests <- 
     fread(
@@ -37,11 +40,12 @@ MigSaliencePlot <- function(aggregation = "months",
     mutate(date_new = lubridate::floor_date(date_clean, aggregation)) %>% 
     group_by(date_new, paper) %>% 
     summarise_all(mean) %>% 
-    filter(date_new < as.Date('2019-01-01')) %>%
+    filter(date_new < as.Date('2019-01-01'),
+           (paper %in% papers)) %>%
     ggplot(aes(x = date_new, y = mig_share, col = paper, lty = paper, shape = paper)) +
     geom_line() + geom_point() +
     ggtitle('Migration salience in different newspapers') +
-    xlab('') + ylab('Share of migration articles') +
+    xlab('') + ylab('Share of articles') +
     theme_minimal() +
     theme(text = element_text(family = "serif")) +
     labs(color = "Outlet", lty = "Outlet", shape = "Outlet") %>% 
@@ -105,7 +109,7 @@ TreatmentTrendPlot <- function(size = 1,
       geom_vline(xintercept = as.Date("2017-02-01"), lty = 2, col = "black", size = size) +
       geom_line(size = size) +
       geom_rug(data = survey_dates, aes(x = date), sides = 't', inherit.aes = F) +
-      ggtitle(paste0(aggregation, "ly Share of Migration Content Devoted to Crime Frames"), 
+      ggtitle(paste0(aggregation, "ly Attention to Crime"), 
               paste0("Bild vs. other major daily newspapers, 2016-", lubridate::year(maxdate))) + 
       xlab("Date") + 
       ylab(paste0("Share of Migration Articles", 
@@ -232,7 +236,8 @@ TreatmentDiDPlot <- function(size = 1,
 
 ## Descriptive visualisation - cntrl vs treatment (by group)
 DescPlot <- function(legend_position = "right",
-                     colorful = F){
+                     colorful = F, 
+                     col_palette = MetBrewer::met.brewer("Archambault", 2)){
   
   gles_p_long <- fread(here('data/raw/gles/Panel/long_cleaned.csv'))
   
@@ -255,11 +260,8 @@ DescPlot <- function(legend_position = "right",
     scale_color_manual(name = "Group",
                        labels = c("Not Bild-reader", "Bild reader") %>% 
                          rev(),
-                       values = if(colorful){
-                         MetBrewer::met.brewer("Archambault", 2)
-                       }else{
-                         c("black", "darkgray")
-                       }) +
+                       values = 
+                         if(colorful){col_palette}else{c("black", "gray")}) +
     scale_linetype_discrete(name = "Group",
                               labels = c("Not Bild-reader", "Bild reader") %>% 
                          rev()) +
@@ -285,7 +287,8 @@ DiDPlot <- function(multi = F,
                     boundary_share = 0.25,
                     theoretical_effect_size = 0.6,
                     clustering = "lfdn",
-                    return_table = F) {
+                    return_table = F,
+                    col = "black") {
   
   gles_p_long <- 
     fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
@@ -427,7 +430,7 @@ DiDPlot <- function(multi = F,
              "Integration Attitude" = int_att_model,
              "Migration Attitude" = mig_att_model),
         coef_map = list("postTRUE:treatTRUE" = ""),
-        facet = T, 
+        facet = T, color = col
         ) +
         geom_vline(xintercept = 0, lty = 1, col = "darkgray", size = size) +
         geom_vline(xintercept = theoretical_effect_size*boundary_share, lty = 3, col = "black", size = size) +
@@ -435,7 +438,14 @@ DiDPlot <- function(multi = F,
         geom_vline(xintercept = theoretical_effect_size, lty = 2, col = "black", size = size) +
         geom_vline(xintercept = -1*theoretical_effect_size, lty = 2, col = "black", size = size) +
         theme(text = element_text(family = "serif")) +
-        xlab("DiD")
+        xlab("DiD") +
+        scale_color_manual(values = c(col)) +
+        scale_x_continuous(
+          breaks=round(c(-1*theoretical_effect_size,
+                   -1*theoretical_effect_size*boundary_share,
+                   theoretical_effect_size*boundary_share,
+                   theoretical_effect_size), 2)
+          )
       
     }else{
       
@@ -492,7 +502,7 @@ DiDPlot <- function(multi = F,
       modelsummary::modelplot(
         list(dv_name = single_model),
         coef_map = list("postTRUE:treatTRUE" = ""),
-        facet = T
+        facet = T, color = col
       ) +
         geom_vline(xintercept = 0, lty = 1, col = "darkgray", size = size) +
         geom_vline(xintercept = boundary_share*theoretical_effect_size,
@@ -504,13 +514,28 @@ DiDPlot <- function(multi = F,
         geom_vline(xintercept = -1*theoretical_effect_size,
                    lty = 2, col = "black", size = size) +
         theme(text = element_text(family = "serif")) +
-        xlab("DiD")
+        xlab("DiD") +
+        scale_x_continuous(
+          breaks=
+            round(
+              c(-1*theoretical_effect_size, 
+                   -1*theoretical_effect_size*boundary_share,
+                   theoretical_effect_size*boundary_share,
+                   theoretical_effect_size
+                   ), 2)
+        )
       
     }else{
       
       modelsummary::modelsummary(single_model, 
                                  output = "markdown",
-                                 stars = T)
+                                 stars = T) +
+        scale_x_continuous(
+          breaks=round(c(-1*theoretical_effect_size, 
+                   -1*theoretical_effect_size*boundary_share, 
+                   theoretical_effect_size*boundary_share, 
+                   theoretical_effect_size, 2))
+        )
       
     }
     
@@ -758,7 +783,7 @@ MigCrimeCorPlot <- function(size = 1){
 }
 
 
-MigCrimeCorPlotBS <- function(size = 1, return_ests = F){
+MigCrimeCorPlotBS <- function(size = 1, return_ests = F, cols = c("black", "gray")){
   
   load(here("data/processed/did_bootstraps_cor.RData"))
   
@@ -821,7 +846,7 @@ MigCrimeCorPlotBS <- function(size = 1, return_ests = F){
       scale_color_manual(name = "Readership", 
                            labels = c("FALSE" = "Not Bild", 
                                       "TRUE" = "Bild"),
-                           values = c("gray", "black")) +
+                           values = cols) +
       scale_shape_discrete(name = "Readership", 
                            labels = c("FALSE" = "Not Bild", 
                                       "TRUE" = "Bild")) %>% 
@@ -1038,7 +1063,7 @@ InSelection <- function() {
 
 # Crowding Out ####
 
-CrowdOutEstimates <- function(vis = T) {
+CrowdOutEstimates <- function(vis = T, col_scale = c("#333333", "#989898")) {
   
   gles_long <- 
     fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
@@ -1160,13 +1185,23 @@ CrowdOutEstimates <- function(vis = T) {
       return(varnames[value])
     }
     
+    ests <- 
+      ests %>% 
+      mutate(
+        value = 
+          factor(
+            value,
+            levels = as.character(c(0, 1, "1-3", 2, 3, 4, "4-9", 5, 6, 7, 8, 9, 10, "10-15", ">15"))))
+    
     ests %>%
-      ggplot(aes(x = factor(value,
-                            levels = as.character(c(0, 1, "1-3", 2, 3, 4, "4-9", 
-                                                    5, 6, 7, 8, 9, 10, "10-15",
-                                                    ">15"))), 
-                 y = CATE, ymin = CATE_lower, ymax = CATE_upper,
-                 col = value != "0")) +
+      ggplot(
+        aes(
+          x = value, 
+          y = CATE, 
+          ymin = CATE_lower, 
+          ymax = CATE_upper,
+          col = value != "0")) +
+      geom_pointrange() +
       geom_hline(yintercept = 0) +
       geom_hline(yintercept = c(0.15, -0.15), lty = 3) +
       geom_hline(yintercept = c(0.6, -0.6), lty = 2) +
@@ -1175,13 +1210,12 @@ CrowdOutEstimates <- function(vis = T) {
                     label = effect_label,
                     hjust = -.3)
       ) +
-      geom_pointrange() +
       facet_wrap(~moderator, scales = "free_x",
                  labeller = labeller) +
       theme_minimal() +
       theme(text = element_text(family = "serif")) +
-      xlab("") +
-      scale_color_manual(values = c("#333333", "#989898")) +
+      xlab("") + 
+      scale_color_manual(values = col_scale) +
       theme(legend.position = "None") %>% 
       return()
     
@@ -1193,9 +1227,10 @@ CrowdOutEstimates <- function(vis = T) {
 
 # Parallel Trends ####
 
-ParallelTrendsPlot <- function(){
-  
-  color_palette = MetBrewer::met.brewer("Archambault", 2)
+ParallelTrendsPlot <- 
+  function(
+    color_palette = MetBrewer::met.brewer("Archambault", 2),
+    multiplot = T){
   
   gles_ltp <- 
     haven::read_dta(here("data/raw/gles/LongTermPanel/ZA5770_v1-0-0.dta")) %>% 
@@ -1232,7 +1267,7 @@ ParallelTrendsPlot <- function(){
     select(lfdn, bild_reader) %>% 
     right_join(gles_ltp, by = "lfdn")
   
-  hist <- 
+  hist_plt <- 
     gles_ltp %>% 
     filter(Erhebung == "l" & !is.na(bild_reader)) %>% 
     ggplot(aes(bild_reader, fill = bild_reader)) +
@@ -1243,7 +1278,8 @@ ParallelTrendsPlot <- function(){
     scale_fill_manual(values = color_palette) 
   
   ## plot
-  gles_ltp %>% 
+  main_plt <- 
+    gles_ltp %>% 
     filter(!is.na(bild_reader),
            Erhebung != "k") %>% 
     group_by(bild_reader, Erhebung) %>% 
@@ -1273,15 +1309,25 @@ ParallelTrendsPlot <- function(){
     scale_fill_manual(values = color_palette) +
     guides(lty = "none", fill = "none") +
     ggtitle("Immigration Attitude by Bild Readership", "GLES Longterm Panel") +
-    ylab("< More liberal | more restrictive >") + xlab("") +
-    hist + 
-    guide_area() +
-    plot_layout(guides = "collect",
-                design = 
-                  "
-                AAAC
-                AAAB
-                ")
+    ylab("< More liberal | more restrictive >") + xlab("")
+  
+  if(multiplot){
+    
+    main_plt +
+      hist + 
+      guide_area() +
+      plot_layout(guides = "collect",
+                  design = 
+                    "
+                  AAAC
+                  AAAB
+                  ") %>% 
+      return()
+    
+  }else{
+    return(main_plt)
+  }
+  
   
   
 }
@@ -1292,7 +1338,8 @@ ParallelTrendsPlot <- function(){
 
 MigChangePlot <- function(return_table = F, 
                           line_plot = T,
-                          color_palette = MetBrewer::met.brewer("Archambault", 2)) {
+                          color_palette = MetBrewer::met.brewer("Archambault", 2),
+                          distances = c(1,2)) {
   
   ## load GLES LTP data, wide to long
   gles_ltp <- 
@@ -1327,7 +1374,7 @@ MigChangePlot <- function(return_table = F,
   gles_ltp <- 
     gles_ltp %>% 
     select(lfdn, date_clean, Erhebung, `174b_clean`) %>% 
-    pivot_wider(lfdn, names_from = Erhebung, values_from = `174b_clean`, names_prefix = "mig_") %>% 
+    pivot_wider(id_cols = lfdn, names_from = Erhebung, values_from = `174b_clean`, names_prefix = "mig_") %>% 
     mutate(
       change_m_1 = abs(mig_m - mig_l),
       change_n_1 = abs(mig_n - mig_m),
@@ -1355,6 +1402,7 @@ MigChangePlot <- function(return_table = F,
                    Erhebung == "m" & Distance == 1 ~ "2016-2017",
                    Erhebung == "n" & Distance == 1 ~ "2017-2018")
         ) %>% 
+        filter(Distance %in% distances) %>% 
         group_by(change_label, Distance) %>% 
         summarise(
           
@@ -1397,9 +1445,10 @@ MigChangePlot <- function(return_table = F,
                    Erhebung == "m" & Distance == 1 ~ "2016-2017",
                    Erhebung == "n" & Distance == 1 ~ "2017-2018")
         ) %>% 
+        filter(Distance %in% distances) %>% 
         ggplot(aes(x = change, fill = Erhebung == "n")) +
         geom_histogram(aes(y = after_stat(count/ sum(count))), binwidth = 1, alpha = 0.5) +
-        geom_boxplot(width = 0.05, outlier.alpha = 0, notch = T, ) +
+        geom_boxplot(width = 0.05, outlier.alpha = 0, notch = T) +
         scale_fill_manual(values = color_palette) +
         xlab("Change in immigration attitude") +
         scale_x_continuous(minor_breaks = seq(0, 10, 1),
@@ -1609,3 +1658,48 @@ GroupedDistPlot <- function(variable = NULL,
   
 }
 
+GroupedTable <- function(header = NULL,
+                         color_palette = c("grey", "white")) {
+  
+  relabeller <- function(lbl){
+    
+    out_lbl <- 
+      case_when(
+        lbl == "female" ~ "Female",
+        lbl == "1130_clean" ~ "Migration Attitude [-3,3]",
+        lbl == "mip_mig" ~ "MIP: Migration", 
+        lbl == "afd" ~ "Share of AfD voters"
+      )
+    
+    return(out_lbl)
+    
+  }
+  
+  gles_p_long <- 
+    fread(here('data/raw/gles/Panel/long_cleaned.csv')) %>% 
+    select(gender_clean, `1130_clean`,  mip_mig, `190b_clean`, treat, wave) %>% 
+    filter(!is.na(treat), !is.na(mip_mig), wave == 1) %>% 
+    mutate(
+      afd = as.numeric(`190b_clean` == "AfD"),
+      female = as.numeric(gender_clean == 2),
+      mip_mig = as.numeric(mip_mig)
+    ) %>% 
+    select(-`190b_clean`, -gender_clean, -wave)
+  
+  datasummary_balance(
+    ~treat, 
+    gles_p_long, 
+    title = header,
+    stars = T,
+    fmt = 2,
+    output = "gt"
+  ) %>% 
+    tab_spanner(label = 'Bild Reader', columns = 2:5) %>% 
+    text_transform(locations = cells_body(columns = 1), relabeller) %>% 
+    tab_style(style = cell_fill(color = color_palette[1]),
+              locations = cells_body(columns = 6)) %>% 
+    tab_style(style = cell_text(color = color_palette[2]),
+              locations = cells_body(columns = 6)) %>% 
+    as_raw_html()
+  
+}

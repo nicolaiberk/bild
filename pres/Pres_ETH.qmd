@@ -1,0 +1,773 @@
+---
+title: "<font size=12>Do Framing Effects Persist Beyond the Lab?</font>"
+subtitle: "Job Market Presentation | <font color='#801414'> Public Policy Group & Immigration Policy Lab </font> | ETH Zürich"
+author: "Nicolai Berk"
+date: "2023-03-14"
+date-format: "DD.MM.YYYY"
+format: 
+  revealjs:
+    theme: [simple, custom.scss]
+    embed-resources: true
+editor: visual
+bibliography: "C:/Users/nicol/Dropbox/Studium/BibTex/PhD.bib"
+---
+
+## News Framing
+
+```{r setup}
+
+knitr::opts_chunk$set(echo = F, cache = T, warning = F, fig.align='center', out.width="100%")
+
+# packages
+library(tidyverse)
+library(here)
+library(patchwork)
+library(fontawesome)
+
+# load self-made functions
+for (filename in list.files(here("code/functions"))){
+  source(here(paste0('code/functions/', filename)))
+}
+
+# define theme params
+
+ipl_red <- "#801414"
+ipl_gray <- "#5B5B66"
+ipl_bg <- '#f0f0f0'
+
+theme_ipl <-
+  theme_minimal() +
+  theme(panel.background = element_rect(fill = ipl_bg, colour = ipl_bg),
+        plot.background = element_rect(fill = ipl_bg, colour = ipl_bg),
+        legend.key = element_rect(fill = ipl_bg))
+
+```
+
+
+![](vis/foxbanner.png){.absolute width="500" top="250" left="0"}
+
+![](vis/cnnborder.png){.absolute width="500" top="250" right="0"}
+
+## Evidence on Framing {#lit}
+
+<br>
+
+::: incremental
+<!-- -   Media effects literature mostly concerned with changes in exposure or general "slant".\ -->
+<!-- <font size="5"> [@Ash2020covid; @Foos2020; @Gentzkow2010]</font> -->
+-   Evidence almost [exclusively from survey experiments]{style="background-color: #801414; color: #f0f0f0;"}.
+-   Unclear how these generalize.\
+<font size="5"> [@Barabas2010; @Hainmueller2015] </font>
+-   Real world is messy:
+    -   **selective exposure** <font size="5"> [@Druckman2012] </font>
+    -   **weak persistence over time** <font size="5"> [@Lecheler2011] </font>
+    -   **crowding out** <font size="5"> [@Chong2013] </font>
+    -   **attitude crystallization** <font size="5"> [@Bechtel2015] </font>
+
+:::
+
+---
+
+<br><br><br><br>
+
+### Do Framing Effects Generalize?
+
+---
+
+### Editorial Change at Germany's Largest Tabloid {.smaller}
+
+<br>
+
+::: incremental
+
+-   Feb 2017: *Bild* chief editor leaves over allegations of sexual misconduct.
+-   New editor: "we must talk about criminal migrants".
+-   Most likely case:
+    - Largest German outlet.\
+    <font size="6" color="#801414">1.7M print sales and 18.5M web impressions per day.</font>
+    - Seen as highly influential on public opinion.
+    - Very strong frame (crime) & large change.
+
+:::
+
+# Treatment
+
+## Measuring Crime Framing {#mediadata}
+
+<br>
+
+- Web-scrape 2.5M news articles.
+- Train two classifiers (crime/migration):
+  + Draw two [stratified samples](#imbalance) of 1800 articles.
+  + Annotate 2x1800 articles using [app interface](#app).
+  + Fine-tune [BERT](#bert) transformer models.
+
+::: aside
+[Examples](#example)
+:::
+
+
+## Performance
+
+<br>
+
+::: columns
+::: {.column width="50%"}
+::: {.callout-note icon="false"}
+## Migration classifier
+
+-   Accuracy: 0.96
+-   **F1: 0.94**
+-   Recall: 0.93
+-   Precision: 0.95
+
+**3.6%** of articles about migration.
+:::
+:::
+
+::: {.column width="50%"}
+::: {.callout-note icon="false"}
+## Crime classifier
+
+-   Accuracy: 0.93
+-   **F1: 0.86**
+-   Recall: 0.92
+-   Precision: 0.8
+
+**7%** of migration content about crime.
+:::
+:::
+:::
+
+## Bild's Migration Coverage
+
+<br>
+
+```{r trendplot}
+
+TreatmentTrendPlot(size = 2, dpa_corrected = F, palette = c(ipl_red, ipl_gray), ) +
+  theme_ipl
+
+```
+
+# Effect
+
+## Estimation: Difference-in-Differences {#estimation}
+
+::: columns
+::: {.column width="30%"}
+```{r didtheory}
+
+data.frame(
+  X = factor(c("pre", "pre", "post", "post", "pre", "post"),
+             levels = c("pre", "post")),
+  Y = c(1.1, 1.3, 1.5, 1.9, 1.3, 1.7),
+  universe = factor(c(rep("counterfactual", 4), rep("factual", 2)),
+                    levels = c("counterfactual", "factual")),
+  group = factor(c("untreated", "treated", "untreated", 
+                   "treated", "untreated", "untreated"),
+                 levels = c("treated", "untreated"))
+) %>% 
+  ggplot(aes(x = X, y = Y, 
+             lty = universe, col = group,
+             group = paste0(universe, group))) +
+  geom_line(size = 2) + 
+  geom_point(size = 6) +
+  ylab("") + xlab("") +
+  theme(axis.text.y = element_blank(), 
+        legend.position = "None") +
+  theme_void() +
+  theme(panel.background = element_rect(fill = ipl_bg, colour = ipl_bg),
+        plot.background = element_rect(fill = ipl_bg, colour = ipl_bg),
+        legend.position = "None") +
+  scale_color_manual(values = c(ipl_red, ipl_gray))
+```
+:::
+
+::: {.column width="70%"}
+<br>
+
+<font size="6" color="#801414"> $y_{w,i} = \alpha + \beta * D_{w,i}+ \phi_w + \rho_i + \epsilon_{w,i}$ </font>
+:::
+:::
+
+-   Attitudinal data from [GLES Panel](#gles). \
+<font size="6">(ca. 15,000 respondents in 15 waves)</font>
+-   Treated: *Bild* readers in pre-treatment wave.
+-   Control: *never*-Bild-readers.
+-   ATE = $\Delta$ attitude Bild readers - $\Delta$ control group.
+-   Parallel Trends: [pre](#sec-trends-pre), [post](#sec-trends-post)
+
+
+# Results
+
+## Effect on Main Dependent Variables {#mainresults}
+
+
+<br>
+
+```{r didest, fig.width=8, fig.height=3}
+
+DiDPlot(col = ipl_red, multi = T, scaled = T) +
+  theme_ipl
+
+```
+
+::: aside
+Dashed lines represent lower bound of experimental estimates, dotted lines indicate Smallest Effect Size of Interest [@Lakens2017].  [More...](#sesoi)
+:::
+
+## Null Effect Explanation {#ipl}
+
+<br>
+
+- Sample Size: >100k observations, >15k individuals.
+- Measurement:
+  + Independent: [LDA](#lda) confirms increase in attention to crime in Bild.
+  + Dependent: Multiple outcomes, different survey, same result.
+- Spillover: possible, yet attitudes more liberal.
+
+:::aside
+See @alrababa2022
+:::
+
+
+## Theoretical Explanations {#why}
+
+<br>
+
+::: {.callout-important icon="false"}
+## ❌ [Selective Exposure](#sec-explain1)
+:::
+
+::: {.callout-important icon="false"}
+## ❌ [Crowding out](#sec-explain3)
+:::
+
+::: {.callout-important icon="false"}
+## ❌ [Over-time effects](#sec-explain2)
+:::
+
+. . .
+
+::: {.callout-warning icon="false"}
+## ❓[Attitude Crystallisation](#sec-explain4)
+
+Far less Attitudinal Change 2016-18 than 2014-16
+
+:::
+
+## Contributions
+
+<br>
+
+. . .
+
+::: callout-important
+## No Framing Effects in Most-Likely Case
+
+***If*** any Effects, only During Brief **Windows of Opportunity**
+
+:::
+
+
+
+
+<!-- . . . -->
+
+<!-- ::: callout-tip -->
+<!-- ## Conditions of Media Effects: Politicization -->
+<!-- ::: -->
+
+
+. . .
+
+::: callout-tip
+## Conditions of Media Effects: Politicization <font size="5">[@Spirig2020]</font>
+
+:::
+
+. . .
+
+::: callout-tip
+## Migration Attitudes: Stability and Change <font size="5">[@Kustov2021]</font>
+:::
+
+. . .
+
+::: callout-tip
+## Measurement of Framing with Supervised Machine Learning
+:::
+
+# Thank you
+
+
+## Research Agenda {.smaller visibility="uncounted"}
+
+
+:::: columns
+::: {.column width="75%"}
+
+
+::: {.callout-ipl icon="false"}
+## Media and Migration
+
+- [<font color="black">Does Migration Coverage Always Benefit the Radical Right?</font>](https://raw.githubusercontent.com/nicolaiberk/FrameCompetition/main/pres/Presentation.pdf)
+- The Effect of Radical Right Violence on Media Coverage about Migration \
+(with W. Krause)
+<!-- - [Does Framing Affect Voting Behaviour?](https://nicolai-berk.shinyapps.io/wzb-221214/#/title-slide) -->
+<!-- - [<font color="black">How Elite Behaviour affects Individual Vaccination Decisions</font>](https://raw.githubusercontent.com/nicolaiberk/PartyVac/main/pres/Presentation.pdf) -->
+
+:::
+
+::: {.callout icon="false"}
+## NLP & ML
+
+- [<font color="black">Measuring Party Accommodation with Supervised Machine Learning</font>](https://raw.githubusercontent.com/nicolaiberk/bild/main/paper/Manuscript_Framing.pdf)
+- Bias and Imbalance in Content Classification
+<!-- - [Measuring Media Bias with Cross-Domain Deep Learning (with T. Arend)](https://raw.githubusercontent.com/nicolaiberk/nlpdl_project/main/reports/final-report-latex/final-report.pdf) -->
+
+:::
+
+
+::: {.callout-ipl icon="false"}
+## Potential IPL Projects
+
+- Does Media Coverage about Migrants affect Integration Outcomes?
+- Efficient Maintenance of Classification Pipelines w. Drift Detection & Active Learning
+- Government Communication about Planned Refugee Homes & Local Acceptance?
+- Do Local Anti-Immigration Movements Depress Immigration at an Economic Cost?
+
+:::
+:::
+
+::: {.column width="25%"}
+
+
+::: {.right}
+
+<br>
+<br>
+<br>
+
+#### Contact
+
+[`r fa("laptop")`](nicolaiberk.com) \| [`r fa("envelope")`](mailto:nicolai.berk@gmail) \| [`r fa("github")`](https://github.com/nicolaiberk) \| [`r fa("twitter")`](twitter.com/nicolaiberk)
+
+:::
+
+::: {.absolute bottom=-10 right=-30 width=250}
+
+```{r, fig.height=5, fig.width=5, fig.align="right"}
+plot(qrcode::qr_code("nicolaiberk.com"), col = c(ipl_bg, ipl_red))
+```
+
+:::
+:::
+::::
+
+
+# Resources {visibility="uncounted"}
+
+::: {#refs}
+:::
+
+# Appendix {visibility="uncounted"}
+
+
+## Why [BERT](https://huggingface.co/docs/transformers/model_doc/bert) {#bert visibility="uncounted"}
+
+<br>
+
+
+- Pre-trained on large language corpus. <font size="5">([Details](https://www.deepset.ai/german-bert))</font> \
+<font color='#801414'>➡ less training data, better performance.</font>
+- Uses **contextual** embeddings. \
+<font color='#801414'>➡ "fish & **chips**" vs "poker **chips**".</font>
+- Outperforms humans on [SQuAD](https://rajpurkar.github.io/SQuAD-explorer/).
+- SOTA in text classification.
+
+<br>
+
+[BACK](#mediadata)
+
+
+![](vis/bertarch.png){.absolute width=400 bottom=0 right=0}
+
+
+## Dealing with Imbalance {#imbalance visibility="uncounted"}
+
+::: columns
+::: {.column width="70%"}
+
+::: callout-important
+## Imbalance: Little Information in Random Samples
+:::
+
+::: callout-tip
+## Informed Approach
+
+- Generate dictionary related to outcome class.
+- Extend using word embeddings to minimize bias.
+- Count occurences in data.
+- Draw stratified sample for subsequent training.
+
+**Ensures overweighting of minority class.**
+
+:::
+:::
+
+::: {.column width="30%"}
+
+<br>
+
+
+```{r, fig.height=4, fig.width=3}
+
+counts <- 
+  round(rbeta(1000, 0.2, 0.5)* 10, 0) %>%
+  as_tibble() %>% 
+  mutate(sample_id = cut(value, 
+                         c(-Inf, 0.5, 2.5, Inf), 
+                         c(1, 2, 3)),
+         id = 1:n())
+
+counts$sample_T <- rbinom(nrow(counts), 1, 0.05*(counts$value+1))
+
+counts %>% 
+  ggplot(aes(x = value)) +
+  geom_histogram(aes(fill = as.character(sample_T)), bins=3) +
+  theme_ipl +
+  scale_fill_manual(values = c(ipl_gray, ipl_red),
+                    labels = c("not sampled", "sampled")) +
+  theme(legend.title = element_blank(),
+        legend.position = "bottom") +
+  xlab("# of dict terms in text") + ylab("Observations")
+
+
+```
+
+:::
+:::
+
+[BACK](#mediadata)
+
+## Effective Annotation using App {#app visibility="uncounted"}
+
+```{r, fig.cap="Screenshot of Annotation App", out.width = "\\textwidth"}
+
+knitr::include_graphics("vis/HandCodingScreenshot.png")
+
+```
+
+[BACK](#mediadata)
+
+## Five most Representative Articles {.smaller visibility="uncounted" #example}
+
+<br>
+
+```{r crimeExamples, results="asis"}
+
+TenMostCrime()
+
+```
+
+<br>
+
+[BACK](#mediadata)
+
+## Prevalence DPA {visibility="uncounted"}
+
+```{r dpa}
+
+data.table::fread(here("data/raw/newspapers/_bild_articles.csv"), 
+                  encoding = "UTF-8") %>% 
+  mutate(
+    dpa = str_detect(text, "(dpa)")
+  ) %>% 
+  mutate(month = lubridate::floor_date(date, "month")) %>% 
+  mutate(
+    dpa = ifelse(dpa, "DPA", "Original")
+  ) %>%
+  ggplot(aes(x = month, fill = dpa)) +
+  geom_bar() +
+  theme_minimal() +
+  ggtitle("Monthly number of articles, Bild online", "By origin, 2013-2019") + 
+  xlab("") + ylab("N") +
+  scale_fill_manual(name = "Source",
+                    values = c(ipl_red, ipl_gray)) +
+  theme_ipl
+
+```
+
+
+
+
+## Attention to Immigration {.smaller visibility="uncounted"}
+
+::: {.panel-tabset}
+
+## incl. DPA
+
+```{r migSalience}
+
+MigSaliencePlot(papers = c("Bild"), 
+                dpa_corrected = F) +
+  geom_vline(xintercept = as.Date("2017-02-01"), col = "red", lty = 2) +
+  theme_ipl
+
+```
+
+## excl. DPA
+
+```{r migSalienceNODPA}
+
+MigSaliencePlot(papers = c("Bild"), 
+                dpa_corrected = T) +
+  geom_vline(xintercept = as.Date("2017-02-01"), col = "red", lty = 2) +
+  theme_ipl
+
+```
+
+:::
+
+
+
+## Treatment excl. DPA content {.smaller visibility="uncounted"}
+
+::: {.panel-tabset}
+
+## incl. DPA
+
+```{r treatment}
+
+TreatmentTrendPlot(dpa_corrected = F, palette = c(ipl_red, ipl_gray)) +
+  theme_ipl + 
+  TreatmentDiDPlot(dpa_corrected = F, palette = c(ipl_red, ipl_gray)) +
+  theme_ipl +
+  theme(legend.position = "None")
+
+```
+
+## excl. DPA
+
+```{r treatmentNODPA}
+
+TreatmentTrendPlot(dpa_corrected = T, palette = c(ipl_red, ipl_gray)) +
+  theme_ipl + 
+  TreatmentDiDPlot(dpa_corrected = T, palette = c(ipl_red, ipl_gray)) +
+  theme_ipl +
+  theme(legend.position = "None")
+
+```
+
+:::
+
+## Alternative Measurement: LDA {visibility="uncounted" #lda}
+
+![](vis/topicChanges.png)
+
+::: aside
+[BACK](#ipl)
+:::
+
+## Dependent Variables {#gles visibility="uncounted"}
+
+### German Longitudinal Election Study (GLES) Panel <font size="5"> [@GLES2017Panel]</font>
+
+<!-- ::: columns -->
+<!-- ::: {.column width="60%"} -->
+
+-   [Immigration Attitudes](#secdv1)
+-   [Integration Attitudes](#secdv1)
+-   [Crime Attitudes](#secdv2)
+-   [Support for RR](#secdv2)
+-   [Most Important Problem](#secdv2)
+
+[BACK](#estimation)
+
+<!-- ::: -->
+
+<!-- ::: {.column width="40%"} -->
+
+![](vis/gles.png){.absolute height=500 bottom=0 right=0}
+
+<!-- ::: -->
+<!-- ::: -->
+
+
+## Dependent Variables: Immigration {#secdv1 visibility="uncounted"}
+
+::: columns
+::: {.column width="50%"}
+::: {.callout-note icon="false"}
+## Immigration Attitudes
+
+-   **Opportunities for immigration** of foreigners should be
+    -   extended (-3) or
+    -   restricted (3).
+-   Asked in **13** waves (1 pre).
+:::
+:::
+
+::: {.column width="50%"}
+::: {.callout-note icon="false"}
+## Integration Attitudes
+
+-   Foreigners should...
+    -   completely **adapt to German culture** (-3) or
+    -   be able to live according to their own culture (3).
+-   Asked in **4** waves (1 pre)
+:::
+:::
+:::
+
+[BACK](#gles)
+
+## Dependent Variables: Other {#secdv2 visibility="uncounted"}
+
+::: columns
+::: {.column width="50%"}
+::: {.callout-note icon="false"}
+## Support for radical-right AfD
+
+-   Attitude towards **AfD**
+    -   strongly dislike (-5) to
+    -   strongly like (5).
+-   Asked in **14** waves (1 pre)
+:::
+
+::: {.callout-note icon="false"}
+## MIP: Migration
+
+-   Binary indicator, 1 if most important problem is migration.
+:::
+:::
+
+::: {.column width="50%"}
+::: {.callout-note icon="false"}
+## Attitude towards crime policy
+
+-   "state should get **more competences in fighting crime**, even if this means more surveillance"
+    -   strongly disagree (1) to
+    -   strongly agree (5).
+-   Asked in **4** waves (1 pre)
+:::
+:::
+:::
+
+[BACK](#gles)
+
+## Parallel Trends: Pre {#sec-trends-pre visibility="uncounted"}
+
+```{r pretrend, warning = F}
+ParallelTrendsPlot(color_palette = c(ipl_gray, ipl_red), multiplot = F) +
+  theme_ipl
+```
+
+[BACK](#estimation)
+
+::: aside
+Data from GLES Longterm Panel [@GLES2018LangfristPanel]
+:::
+
+## Parallel Trends: Post {#sec-trends-post visibility="uncounted"}
+
+```{r posttrend}
+DescPlot(legend_position = "bottom", colorful = T, col_palette = c(ipl_red, ipl_gray)) +
+  theme_ipl
+```
+
+[BACK](#estimation)
+
+
+## Group Differences {.smaller visibility="uncounted"}
+
+<br>
+
+```{r bildtable}
+
+GroupedTable(color_palette = c(ipl_red, ipl_bg))
+
+```
+
+
+## Expected Effect Size {#sesoi visibility="uncounted"}
+
+<br>
+
+-   most results in framing literature between 10% and 25% of range, up to \>40%.
+-   **expected effect** to meet experimental studies at 10% of range = **0.6** on 7-point Likert or **0.34 SD**.
+-   **Smallest Effect Size Of Interest** [SESOI, @Lakens2017] of 2.5% of range = **0.15** or **0.08 SD**.
+
+::: aside
+Share of scale reported due to often unreported standard deviations.
+:::
+
+[BACK](#mainresults)
+
+## Association of Migration with Crime {#assoc visibility="uncounted"}
+
+<br>
+
+```{r assoc, fig.height=3.5, fig.width=8, fig.cap="Bootstrapped Correlation of Crime and Migration Attitude, per wave."}
+
+MigCrimeCorPlotBS(cols = c(ipl_gray, ipl_red)) +
+  theme_ipl
+
+```
+
+
+## Selective Exposure {#sec-explain1 visibility="uncounted"}
+
+<br>
+
+```{r outselect, fig.height=3.5, fig.width=8, fig.cap="Share of Bild readers indicating to have consumed Bild, by wave."}
+OutSelection(color_palette = MetBrewer::met.brewer("NewKingdom", 3)[c(2, 3, 1)]) +
+  theme_ipl
+```
+
+[BACK](#why)
+
+## Over-time effects {#sec-explain2 visibility="uncounted"}
+
+<br>
+
+```{r overtime, fig.height=3.5, fig.width=8, fig.cap="Treatment Effect, by wave."}
+DiDByWavePlot() +
+  theme_ipl
+```
+
+[BACK](#why)
+
+## Crowding Out {#sec-explain3 visibility="uncounted"}
+
+<br>
+
+```{r crowdout, fig.height=3.5, fig.width=8, fig.cap="Effect Conditional on Consumption of Other News Sources."}
+CrowdOutEstimates(vis = T, col_scale = c(ipl_red, ipl_gray)) +
+  theme_ipl +
+  theme(legend.position = "none")
+
+```
+
+[BACK](#why)
+
+## Attitude Crystallisation {#sec-explain4 visibility="uncounted"}
+
+<br>
+
+```{r migchange, warning=FALSE, fig.height=3, fig.width=6, fig.cap="Average Change in Immigration Attitude, by period"}
+MigChangePlot(line_plot = T, 
+              color_palette = c(ipl_red, ipl_gray), 
+              distances = c(2)) +
+  theme_ipl +
+  theme(
+    strip.background = element_blank(),
+    strip.text.x = element_blank(),
+    text = element_text(family = "serif"),
+    legend.position = "None"
+  )
+```
+
+[BACK](#why)

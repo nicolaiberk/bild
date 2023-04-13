@@ -1,0 +1,29 @@
+/*-- scss:defaults --*/
+
+// fonts
+$body-bg: #f0f0f0;
+$link-color: #801414;
+
+/*-- scss:rules --*/
+
+.reveal .slide blockquote {
+  border-left: 3px solid $text-muted;
+  padding-left: 0.5em;
+}
+
+mark {
+  background-color: #801414;
+  color: #f0f0f0;
+}
+
+.right {
+  text-align: right;
+}
+
+div.callout-ipl.callout {
+  border-left-color: $link-color;
+}
+
+div.callout-ipl.callout-style-default>.callout-header {
+  background-color: $link-color;
+}

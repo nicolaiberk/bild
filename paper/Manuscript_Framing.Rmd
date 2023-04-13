@@ -193,7 +193,7 @@ postdate <- as.Date("2017-02-01")
 title <- "Mean migration attitude post-Reichelt takeover"
 
 gles_p_long["dv"] <- gles_p_long["1130_clean"]
-    
+
 single_model <- 
   fixest::feglm(dv ~ post*treat | lfdn + wave_ctrl, 
                 data = 

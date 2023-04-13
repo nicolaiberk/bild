@@ -1,0 +1,95 @@
+# script job talk eth
+
+## Title Slide
+
+Thank you very much for the invitation to lovely Zurich, I am grateful to present my job market paper here today. This project started around a year and a half ago and is currently under review at political communication. It is concerned with the limits of media effects - that is *which* precise media content is *when* persuasive.
+
+## News Framing
+
+The field of political communication suggests that one of the major means of persuasion in media content is framing, specifically *emphasis* framing. For example, when consulting right-wing fox news on the issue of migration, we will mostly find content emphasising negative considerations like crime and costs that immigrants might cause. Turning to liberal, left leaning outlets like CNN, we will find more articles emphasising humanitarian concerns and labour market needs.
+
+## Evidence on Framing Effects
+
+The effectiveness of this communication has been documented in countless experimental studies. However, observational evidence is scarce, as the treatment in media effects studies is usually a broad change in news slant or exposure to entirely different outlets. To address this gap, this paper asks how well framing experiments generalize.
+
+This is not a given: existing research shows that the generalizability of survey and lab experiments varies.
+
+Especially surrounding framing, there are several concerns:
+- demand for specific news content leads individuals to expose themselves to attitudinally congruent content, thereby avoiding persuasion
+
+- framing effects might quickly dissipate over time...
+
+- especially when individuals are exposed to different frames over time, the effects of a single frame migth be crowded out
+
+- lastly, the campaigning literature has shown that, once individuals formed an attitude on an issue, they are unlikely to respond to attempts of persuasion - this process is often referred to as crystallisation
+
+# Does Framing work 'in the Wild'?
+
+Hence this paper asks "does framing work 'in the wild'"?
+
+## Editorial change at Germany's largest tabloid
+
+- the case I exploit to address this question revolves around this man, Julian Reichelt
+
+- in 2016, Reichelt was an aspiring editor at Bild - germany's largest tabloid - when his Boss, Kai Diekmann, stumbles over allegations of sexual harrassment (something he would stumble himself over a little later)
+
+- Reichelt, who advocates for more tolerance towards anti-immigration stances, takes over
+
+- as I will show in a bit, Bild increasingly framed migrants as criminals in the months following his takeover
+
+
+# Measurement & Estimation
+
+I will now discuss the measurement of crime framing and the estimation of the impact of this shift on attitudes
+
+## Media Data
+
+In order to show how the emphasis of crime in migration coverage changed, I web-scraped 2.5 million news articles from the web pages of the major German dailies. These articles are then classified into migration and crime content using BERT transformer models. This enables me to estimate the prevalence of crime content in migration coverage over time.
+
+## Classification
+
+Let me say a few things about the classification proccess: In order to deal with the rare nature of migration and crime content, I generate a dictionary for each concept, extending it to represent the topic well and count the prevalence of these terms in teh texts. Based on this prevalence, I draw a stratified sample (100 articles per newspaper per stratum), oversampling cases with more dictionary terms (and thus a higher probability to belong to the outcome class of interest).
+
+This sample of 1800 articles is annotated by coders using a shiny app, which increases accuracy and speed of the process
+
+These annotations are then used to fine-tune a BERT transformer model which was previously trained on a large corpus of german-language texts.
+
+## Performance
+
+Both models perform outstanding, with high to near-perfect precision and recall.
+
+## A sharp, identifiable change in migration framing
+
+Using this approach, I can measure the share of migration coverage concerned with crime. This graph shows the share of crime content in migration coverage for Bild (indicated by the red line) and all other newspapers (gray, dashed line). As one can see, the emphasis of crime in Bild's migration coverage steeply increases shortly after Reichelts takover (dahed vertical line). This is a substantial increase of 5 to 6 percentage points or over 40% of the pre-treatment level, and even more so compared to the virtually unchanged coverage in other newspapers.
+
+## Estimation
+
+After establishing the precise nature of the treatment, I am interested in estimating the impact of this increase in crime framign on migration attitudes and related variables. I do so with a simple 2 by 2 difference-in-differences design, defining Bild-readers in the pre-treatment wave as treated and never-Bild-readers as control group (results are not sensitive to the inclusion of later-readers). You can see the formula for the two-way fixed-effects specification here.
+	To measure exposure and dependent variables I draw on a large panel dataset by the German longitudinal eleciton study, which interviewed around 15,000 individuals in 15 waves. It contains data on migration, crime, and integration attitudes, problem salience, as well as voting intentions.
+		In potential outcomes lingo, the metric of interest is the difference between the change in the treated group and control group, under the assumption that these groups would display parallel trends in absence of treatment. Although this assumption is - in the absence of counterfactual observations - untestable, pre- and post-trends suggest that it isn't a strong assumption.
+
+# Results
+
+## Effect on Main Dependent Variables
+
+What do I find? For all outcomes of interest (Migration and Integration attitudes, perception of migration as the most important problem, and radical right voting), I estimate a precise null effect. The dashed lines indicate a conservative estimate of reproted experimental effects at around 0.35 SDs. The dotted lines indicate the smallest effect size of interest, corresponding to 0.08 SDs or a 0.15 change on the 7-point Likert scale. The increase in crime framing did not affect migration attitudes.
+
+## Why?
+
+The remainder of the paper discusses explanations for the absence of this effect. I find no support for demand effects, as Bild readers with initially liberal immigration attitudes continue reading the paper at similar levels as conservative BIld readers. There is no evidence that exclusive consumers of Bild are more reactive, nor do i find substantial long-term effects. However, I find suggestive evidence for attitude crystallization: the average change in attitudes in 2014-2016 - in this period fell the Syrian Refugee Protection Crisis - was around half a point larger than in the period 2016-2018.
+
+## Implications
+
+What are the take-aways from these findings?
+
+First, the findings suggest a model of persuasion with critical opportunity windows during the politicisation of attitudes. This would reconcile findings of attitude stability with media effects research.
+
+Second, and related, this allows moving towards a conditional view on media effects, adding the dimension of politicization to the existing body of work.
+
+Lastly, the paper showcases how emphasis framing can be measured with supervised machine learning in a two-step process, moving beyond the widespread and widely criticised application of unsupervised methods to measure framing.
+
+# Thank you
+
+This was it from my side, I hope you enjoyed the talk and I look forward to your questions!
+
+# Research Agenda

@@ -157,7 +157,7 @@ resps %>%
 
 ]
 
-.footnote[(Very liberal after Sniderman and Theriault 2004)]
+.footnote[(Very freely after Sniderman and Theriault 2004)]
 
 ---
 
@@ -187,15 +187,6 @@ resps %>%
 <br>
 
 ## No observational studies assessing causal effect of framing!
-
----
-
-## What is necessary for the study of framing effects?
-
-<br>
-
-# 1. Precisely identifiable, sharp change of frames in communication.
-# 2. Good measure of frames in mind.
 
 
 ---
@@ -257,7 +248,7 @@ knitr::include_graphics("https://upload.wikimedia.org/wikipedia/commons/thumb/e/
 ### Interesting because:
 
 - **Clearly identifiable short-term-change** in migration coverage.
-- Clear expectations regarding impact.
+- Clear expectations regarding impact (more conservative migration attitudes).
 - Change not debated in the media $\rightarrow$__No co-treatment__! <font size="5" color="#004A95"> `r Citep(myBib["Spirig2020"])`</font>.
 
 ]
@@ -265,32 +256,32 @@ knitr::include_graphics("https://upload.wikimedia.org/wikipedia/commons/thumb/e/
 
 ---
 
-class: inverse, center, middle
+<!-- class: inverse, center, middle -->
 
-# How does this affect migration attitudes?
+<!-- # How does this affect migration attitudes? -->
 
----
-
-
-## Theoretical Expectations
+<!-- --- -->
 
 
-.pull-left[
-
-![](vis/CognitiveStorage.png)
-
-]
+<!-- ## Theoretical Expectations -->
 
 
-.pull-right[
+<!-- .pull-left[ -->
 
-### Increased exposure to crime frames will lead to...
-- H1: **more conservative** attitudes towards migration.
-- H2: **stronger association** of crime and migration attitudes.
+<!-- ![](vis/CognitiveStorage.png) -->
 
-]
+<!-- ] -->
 
----
+
+<!-- .pull-right[ -->
+
+<!-- ### Increased exposure to crime frames will lead to... -->
+<!-- - H1: **more conservative** attitudes towards migration. -->
+<!-- - H2: **stronger association** of crime and migration attitudes. -->
+
+<!-- ] -->
+
+<!-- --- -->
 
 class: inverse, center, middle
 
@@ -307,7 +298,8 @@ class: inverse, center, middle
     + Annotate 1800 articles.
     + Supervised deep-learning model (BERT) to **identify migration content**.
   2. **Select crime frames**.
-    + Same, but subset of articles about migration content.
+    + Same procedure.
+    + Estimation of crime content **within** migration content.
 
 
 
@@ -317,11 +309,11 @@ class: inverse, center, middle
 
 ```{r trendplot, cache = F}
 
-TreatmentTrendPlot(size = 2, 
-                   dpa_corrected = T) +
+TreatmentTrendPlot(size = 2, dpa_corrected = F, palette = c("red", "#004A95")) +
   theme_xaringan()
 
 ```
+
 
 
 
@@ -329,60 +321,15 @@ TreatmentTrendPlot(size = 2,
 
 ## Frames in Mind
 
-German Longitudinal Election Study (GLES) Panel <font size="5" color="#004A95"> `r Citep(myBib["GLES2017Panel"])`</font>.
+### German Longitudinal Election Study (GLES) Panel <font size="5" color="#004A95"> `r Citep(myBib["GLES2017Panel"])`</font>.
 
-.pull-left[
+**Questions on:**
 
-
-### Immigration Attitudes
-- **Opportunities for immigration** of foreigners should be 
-  + extended (-3) or
-  + restricted (3).
-- Asked in **13** waves (1 pre).
-
-]
-
-.pull-right[
-
-
-
-### Integration Attitudes
-- Foreigners should...
-  + completely **adapt to German culture** (-3) or
-  + be able to live according to their own culture (3).
-- Asked in **4** waves (1 pre)
-
-]
-
----
-
-## Frames in Mind (continued)
-
-.pull-left[
-
-### Support for radical-right AfD
-- Attitude towards **AfD**
-  + strongly dislike (-5) to
-  + strongly like (5).
-- Asked in **14** waves (1 pre)
-
-### MIP: Migration
-- Binary indicator, 1 if most important problem is migration.
-
-]
-
-.pull-right[
-
-
-### Attitude towards crime policy
-- "state should get **more competences in fighting crime**, even if this means more surveillance"
-  + strongly disagree (1) to
-  + strongly agree (5).
-- Asked in **4** waves (1 pre)
-
-
-]
-
+- [Immigration Attitudes]()
+- [Integration Attitudes]()
+- [Crime Attitudes]()
+- [Support for RR]()
+- [Most Important Problem]()
 
 ---
 
@@ -643,5 +590,68 @@ PrintBibliography(myBib, start = 5, end = 8)
 PrintBibliography(myBib, start = 9)
 
 ```
+
+]
+
+---
+
+class: inverse, center, middle
+
+# Appendix
+
+---
+
+## Operationalization DV
+
+
+.pull-left[
+
+
+### Immigration Attitudes
+- **Opportunities for immigration** of foreigners should be 
+  + extended (-3) or
+  + restricted (3).
+- Asked in **13** waves (1 pre).
+
+]
+
+.pull-right[
+
+
+
+### Integration Attitudes
+- Foreigners should...
+  + completely **adapt to German culture** (-3) or
+  + be able to live according to their own culture (3).
+- Asked in **4** waves (1 pre)
+
+]
+
+---
+
+## Operationalization DV (continued)
+
+.pull-left[
+
+### Support for radical-right AfD
+- Attitude towards **AfD**
+  + strongly dislike (-5) to
+  + strongly like (5).
+- Asked in **14** waves (1 pre)
+
+### MIP: Migration
+- Binary indicator, 1 if most important problem is migration.
+
+]
+
+.pull-right[
+
+
+### Attitude towards crime policy
+- "state should get **more competences in fighting crime**, even if this means more surveillance"
+  + strongly disagree (1) to
+  + strongly agree (5).
+- Asked in **4** waves (1 pre)
+
 
 ]
