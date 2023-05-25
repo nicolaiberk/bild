@@ -145,7 +145,7 @@ theme_ipl <-
 
 ```{r trendplot}
 
-TreatmentTrendPlot(size = 2, dpa_corrected = F, palette = c(ipl_red, ipl_gray), ) +
+TreatmentTrendPlot(size = 2, dpa_corrected = F, palette = c(ipl_red, ipl_gray)) +
   theme_ipl
 
 ```
