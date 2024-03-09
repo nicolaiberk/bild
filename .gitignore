@@ -1,3 +1,9 @@
+library/
+local/
+cellar/
+lock/
+python/
+staging/
 .gitignore
 .Rproj.user
 .Rhistory
@@ -22,3 +28,5 @@ paper/Manuscript_Framing.log
 paper/Manuscript_Framing_jyb_comments.pdf
 paper/Manuscript_Framing_TM_comments.pdf
 library
+paper/resubmission
+pres/Pres_ETH.pdf
